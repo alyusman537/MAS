@@ -15,7 +15,7 @@ class Wilayah extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            'wilayah' => [
+            'kode' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '20',
             ],

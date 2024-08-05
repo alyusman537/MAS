@@ -26,7 +26,7 @@ class ModelAnggota extends Model
     public function allAnggota()
     {
         $db = $this->db->table('anggota');
-        $db->select('id, nia, nama, alamat, wa, wilayah, level, aktif');
+        $db->select('id, nia, nama, alamat, wa, wilayah, level, email, aktif');
         $db->where('aktif', '1');
         $db->orderBy('nama', 'ASC');
         $data = $db->get();
