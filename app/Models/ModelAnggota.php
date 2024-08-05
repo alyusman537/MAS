@@ -12,7 +12,7 @@ class ModelAnggota extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nia', 'nama', 'wa', 'alamat', 'wilayah', 'level', 'password', 'aktif'];
+    protected $allowedFields    = ['nia', 'nama', 'wa', 'alamat', 'wilayah', 'level', 'password', 'foto', 'email', 'aktif'];
 
     protected bool $allowEmptyInserts = false;
 
@@ -38,7 +38,7 @@ class ModelAnggota extends Model
     public function anggotaById($id)
     {
         $db = $this->db->table('anggota');
-        $db->select('id, nia, nama, alamat, wa, wilayah, level, aktif');
+        $db->select('id, nia, nama, alamat, wa, wilayah, level, foto, email, aktif');
         $db->where('id', $id);
         $data = $db->get();
 

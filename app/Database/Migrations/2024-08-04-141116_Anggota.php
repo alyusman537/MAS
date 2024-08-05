@@ -18,26 +18,33 @@ class Anggota extends Migration
             'nia' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '20',
+                'unique' => true,
             ],
             'nama' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '100',
             ],
-            'wa' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '15',
-            ],
             'alamat' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '300',
             ],
-            'nia' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '20',
-            ],
             'wilayah' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '20',
+            ],
+            'wa' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '15',
+            ],
+            'email' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '100',
+                'unique' => true,
+            ],
+            'foto' => [
+                'type' => 'VARCHAR',
+                'constraint' => '100',
+                'default' => null
             ],
             'level' => [
                 'type'       => 'ENUM',
@@ -49,8 +56,9 @@ class Anggota extends Migration
                 'constraint' => '100',
             ],
             'aktif' => [
-                'type' => 'BOOLEAN',
-                'default' => true,
+                'type' => 'ENUM',
+                'constraint' => ['baru', 'aktif', 'nonaktif'],
+                'default' => 'baru',
             ],
             'created_at' => [
                 'type' => 'DATETIME',
