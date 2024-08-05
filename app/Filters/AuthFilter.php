@@ -29,13 +29,37 @@ class AuthFilter implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        $key = getenv('TOKEN_SECRET');
+        $key = getenv('JWT_KEY');
         $header = $request->getServer('HTTP_AUTHORIZATION');
-        if(!$header) return Services::response()
-                            ->setJSON(['msg' => 'Token Required'])
-                            ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
-        $token = explode(' ', $header)[1];
+        // if(!$header) return Services::response()
+        //                     ->setJSON(['msg' => 'Token Required'])
+        //                     ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
+        // $token = explode(' ', $header)[1];
 
+        // try {
+        //     JWT::decode($token, new Key($key, 'HS256'));
+        // } catch (\Throwable $th) {
+        //     return Services::response()
+        //                     ->setJSON(['msg' => 'Invalid Token'])
+        //                     ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
+        // }
+
+        $token = null;
+  
+        // extract the token from the header
+        if(!empty($header)) {
+            if (preg_match('/Bearer\s(\S+)/', $header, $matches)) {
+                $token = $matches[1];
+            }
+        }
+  
+        if(is_null($token) || empty($token)) {
+            $response = service('response');
+            $response->setBody('Access denied');
+            $response->setStatusCode(401);
+            return $response;
+        }
+  
         try {
             JWT::decode($token, new Key($key, 'HS256'));
         } catch (\Throwable $th) {
