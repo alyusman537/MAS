@@ -208,7 +208,7 @@ class Infaq extends BaseController
     {
         helper(['form']);
         $rules = [
-            'kode'          => [
+            'kode_infaq'          => [
                 'rules' => 'required',
                 'errors' => [
                     'required' => '{field} tidak boleh kosong.',
@@ -229,7 +229,7 @@ class Infaq extends BaseController
         $mp = new ModelPembayaran();
         $json = $this->request->getJSON();
 
-        $infaq = $mi->select('*')->where('kode', $json->kode)->first();
+        $infaq = $mi->select('*')->where('kode', $json->kode_infaq)->first();
         if(!$infaq) return $this->fail('Kode Acara '.$json->kode.' belum dibuat.', 400);
         if($infaq['status'] == '0') return $this->fail('Acara '.$infaq['acara'].' sudah dinonaktifkan', 400);
         if($infaq['tanggal_acara'] > date('Y-m-d')) return $this->fail('Tanggal acara '.$infaq['acara'].' sudah terlewat', 400);
@@ -243,7 +243,8 @@ class Infaq extends BaseController
         foreach ($anggota as $key => $val) {
             $dorong = [
                 'tanggal' => $tanggal,
-                'kode_infaq' => $json->kode,
+                'nomor_pembayaran' => time().'-'.$val['nia'],
+                'kode_infaq' => $json->kode_infaq,
                 'nia' => $val['nia'],
             ];
             $iuran [] = $dorong;

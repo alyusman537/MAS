@@ -16,6 +16,10 @@ class Pembayaran extends Migration
             'tanggal' => [
                 'type'       => 'DATE',
             ],
+            'nomor_pembayaran' => [
+                'type' => 'VARCHAR',
+                'constraint' => '20',
+            ],
             'kode_infaq' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '20',
