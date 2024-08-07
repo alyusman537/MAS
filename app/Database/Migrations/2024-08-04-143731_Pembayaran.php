@@ -28,6 +28,10 @@ class Pembayaran extends Migration
                 'type'       => 'INTEGER',
                 'default' => 0,
             ],
+            'tanggal_bayar' => [
+                'type' => 'DATETIME',
+                'default' => null,
+            ],
             'bukti_bayar' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '100',

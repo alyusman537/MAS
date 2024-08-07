@@ -12,7 +12,7 @@ class ModelPembayaran extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['tanggal', 'kode_infaq', 'nia', 'bayar', 'bukti_bayar', 'validator', 'tanggal_validasi'];
+    protected $allowedFields    = ['tanggal', 'kode_infaq', 'nia', 'bayar', 'tanggal_bayar', 'bukti_bayar', 'validator', 'tanggal_validasi'];
 
     protected bool $allowEmptyInserts = false;
 

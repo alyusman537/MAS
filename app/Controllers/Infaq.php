@@ -8,6 +8,7 @@ use CodeIgniter\API\ResponseTrait;
 use App\Models\ModelAnggota;
 use App\Models\ModelWilayah;
 use App\Models\ModelInfaq;
+use App\Models\ModelPembayaran;
 
 use App\Libraries\JwtDecode;
 
@@ -225,6 +226,7 @@ class Infaq extends BaseController
         $mi = new ModelInfaq();
         $mw = new ModelWilayah();
         $ma = new ModelAnggota();
+        $mp = new ModelPembayaran();
         $json = $this->request->getJSON();
 
         $infaq = $mi->select('*')->where('kode', $json->kode)->first();
@@ -245,12 +247,8 @@ class Infaq extends BaseController
                 'nia' => $val['nia'],
             ];
             $iuran [] = $dorong;
+            $mp->ignore(true)->insert($dorong);
         }
-        try {
-            $mi->insertBatch($iuran);
-            return $this->respond('Kode infaq '.$json->kode.' berhasil digenerate ke wilayah '.$wilayah['keterangan']);
-        } catch (\Throwable $th) {
-            return $this->fail($th->getMessage(), $th->getCode());
-        }
+        return $this->respond('Kode infaq '.$json->kode.' berhasil digenerate ke wilayah '.$wilayah['keterangan']);
     }
 }
