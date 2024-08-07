@@ -20,9 +20,13 @@ class Infaq extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => '20',
             ],
-            'header' => [
+            'acara' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '100',
+            ],
+            
+            'tanggal_acara' => [
+                'type'       => 'DATE',
             ],
             'keterangan' => [
                 'type'       => 'VARCHAR',

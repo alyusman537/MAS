@@ -18,20 +18,20 @@ class Anggota extends BaseController
         // $pass = password_hash('saya', PASSWORD_DEFAULT);
         // return $this->respond(['pass' => $pass]);
         $exp = getenv('JWT_EXP');
-        $header = $this->request->getServer('HTTP_AUTHORIZATION');// header("Authorization");
+        $header = $this->request->getServer('HTTP_AUTHORIZATION'); // header("Authorization");
         $key = new JwtDecode();
         $decoded = $key->decoder($header);
         $tangal = date('Y-m-d H:i:s', $decoded[0]->exp);
         return $this->respond(['key' => $decoded, 'tang' => $tangal]);
     }
 
-    public function allAnggota()
+    public function all()
     {
         $ma = new ModelAnggota;
         return $this->respond($ma->allAnggota());
     }
 
-    public function anggotaById($id = null)
+    public function byId($id = null)
     {
         $ma = new ModelAnggota();
         $mw = new ModelWilayah();
@@ -44,7 +44,7 @@ class Anggota extends BaseController
         return $this->respond($data);
     }
 
-    public function newAnggota()
+    public function new()
     {
         $mw = new ModelWilayah();
         $wilayah = $mw->select('*')->where('aktif', '1')->findAll();
@@ -60,7 +60,8 @@ class Anggota extends BaseController
         ];
         return $this->respond($data);
     }
-    public function addAnggota()
+
+    public function add()
     {
         helper(['form']);
         $rules = [
@@ -70,6 +71,15 @@ class Anggota extends BaseController
                     'required' => '{field} tidak boleh kosong.',
                     'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
                     'max_length' => '{field} tidak boleh lebih dari 20 karakter.',
+                    'is_unique' => '{field} sudah terdaftar.'
+                ],
+            ],
+            'nama'          => [
+                'rules' => 'required|min_length[4]|max_length[100]',
+                'errors' => [
+                    'required' => '{field} tidak boleh kosong.',
+                    'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
+                    'max_length' => '{field} tidak boleh lebih dari 100 karakter.',
                     'is_unique' => '{field} sudah terdaftar.'
                 ],
             ],
@@ -99,9 +109,8 @@ class Anggota extends BaseController
             ]
         ];
 
-        if(!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
         $ma = new ModelAnggota();
-        $mw = new ModelWilayah();
         $json = $this->request->getJSON();
         $nia = $json->nia;
         $email = $json->email;
@@ -133,61 +142,151 @@ class Anggota extends BaseController
         }
     }
 
-    public function newRegisterAnggota()
+    public function edit($nia)
     {
+        $ma = new ModelAnggota();
         $mw = new ModelWilayah();
+        $anggota = $ma->select('*')->where('nia', $nia)->first();
+        if (!$anggota) return $this->fail('NIA ' . $nia . ' belum terdaftar.', 400);
         $wilayah = $mw->select('*')->where('aktif', '1')->findAll();
+        // $cekWilayah = $mw->select('*')->where('kode', $wilayah)->first();
         $data = [
             'anggota' => [
-                'nia' => null,
-                'nama' => null,
-                'alamat' => null,
-                'wa' => null,
-                'wilayah' => null
+                'nia' => $anggota['nia'],
+                'nama' => $anggota['nama'],
+                'alamat' => $anggota['alamat'],
+                'wa' => $anggota['wa'],
+                'wilayah' => $anggota['wilayah'],
+                'email' => $anggota['email'],
+                'level' => $anggota['user'],
+                'aktif' => $anggota['aktif'] == '1' ? true : false
+            ],
+            'ubah' => [
+                'nama' => $anggota['nama'],
+                'alamat' => $anggota['alamat'],
+                'wa' => $anggota['wa'],
+                'wilayah' => $anggota['wilayah'],
+                'email' => $anggota['email'],
+                'level' => $anggota['user'],
             ],
             'wilayah' => $wilayah
         ];
+
         return $this->respond($data);
     }
-    public function addRegisterAnggota()
+
+    public function udpate($nia)
     {
         helper(['form']);
         $rules = [
-            'nia'          => [
-                'rules' => 'required|min_length[4]|max_length[20]|is_unique[anggota.nia]',
+            'nama'          => [
+                'rules' => 'required|min_length[4]|max_length[100]',
                 'errors' => [
                     'required' => '{field} tidak boleh kosong.',
                     'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
-                    'max_length' => '{field} tidak boleh lebih dari 20 karakter.',
-                    'is_unique' => '{filed} sudah terpakai.'
+                    'max_length' => '{field} tidak boleh lebih dari 100 karakter.',
+                    'is_unique' => '{field} sudah terdaftar.'
                 ],
             ],
-            'email'         => 'required|min_length[4]|max_length[100]|valid_email|is_unique[anggota.email]',
-            'alamat'      => 'required|min_length[4]|max_length[300]',
-            'wilayah'  => 'matches[password]'
+            'email'         => [
+                'rules' => 'required|min_length[4]|max_length[100]|valid_email|is_unique[anggota.email]',
+                'errors' => [
+                    'required' => '{field} tidak boleh kosong',
+                    'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
+                    'max_length' => '{field} tidak boleh lebih dari 100 karakter.',
+                    'is_unique' => '{field} sudah terdaftar.',
+                    'valid_email' => '{field} yang anda masukkan tidak valid.'
+                ]
+            ],
+            'alamat'      => [
+                'rules' => 'required|min_length[4]|max_length[300]',
+                'errors' => [
+                    'required' => '{field} tidak boleh kosong',
+                    'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
+                    'max_length' => '{field} tidak boleh lebih dari 300 karakter.',
+                ]
+            ],
+            'wilayah'  => [
+                'rules' => 'matches[wilayah.kode]',
+                'errors' => [
+                    'matches' => 'Kode wilayah yang anda masukkan tidak valid.'
+                ]
+                ],
+                'level'  => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} tidak boleh kosong.'
+                ]
+                ],
+                
+                'wa'  => [
+                    'rules' => 'required|min_length[10]|max_length[16]',
+                'errors' => [
+                    'required' => '{field} tidak boleh kosong',
+                    'min_length' => '{field} tidak boleh kurang dari 10 karakter.',
+                    'max_length' => '{field} tidak boleh lebih dari 16 karakter.',
+                ]
+                    ],
         ];
 
-        if(!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
         $ma = new ModelAnggota();
+        $mw = new ModelWilayah();
+
         $json = $this->request->getJSON();
         $nia = $json->nia;
+        $email = $json->email;
 
         $cek = $ma->select('*')->where('nia', $nia)->first();
-        if ($cek) return $this->fail('Nomor induk anggota ' . $nia . ' sudah ada.', 400);
+        if (!$cek) return $this->fail('Nomor induk anggota ' . $nia . ' belum terdaftar.', 400);
+        
+        $wilayah = $mw->select('*')->where(['kode' => $cek['wilayah'], 'aktif' => '1'])->first();
+        if(!$wilayah) return $this->fail('Kode ' . $wilayah . ' yang anda masukkan tidak terdaftar.', 400);
         $data = [
-            'nia' => $nia,
             'nama' => $json->nama,
             'alamat' => $json->alamat,
             'wa' => $json->wa,
-            'wilayah' => $json->wilayah,
-            'level' => 'user',
-            'password' => password_hash($nia, PASSWORD_DEFAULT),
-            'aktif' => 'baru'
+            'wilayah' => $wilayah,
+            'email' => $email,
+            'level' => $json->level,
         ];
 
         try {
-            $ma->insert($data);
-            return $this->respondCreated($data);
+            $ma->set($data);
+            $ma->where('nia', $nia);
+            $ma->update();
+            return $this->respond(['pesan' => 'Data anggota NIA '.$nia.' berhasil diperbaharui.']);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage(), $th->getCode());
+        }
+    }
+
+    public function delete($nia)
+    {
+        $ma = new ModelAnggota();
+
+        try {
+            $ma->set(['aktif' => 'nonaktif']);
+            $ma->where('nia', $nia);
+            $ma->update();
+            return $this->respond(['pesan' => 'Data anggota NIA ' . $nia . ' berhasil dihapus.']);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage(), $th->getCode());
+        }
+    }
+
+    public function resetPassword($nia)
+    {
+        $ma = new ModelAnggota();
+        $data = [
+            'password' => password_hash($nia, PASSWORD_DEFAULT),
+        ];
+
+        try {
+            $ma->set($data);
+            $ma->where('nia', $nia);
+            $ma->update();
+            return $this->respond(['pesan' => 'Password anggota NIA ' . $nia . ' berhasil direset.']);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage(), $th->getCode());
         }

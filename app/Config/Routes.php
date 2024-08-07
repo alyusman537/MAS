@@ -12,15 +12,24 @@ $routes->get('/api/login/refresh/(:any)', 'Login::refreshToken/$1');
 
 $routes->get('/api/admin/wilayah', 'Wilayah::index');
 $routes->get('/api/admin/wilayah/(:num)', 'Wilayah::wilayahById/$1');
-$routes->post('/api/admin/wilayah', 'Wilayah::add');
-$routes->put('/api/admin/wilayah/(:num)', 'Wilayah::update/$1');
-$routes->delete('/api/admin/wilayah/(:num)', 'Wilayah::delete/$1');
+$routes->post('/api/admin/wilayah-add', 'Wilayah::add');
+$routes->put('/api/admin/wilayah-update/(:num)', 'Wilayah::update/$1');
+$routes->delete('/api/admin/wilayah-delete/(:num)', 'Wilayah::delete/$1');
 
-$routes->get('/api/admin/anggota-semua', 'Anggota::allAnggota');
-$routes->get('/api/admin/anggota-id/(:num)', 'Anggota::anggotaById/$1');
-$routes->post('/api/admin/anggota-update/(:any)', 'Anggota::updateAnggota/$1');
-$routes->put('/api/admin/reset-password/(:any)', 'Anggota::resetPassword/$1');
+$routes->get('/api/admin/anggota-semua', 'Anggota::all');
+$routes->get('/api/admin/anggota-id/(:num)', 'Anggota::ById/$1');
+$routes->get('/api/admin/anggota-edit/(:any)', 'Anggota::edit/$1');
+$routes->put('/api/admin/anggota-update/(:any)', 'Anggota::update/$1');
+$routes->delete('/api/admin/anggota-delete/(:any)', 'Anggota::delete/$1');
+$routes->get('/api/admin/reset-password/(:any)', 'Anggota::resetPassword/$1');
 
-$routes->get('/api/anggota-register', 'Anggota::newAnggota');
-$routes->post('/api/anggota-register', 'Anggota::addAnggota');
-$routes->put('/api/update-profile', 'Anggota::updateProfile');
+$routes->put('/api/user/update-password/(:any)', 'Anggota::updatePassword/$1');
+$routes->put('/api/user/update-profile/(:any)', 'Anggota::updateProfile/$1');
+
+$routes->get('/api/admin/infaq-semua', 'Infaq::index');
+$routes->get('/api/admin/infaq-id/(:num)', 'Infaq::byId/$1');
+$routes->get('/api/admin/infaq-new', 'Infaq::new');
+$routes->post('/api/admin/infaq-add', 'Infaq::add');
+$routes->get('/api/admin/infaq-edit/(:num)', 'Infaq::edit/$1');
+$routes->put('/api/admin/infaq-update/(:num)', 'Infaq::update/$1');
+$routes->put('/api/admin/infaq-hapus/(:num)', 'Infaq::delete/$1');
