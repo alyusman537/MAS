@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class Pembayaran extends Migration
+class Umum extends Migration
 {
     public function up()
     {
@@ -16,42 +16,34 @@ class Pembayaran extends Migration
             'tanggal' => [
                 'type'       => 'DATE',
             ],
-            'nomor_pembayaran' => [
-                'type' => 'VARCHAR',
-                'constraint' => '20',
-            ],
-            'kode_infaq' => [
+            'kode' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '20',
             ],
-            'nia' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '20',
-            ],
-            'bayar' => [
+            'nominal' => [
                 'type'       => 'INTEGER',
                 'default' => 0,
             ],
-            'tanggal_bayar' => [
-                'type' => 'DATETIME',
-                'default' => null,
-            ],
-            'bukti_bayar' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '100',
-                'default' => null,
-            ],
-            'validator' => [
+            'nia' => [
                 'type' => 'VARCHAR',
                 'constraint' => '20',
+            ],
+            'keterangan' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '500',
+            ],
+            'bukti' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '100',
+            ],
+            'validator' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '20',
+                'default' => null,
             ],
             'tanggal_validasi' => [
                 'type' => 'DATETIME',
                 'default' => null,
-            ],
-            'aktif' => [
-                'type' => 'BOOLEAN',
-                'default' => true,
             ],
             'created_at' => [
                 'type' => 'DATETIME',
@@ -63,7 +55,7 @@ class Pembayaran extends Migration
             ],
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->createTable('pembayaran');
+        $this->forge->createTable('umum');
     }
 
     public function down()

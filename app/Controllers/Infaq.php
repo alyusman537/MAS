@@ -12,8 +12,6 @@ use App\Models\ModelPembayaran;
 
 use App\Libraries\JwtDecode;
 
-use function PHPUnit\Framework\returnSelf;
-
 class Infaq extends BaseController
 {
     use ResponseTrait;
@@ -191,6 +189,10 @@ class Infaq extends BaseController
     public function delete($id)
     {
         $mi = new ModelInfaq();
+        $mp = new ModelPembayaran();
+        $infaq = $mi->select('*')->find($id);
+        if (!$infaq) return $this->fail('Data infaq tidak ditemukan.', 400);
+        if ($infaq['aktif'] == '0') return $this->fail('Anda tidak bisa menonaktifkan data yang sudh dihapus.', 400);
         $data = [
             'aktif' => false
         ];
@@ -198,7 +200,15 @@ class Infaq extends BaseController
             $mi->set($data);
             $mi->where('id', $id);
             $mi->update();
-            return $this->respond(['pesan' => 'Data infaq berhasil dihapus.']);
+
+            try {
+                $mp->set(['aktif' => '0']);
+                $mp->where('kode_infaq', $infaq['kode']);
+                $mp->update();
+                return $this->respond(['pesan' => 'Data infaq berhasil dihapus.']);
+            } catch (\Throwable $th) {
+                return $this->fail($th->getMessage(), $th->getCode());
+            }
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage(), $th->getCode());
         }
@@ -230,12 +240,12 @@ class Infaq extends BaseController
         $json = $this->request->getJSON();
 
         $infaq = $mi->select('*')->where('kode', $json->kode_infaq)->first();
-        if(!$infaq) return $this->fail('Kode Acara '.$json->kode.' belum dibuat.', 400);
-        if($infaq['status'] == '0') return $this->fail('Acara '.$infaq['acara'].' sudah dinonaktifkan', 400);
-        if($infaq['tanggal_acara'] > date('Y-m-d')) return $this->fail('Tanggal acara '.$infaq['acara'].' sudah terlewat', 400);
+        if (!$infaq) return $this->fail('Kode Acara ' . $json->kode . ' belum dibuat.', 400);
+        if ($infaq['status'] == '0') return $this->fail('Acara ' . $infaq['acara'] . ' sudah dinonaktifkan', 400);
+        if ($infaq['tanggal_acara'] > date('Y-m-d')) return $this->fail('Tanggal acara ' . $infaq['acara'] . ' sudah terlewat', 400);
         $wilayah = $mw->select('*')->where('kode', $json->wilayah)->first();
-        if(!$wilayah) return $this->fail('Kode wilayah'.$json->wilayah.' tidak ditemukan', 400);
-        if($wilayah['aktif'] == '0') return $this->fail('Kode wilayah '.$json->wilayah.' sudah dinonaktifkan', 400);
+        if (!$wilayah) return $this->fail('Kode wilayah' . $json->wilayah . ' tidak ditemukan', 400);
+        if ($wilayah['aktif'] == '0') return $this->fail('Kode wilayah ' . $json->wilayah . ' sudah dinonaktifkan', 400);
 
         $anggota = $ma->select('*')->where(['wilayah' => $json->wilayah, 'aktif' => 'aktif'])->findAll();
         $iuran = [];
@@ -243,13 +253,13 @@ class Infaq extends BaseController
         foreach ($anggota as $key => $val) {
             $dorong = [
                 'tanggal' => $tanggal,
-                'nomor_pembayaran' => time().'-'.$val['nia'],
+                'nomor_pembayaran' => time() . '-' . $val['nia'],
                 'kode_infaq' => $json->kode_infaq,
                 'nia' => $val['nia'],
             ];
-            $iuran [] = $dorong;
+            $iuran[] = $dorong;
             $mp->ignore(true)->insert($dorong);
         }
-        return $this->respond('Kode infaq '.$json->kode.' berhasil digenerate ke wilayah '.$wilayah['keterangan']);
+        return $this->respond('Kode infaq ' . $json->kode . ' berhasil digenerate ke wilayah ' . $wilayah['keterangan']);
     }
 }

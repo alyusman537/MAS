@@ -61,27 +61,27 @@ class Pembayaran extends BaseController
         $json = $this->request->getJSON();
         $tgl_sekarang = date('Y-m-d H:i:s');
         $validator = $json->validator; //diambil dari token
-        $nominal_infaq = (int) $infaq['nominal'];
-        $infaq = $mi->select('*')->where('kode_infaq', $kode_infaq)->first();
-        if(!$infaq) return $this->fail('Kode infaq '.$kode_infaq.' tidak ditemukan.', 400);
 
-        $bayar = $mp->select('*')->where(['kode_infaq' => $kode_infaq, 'nia' => $nia])->first();
-        if(!$bayar) return $this->fail('Kode pembayaran infaq '.$kode_infaq.' anda tidak ditemukan.', 400);
-        if((int) $bayar['bayar'] >= $nominal_infaq && $bayar['validator'] == null) return $this->fail('Kode infaq Anda sudah terbayar namun belum diterima oleh admin. silahkan hubungi admin untuk konfirmasi.', 400);
+        $bayar = $mp->select('*')->where(['nomor_pembayaran' => $nomor_pembayaran])->first();
+        $infaq = $mi->select('*')->where('kode', $bayar['kode_infaq'])->first();
+        if(!$bayar) return $this->fail('Kode pembayaran infaq '.$nomor_pembayaran.' anda tidak ditemukan.', 400);
+        if($bayar['bayar'] >= (int) $infaq['nominal'] && $bayar['validator'] != null) return $this->fail('Pembayaran iuran sudah tervalidasi.', 400);
+        if((int) $bayar['bayar'] < (int) $infaq['nominal'] ) return $this->fail('Nominal iuran kurang dari ketentuan infaq.', 400);
 
         $data = [
-            'bayar' => $json->bayar,
-            'tanggal_bayar' => $tgl_sekarang,
-            'bukti_bayar' => $json->bukti_bayar
+            'validator' => $validator,
+            'tanggal_validasi' => $tgl_sekarang,
         ];
 
         try {
             $mp->set($data);
-            $mp->where(['kode_infaq' => $kode_infaq, 'nia' => $nia]);
+            $mp->where('nomor_pembayaran', $nomor_pembayaran);
             $mp->update();
-            $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil dilakukan.']);
+            $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' .$validator.'.']);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage(), $th->getCode());
         }
     }
+
+    
 }
