@@ -4,15 +4,10 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
-use App\Models\ModelAnggota;
-use App\Models\ModelWilayah;
-use App\Models\ModelInfaq;
-use App\Models\ModelPembayaran;
 use App\Models\ModelUmum;
+use App\Models\ModelTmpUmum;
 
 use App\Libraries\JwtDecode;
-
-use function PHPUnit\Framework\returnSelf;
 
 class Umum extends BaseController
 {
@@ -33,19 +28,50 @@ class Umum extends BaseController
 
     public function new()
     {
-        $mu = new ModelUmum();
+        $mu = new ModelTmpUmum();
+        $nia = '000';//dari token
+        $tmp = $mu->select('*')->where('nia', $nia)->first();
+        if($tmp) {
+            $mu->where(['nia' => $nia]);
+            $mu->delete();
+        } 
         $data = [
+            'nia' => $nia,
             'nominal' => 0,
             'keterangan' => null
         ];
-        return $this->respond($data);
+        $mu->insert($data);
+        return $this->respondCreated($data);
     }
 
     public function add()
     {
-        $mu = new ModelUmum();
+        $mu = new ModelTmpUmum();
         $json = $this->request->getJSON();
         $nia = '000';//amil dari token
+        $data = [
+            'tanggal' => date('Y-m-d'),
+            'kode' => time().'-'.$nia,
+            'nominal' => $json->nominal,
+            'nia' => $nia,
+            'keterangan' => $json->keterangan
+        ];
+        try {
+            $insert = $mu->insert($data);
+            if(!$insert) return $this->fail($mu->errors(), 400);
+            return $this->respondCreated($data);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage(), $th->getCode());
+        }
+    }
+
+    public function save()
+    {
+        $mu = new ModelUmum();
+        $mtu = new ModelTmpUmum();
+        $nia = '000';//amil dari token
+        $json = $this->request->getJSON();
+        $tmp = $mtu->select('*')->where('nia', $nia)->first();
         $data = [
             'tanggal' => date('Y-m-d'),
             'kode' => time().'-'.$nia,

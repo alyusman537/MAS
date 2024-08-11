@@ -35,6 +35,7 @@ class Umum extends Migration
             'bukti' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '100',
+                'default' => null,
             ],
             'validator' => [
                 'type'       => 'VARCHAR',

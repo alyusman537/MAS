@@ -35,11 +35,12 @@ class ModelAnggota extends Model
         return $data->getResult();
     }
 
-    public function anggotaById($id)
+    public function anggotaById($nia)
     {
-        $db = $this->db->table('anggota');
+        $db = $this->db->table('anggota as a');
         $db->select('id, nia, nama, alamat, wa, wilayah, level, foto, email, aktif');
-        $db->where('id', $id);
+        $db->where('nia', $nia);
+        $db->limit(1);
         $data = $db->get();
 
         if(!$data) return false;

@@ -7,9 +7,15 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Anggota::index');
 
-$routes->post('/api/login/auth', 'Login::auth');
-$routes->get('/api/login/refresh/(:any)', 'Login::refreshToken/$1');
+$routes->post('/api/user-login', 'Login::auth');
+$routes->get('/api/user/refresh-token/(:any)', 'Login::refreshToken/$1');
+$routes->get('/api/user/profile/(:any)', 'Profile::index');
+$routes->get('/api/user/edit-password/(:any)', 'Profile::editPassword/$1');
+$routes->put('/api/user/update-password/(:any)', 'profile::updatePassword/$1');
 
+//////////// ADMIN /////////////////////
+
+$routes->post('/api/admin-login', 'Login::adminAuth');
 $routes->get('/api/admin/wilayah', 'Wilayah::index');
 $routes->get('/api/admin/wilayah/(:num)', 'Wilayah::wilayahById/$1');
 $routes->post('/api/admin/wilayah-add', 'Wilayah::add');
@@ -23,8 +29,6 @@ $routes->put('/api/admin/anggota-update/(:any)', 'Anggota::update/$1');
 $routes->delete('/api/admin/anggota-delete/(:any)', 'Anggota::delete/$1');
 $routes->get('/api/admin/reset-password/(:any)', 'Anggota::resetPassword/$1');
 
-$routes->put('/api/user/update-password/(:any)', 'Anggota::updatePassword/$1');
-$routes->put('/api/user/update-profile/(:any)', 'Anggota::updateProfile/$1');
 
 $routes->get('/api/admin/infaq-semua', 'Infaq::index');
 $routes->get('/api/admin/infaq-id/(:num)', 'Infaq::byId/$1');
