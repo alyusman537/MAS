@@ -28,8 +28,12 @@ class Umum extends BaseController
 
     public function new()
     {
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
+        $decoder = new JwtDecode();
+        $user = $decoder->decoder($header);
+        $nia = $user->sub; //dari token
+
         $mu = new ModelTmpUmum();
-        $nia = '000';//dari token
         $tmp = $mu->select('*')->where('nia', $nia)->first();
         if($tmp) {
             $mu->where(['nia' => $nia]);
@@ -44,29 +48,14 @@ class Umum extends BaseController
         return $this->respondCreated($data);
     }
 
+
     public function add()
     {
-        $mu = new ModelTmpUmum();
-        $json = $this->request->getJSON();
-        $nia = '000';//amil dari token
-        $data = [
-            'tanggal' => date('Y-m-d'),
-            'kode' => time().'-'.$nia,
-            'nominal' => $json->nominal,
-            'nia' => $nia,
-            'keterangan' => $json->keterangan
-        ];
-        try {
-            $insert = $mu->insert($data);
-            if(!$insert) return $this->fail($mu->errors(), 400);
-            return $this->respondCreated($data);
-        } catch (\Throwable $th) {
-            return $this->fail($th->getMessage(), $th->getCode());
-        }
-    }
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
+        $decoder = new JwtDecode();
+        $user = $decoder->decoder($header);
+        $nia = $user->sub; //dari token
 
-    public function save()
-    {
         $mu = new ModelUmum();
         $mtu = new ModelTmpUmum();
         $nia = '000';//amil dari token

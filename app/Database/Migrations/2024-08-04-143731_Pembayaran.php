@@ -44,6 +44,7 @@ class Pembayaran extends Migration
             'validator' => [
                 'type' => 'VARCHAR',
                 'constraint' => '20',
+                'default' => null,
             ],
             'tanggal_validasi' => [
                 'type' => 'DATETIME',

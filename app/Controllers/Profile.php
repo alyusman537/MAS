@@ -7,32 +7,39 @@ use CodeIgniter\API\ResponseTrait;
 
 use App\Models\ModelAnggota;
 
+use App\Libraries\JwtDecode;
+
 class Profile extends BaseController
 {
     use ResponseTrait;
     public function index()
     {
-        $nia = '000'; //dari token
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
+        $decoder = new JwtDecode();
+        $user = $decoder->decoder($header);
+
+        $nia = $user->sub; //dari token
         $ma = new ModelAnggota();
-        $profile = $ma->anggotaById($nia);
+        $profile = $ma->select('*')->where('nia',$nia)->first();
+        $foto = $profile['foto'] === null ? base_url() . 'render/image/null' : base_url() . 'render/image/' . $profile['foto'];
         $data = [
             'nia' => $profile['nia'],
             'nama' => strtoupper($profile['nama']),
             'wa' => $profile['wa'],
             'alamat' => $profile['alamat'],
-            'kode_wilayah' => $profile['kode_wilayah'],
-            'nama_wilayah' => $profile['nama_wilayah'],
+            'kode_wilayah' => $profile['wilayah'],
             'level' => $profile['level'],
-            'foto' => base_url() . 'render/image/' . $profile['foto'],
+            'foto' => $foto,
             'email' => $profile['email'],
-            'aktif' => $profile['aktif']
+            'aktif' => $profile['aktif'],
         ];
+
+        return $this->respond($data);
     }
 
     public function edit($nia)
     {
         $ma = new ModelAnggota();
-        $mw = new ModelWilayah();
         $anggota = $ma->select('*')->where('nia', $nia)->first();
         if (!$anggota) return $this->fail('NIA ' . $nia . ' belum terdaftar.', 400);
 
@@ -46,8 +53,14 @@ class Profile extends BaseController
         return $this->respond($data);
     }
 
-    public function udpate($nia)
+    public function update($nia)
     {
+        $header = $this->request->getServer('HTTP_AUTHORIZATION'); // header("Authorization");
+        $decoder = new JwtDecode();
+        $user = $decoder->decoder($header); 
+        $nia_from_token = $user->sub; //dari token
+        if ($nia != $nia_from_token) return $this->fail('Anda tidak berhak mengedit data anggota lainnya.', 400);
+
         helper(['form']);
         $rules = [
             'nama'          => [
@@ -60,12 +73,12 @@ class Profile extends BaseController
                 ],
             ],
             'email'         => [
-                'rules' => 'required|min_length[4]|max_length[100]|valid_email|is_unique[anggota.email]',
+                'rules' => 'required|min_length[4]|max_length[100]|valid_email',//|is_unique[anggota.email]',
                 'errors' => [
                     'required' => '{field} tidak boleh kosong',
                     'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
                     'max_length' => '{field} tidak boleh lebih dari 100 karakter.',
-                    'is_unique' => '{field} sudah terdaftar.',
+                    // 'is_unique' => '{field} sudah terdaftar.',
                     'valid_email' => '{field} yang anda masukkan tidak valid.'
                 ]
             ],
@@ -90,31 +103,25 @@ class Profile extends BaseController
 
         if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
         $ma = new ModelAnggota();
-        $mw = new ModelWilayah();
 
         $json = $this->request->getJSON();
-        $nia = $json->nia;
+        // $nia = $json->nia;
         $email = $json->email;
 
         $cek = $ma->select('*')->where('nia', $nia)->first();
-        if (!$cek) return $this->fail('Nomor induk anggota ' . $nia . ' belum terdaftar.', 400);
-
-        $wilayah = $mw->select('*')->where(['kode' => $cek['wilayah'], 'aktif' => '1'])->first();
-        if (!$wilayah) return $this->fail('Kode ' . $wilayah . ' yang anda masukkan tidak terdaftar.', 400);
+        if (!$cek) return $this->fail('Nomor induk anggota Anda belum terdaftar.', 400);
         $data = [
             'nama' => $json->nama,
             'alamat' => $json->alamat,
             'wa' => $json->wa,
-            'wilayah' => $wilayah,
             'email' => $email,
-            'level' => $json->level,
         ];
 
         try {
             $ma->set($data);
             $ma->where('nia', $nia);
             $ma->update();
-            return $this->respond(['pesan' => 'Data anggota NIA ' . $nia . ' berhasil diperbaharui.']);
+            return $this->respond(['pesan' => 'Data Anda berhasil diperbaharui.']);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage(), $th->getCode());
         }
@@ -132,8 +139,13 @@ class Profile extends BaseController
         return $this->respond($data);
     }
 
-    public function ubahPassword($nia)
+    public function updatePassword($nia)
     {
+        $header = $this->request->getServer('HTTP_AUTHORIZATION'); // header("Authorization");
+        $decoder = new JwtDecode();
+        $user = $decoder->decoder($header); 
+        $nia_from_token = $user->sub; //dari token
+
         helper(['form']);
         $rules = [
             'password_lama'          => [
@@ -165,7 +177,7 @@ class Profile extends BaseController
         $ma = new ModelAnggota();
 
         $json = $this->request->getJSON();
-        $nia_from_token = '000';
+
         $password_lama = $json->password_lama;
         $password_baru = $json->password_baru;
         $konfirmasi_password = $json->konfirmasi_password;

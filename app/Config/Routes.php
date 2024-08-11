@@ -8,10 +8,19 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Anggota::index');
 
 $routes->post('/api/user-login', 'Login::auth');
-$routes->get('/api/user/refresh-token/(:any)', 'Login::refreshToken/$1');
-$routes->get('/api/user/profile/(:any)', 'Profile::index');
-$routes->get('/api/user/edit-password/(:any)', 'Profile::editPassword/$1');
-$routes->put('/api/user/update-password/(:any)', 'profile::updatePassword/$1');
+$routes->get('/api/user/refresh-token', 'Login::refreshToken');
+
+$routes->get('/api/user/profile', 'Profile::index');
+$routes->get('/api/user/profile/edit/(:any)', 'Profile::edit/$1');
+$routes->put('/api/user/profile/update/(:any)', 'Profile::update/$1');
+$routes->get('/api/user/profile/edit-password', 'Profile::editPassword');
+$routes->put('/api/user/profile/update-password/(:any)', 'profile::updatePassword/$1');
+
+$routes->get('/api/user/home/infaq-belum', 'HomeUser::infaqBelum');
+$routes->get('/api/user/home/infaq-lunas', 'HomeUser::infaqlunas');
+$routes->get('/api/user/home/infaq-umum', 'HomeUser::infaqUmum');
+
+$routes->get('/api/user/infaq-umum/new', 'Umum::new');
 
 //////////// ADMIN /////////////////////
 

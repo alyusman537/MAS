@@ -20,6 +20,34 @@ class ModelPembayaran extends Model
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';   
+    protected $updatedField  = 'updated_at';
+    
+    public function belum($nia)
+    {
+        $db = $this->db->table('pembayaran as p');
+        $db->select('p.*, infaq.acara, infaq.rutin');
+        $db->where('p.validator IS NULL AND p.tanggal_validasi IS NULL AND infaq.aktif = "1"');
+        $db->where('p.nia', $nia);
+        $db->join('infaq', 'p.kode_infaq=infaq.kode');
+        $db->orderBy('p.tanggal', 'DESC');
+        $db->limit(50);
+        $data = $db->get();
+        if(!$data) return false;
+        return $data->getResult();
+    }
+
+    public function lunas($nia)
+    {
+        $db = $this->db->table('pembayaran as p');
+        $db->select('p.*, infaq.acara, infaq.rutin');
+        $db->where('p.validator IS NOT NULL AND p.tanggal_validasi IS NOT NULL');
+        $db->where('p.nia' , $nia);
+        $db->join('infaq', 'p.kode_infaq=infaq.kode', 'left');
+        $db->orderBy('p.tanggal', 'DESC');
+        $db->limit(50);
+        $data = $db->get();
+        if(!$data) return false;
+        return $data->getResult();
+    }
     
 }

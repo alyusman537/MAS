@@ -43,9 +43,9 @@ class Filters extends BaseConfig
             // 'csrf',
             // 'invalidchars',
             'cors',
-            // 'auth' => [
-            //     'except' => ['/api/login/auth']
-            // ],
+            'auth' => [
+                'except' => ['/api/user-login', '/api/admin-login']
+            ],
         ],
         'after' => [
             'toolbar',

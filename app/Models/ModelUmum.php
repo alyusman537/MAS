@@ -72,4 +72,5 @@ class ModelUmum extends Model
         if(!$data) return false;
         return $data->getResult();
     }
+
 }
