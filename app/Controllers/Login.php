@@ -98,7 +98,7 @@ class Login extends BaseController
         $decoded = JWT::decode($jwt, new Key($key, 'HS256'));
 
         $iat = time();
-        $exp = $iat + (60*5);
+        $exp = $iat + (60*getenv('JWT_EXP'));
 
         if($iat > $decoded->exp) return $this->fail('Token sudah kadaluarsa', 401);
 
@@ -190,12 +190,15 @@ class Login extends BaseController
         return $this->respond($response, 200);
     }
 
-    public function refreshAdmin($token)
+    public function adminRefresh()
     {
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
         $key = getenv('ADMIN_KEY');
-        $decoded = JWT::decode($token, new Key($key, 'HS256'));
+        $jwt = explode(' ', $header)[1];
+        $decoded = JWT::decode($jwt, new Key($key, 'HS256'));
+
         $iat = time();
-        $exp = $iat + (60*5);
+        $exp = $iat + (60*getenv('JWT_EXP'));
 
         if($iat > $decoded->exp) return $this->fail('Token sudah kadaluarsa', 401);
 

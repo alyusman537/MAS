@@ -27,7 +27,8 @@ class ModelAnggota extends Model
     {
         $db = $this->db->table('anggota');
         $db->select('id, nia, nama, alamat, wa, wilayah, level, email, aktif');
-        $db->where('aktif', '1');
+        $db->where(['aktif' => 'aktif']);//, 'nia <> "0537"']);
+        $db->where('nia <> 0537');
         $db->orderBy('nama', 'ASC');
         $data = $db->get();
 
@@ -43,6 +44,7 @@ class ModelAnggota extends Model
         $db->limit(1);
         $data = $db->get();
 
+        if($nia === '0537') return false;
         if(!$data) return false;
         return $data->getResult();
     }

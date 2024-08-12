@@ -22,24 +22,29 @@ $routes->get('/api/user/home/infaq-umum', 'HomeUser::infaqUmum');
 
 $routes->get('/api/user/infaq-umum/new', 'Umum::new');
 $routes->post('/api/user/infaq-umum/add', 'Umum::add');
+$routes->get('/api/user/infaq-umum/id/(:any)', 'Umum::byId/$1');
 $routes->get('/api/user/infaq-umum/edit/(:any)', 'Umum::edit/$1');
 $routes->put('/api/user/infaq-umum/update/(:any)', 'Umum::update/$1');
 
 //////////// ADMIN /////////////////////
 
 $routes->post('/api/admin-login', 'Login::adminAuth');
+$routes->get('/api/admin-refresh', 'Login::adminRefresh');
+
 $routes->get('/api/admin/wilayah', 'Wilayah::index');
 $routes->get('/api/admin/wilayah/(:num)', 'Wilayah::wilayahById/$1');
-$routes->post('/api/admin/wilayah-add', 'Wilayah::add');
-$routes->put('/api/admin/wilayah-update/(:num)', 'Wilayah::update/$1');
-$routes->delete('/api/admin/wilayah-delete/(:num)', 'Wilayah::delete/$1');
+$routes->post('/api/admin/wilayah', 'Wilayah::add');
+$routes->put('/api/admin/wilayah/(:num)', 'Wilayah::update/$1');
+$routes->delete('/api/admin/wilayah/(:num)', 'Wilayah::delete/$1');
 
-$routes->get('/api/admin/anggota-semua', 'Anggota::all');
-$routes->get('/api/admin/anggota-id/(:num)', 'Anggota::ById/$1');
-$routes->get('/api/admin/anggota-edit/(:any)', 'Anggota::edit/$1');
-$routes->put('/api/admin/anggota-update/(:any)', 'Anggota::update/$1');
-$routes->delete('/api/admin/anggota-delete/(:any)', 'Anggota::delete/$1');
-$routes->get('/api/admin/reset-password/(:any)', 'Anggota::resetPassword/$1');
+$routes->get('/api/admin/anggota', 'Anggota::all');
+$routes->get('/api/admin/anggota/(:num)', 'Anggota::ById/$1');
+$routes->get('/api/admin/anggota/new', 'Anggota::new');
+$routes->post('/api/admin/anggota', 'Anggota::add');
+$routes->get('/api/admin/anggota/edit/(:num)', 'Anggota::edit/$1');
+$routes->put('/api/admin/anggota/(:num)', 'Anggota::update/$1');
+$routes->delete('/api/admin/anggota/(:num)', 'Anggota::delete/$1');
+$routes->get('/api/admin/reset-password/(:num)', 'Anggota::resetPassword/$1');
 
 
 $routes->get('/api/admin/infaq-semua', 'Infaq::index');

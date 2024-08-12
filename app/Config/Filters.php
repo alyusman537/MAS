@@ -10,6 +10,7 @@ use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\SecureHeaders;
 
 use App\Filters\AuthFilter;
+use App\Filters\AdminAuth;
 use App\Filters\Cors;
 
 class Filters extends BaseConfig
@@ -28,6 +29,7 @@ class Filters extends BaseConfig
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
         'auth'          => AuthFilter::class,
+        'admin'          => AdminAuth::class,
         'cors'          => Cors::class,
     ];
 
@@ -44,7 +46,10 @@ class Filters extends BaseConfig
             // 'invalidchars',
             'cors',
             'auth' => [
-                'except' => ['/api/user-login', '/api/admin-login']
+                'except' => ['/api/user-login', '/api/admin*']
+            ],
+            'admin' => [
+                'except' => ['/api/admin-login', '/api/user*']
             ],
         ],
         'after' => [

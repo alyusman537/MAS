@@ -21,7 +21,7 @@ class Umum extends BaseController
     public function byId($id)
     {
         $mu = new ModelUmum();
-        $data = $mu->select('*')->find('id', $id);
+        $data = $mu->select('*')->where('id', $id)->first();
         if(!$data) return $this->fail('Data Infaq umum tidak ditemukan.', 400);
         return $this->respond($data);
     }

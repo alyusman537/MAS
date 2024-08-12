@@ -13,7 +13,7 @@ class Wilayah extends BaseController
     public function index()
     {
         $mw = new ModelWilayah();
-        $data = $mw->select('*')->orderBy('keterangan', 'ASC')->findAll();
+        $data = $mw->select('*')->orderBy('aktif', 'ASC')->findAll();
         return $this->respond($data);
     }
     public function wilayahById($id = null)
@@ -50,7 +50,7 @@ class Wilayah extends BaseController
         if(!$this->validate($rules)) return $this->fail($this->validator->getErrors());
         $mw = new ModelWilayah();
         $json = $this->request->getJSON();
-        $kode = $json->kode;
+        $kode = strtoupper($json->kode);
         $cek = $mw->select('*')->where('kode', $kode)->first();
         if($cek) return $this->fail('Kode Wilayah '.$kode.' sudah terpakai.', 400);
         $data = [
