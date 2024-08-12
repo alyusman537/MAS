@@ -21,6 +21,9 @@ $routes->get('/api/user/home/infaq-lunas', 'HomeUser::infaqlunas');
 $routes->get('/api/user/home/infaq-umum', 'HomeUser::infaqUmum');
 
 $routes->get('/api/user/infaq-umum/new', 'Umum::new');
+$routes->post('/api/user/infaq-umum/add', 'Umum::add');
+$routes->get('/api/user/infaq-umum/edit/(:any)', 'Umum::edit/$1');
+$routes->put('/api/user/infaq-umum/update/(:any)', 'Umum::update/$1');
 
 //////////// ADMIN /////////////////////
 

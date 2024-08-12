@@ -40,7 +40,6 @@ class Umum extends BaseController
             $mu->delete();
         } 
         $data = [
-            'nia' => $nia,
             'nominal' => 0,
             'keterangan' => null
         ];
@@ -57,10 +56,7 @@ class Umum extends BaseController
         $nia = $user->sub; //dari token
 
         $mu = new ModelUmum();
-        $mtu = new ModelTmpUmum();
-        $nia = '000';//amil dari token
         $json = $this->request->getJSON();
-        $tmp = $mtu->select('*')->where('nia', $nia)->first();
         $data = [
             'tanggal' => date('Y-m-d'),
             'kode' => time().'-'.$nia,
