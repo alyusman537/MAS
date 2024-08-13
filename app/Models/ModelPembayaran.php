@@ -28,7 +28,7 @@ class ModelPembayaran extends Model
         $db->select('p.*, infaq.acara, infaq.rutin');
         $db->where('p.validator IS NULL AND p.tanggal_validasi IS NULL AND infaq.aktif = "1"');
         $db->where('p.nia', $nia);
-        $db->join('infaq', 'p.kode_infaq=infaq.kode');
+        $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
         $db->orderBy('p.tanggal', 'DESC');
         $db->limit(50);
         $data = $db->get();
@@ -42,7 +42,7 @@ class ModelPembayaran extends Model
         $db->select('p.*, infaq.acara, infaq.rutin');
         $db->where('p.validator IS NOT NULL AND p.tanggal_validasi IS NOT NULL');
         $db->where('p.nia' , $nia);
-        $db->join('infaq', 'p.kode_infaq=infaq.kode', 'left');
+        $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
         $db->orderBy('p.tanggal', 'DESC');
         $db->limit(50);
         $data = $db->get();

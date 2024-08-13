@@ -33,7 +33,7 @@ class Pembayaran extends Migration
                 'default' => 0,
             ],
             'tanggal_bayar' => [
-                'type' => 'DATETIME',
+                'type' => 'DATE',
                 'default' => null,
             ],
             'bukti_bayar' => [

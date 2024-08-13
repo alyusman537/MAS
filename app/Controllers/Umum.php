@@ -113,6 +113,7 @@ class Umum extends BaseController
             return $this->fail($th->getMessage(), $th->getCode());
         }
     }
+    
     public function unggahBukti($id)
     {
         helper(['form', 'url']);

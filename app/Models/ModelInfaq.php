@@ -12,7 +12,7 @@ class ModelInfaq extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['tanggal', 'kode', 'acara', 'keterangan', 'nominal', 'rutin', 'aktif'];
+    protected $allowedFields    = ['tanggal', 'kode', 'acara', 'tanggal_acara', 'keterangan', 'nominal', 'rutin', 'aktif'];
 
     protected bool $allowEmptyInserts = false;
 

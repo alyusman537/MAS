@@ -44,6 +44,21 @@ class Anggota extends BaseController
         return $this->respond($data);
     }
 
+    public function byWilayah($wilayah)
+    {
+        $ma = new ModelAnggota();
+        $mw = new ModelWilayah();
+        $cekWilayah = $mw->select('*')->where('kode', $wilayah)->first();
+        if(!$cekWilayah) return $this->fail('Kode wilayah '.$wilayah.' tidak ada.', 400);
+        $anggota = $ma->select('id, nia, nama, alamat, wa, wilayah, level, aktif')->where(['wilayah' => $wilayah, 'aktif' => 'aktif'])->findAll();
+        // if (!$anggota) return $this->fail('ID anggota ' . $id . ' tidak ditemukan.', 400);
+        // $data = [
+        //     'anggota' => $anggota,
+        //     'wilayah' => $mw->select('keterangan')->where('kode', $anggota['wilayah'])->first()
+        // ];
+        return $this->respond($anggota);
+    }
+
     public function new()
     {
         $mw = new ModelWilayah();
@@ -76,10 +91,10 @@ class Anggota extends BaseController
                 ],
             ],
             'nama'          => [
-                'rules' => 'required|min_length[4]|max_length[100]',
+                'rules' => 'required|min_length[3]|max_length[100]',
                 'errors' => [
                     'required' => '{field} tidak boleh kosong.',
-                    'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
+                    'min_length' => '{field} tidak boleh kurang dari 3 karakter.',
                     'max_length' => '{field} tidak boleh lebih dari 100 karakter.',
                     'is_unique' => '{field} sudah terdaftar.'
                 ],
@@ -123,7 +138,7 @@ class Anggota extends BaseController
 
         $wilayah = $json->wilayah;
         $cekWilayah = $mw->select('*')->where(['kode' => $wilayah, 'aktif' => '1'])->first();
-        if (!$cekWilayah) return $this->fail('Kode ' . $wilayah . ' tidak terdaftar.', 400);
+        if (!$cekWilayah) return $this->fail('Kode wilayah ' . $wilayah . ' tidak terdaftar.', 400);
         $data = [
             'nia' => $nia,
             'nama' => $json->nama,
@@ -183,10 +198,10 @@ class Anggota extends BaseController
         helper(['form']);
         $rules = [
             'nama'          => [
-                'rules' => 'required|min_length[4]|max_length[100]',
+                'rules' => 'required|min_length[3]|max_length[100]',
                 'errors' => [
                     'required' => '{field} tidak boleh kosong.',
-                    'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
+                    'min_length' => '{field} tidak boleh kurang dari 3 karakter.',
                     'max_length' => '{field} tidak boleh lebih dari 100 karakter.',
                     'is_unique' => '{field} sudah terdaftar.'
                 ],
@@ -280,6 +295,9 @@ class Anggota extends BaseController
     public function resetPassword($nia)
     {
         $ma = new ModelAnggota();
+        $cek = $ma->select('*')->where('nia', $nia)->first();
+        if(!$cek) return $this->fail('Data anggota NIA '.$nia.' tidak ada.', 400);
+        if($cek['aktif'] != 'aktif') return $this->fail('Data anggota NIA '.$nia.' masuk dalam daftar anggota nonaktif.', 400);
         $data = [
             'password' => password_hash($nia, PASSWORD_DEFAULT),
         ];
