@@ -22,11 +22,11 @@ class ModelPembayaran extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     
-    public function belum($nia)
+    public function daftarInfaq($nia, $status)
     {
         $db = $this->db->table('pembayaran as p');
         $db->select('p.*, infaq.acara, infaq.rutin');
-        $db->where('p.validator IS NULL AND p.tanggal_validasi IS NULL AND infaq.aktif = "1"');
+        $db->where('p.validator IS '.$status.' AND infaq.aktif = "1"');
         $db->where('p.nia', $nia);
         $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
         $db->orderBy('p.tanggal', 'DESC');
@@ -50,4 +50,17 @@ class ModelPembayaran extends Model
         return $data->getResult();
     }
     
+    public function daftarTunggu($status)
+    {
+        $db = $this->db->table('pembayaran as p');
+        $db->select('p.*, infaq.acara, infaq.rutin, anggota.nama');
+        $db->where('p.validator IS '.$status.' AND infaq.aktif = 1');
+        $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
+        $db->join('anggota', 'anggota.nia=p.nia', 'left');
+        $db->orderBy('p.tanggal', 'DESC');
+        $db->limit(50);
+        $data = $db->get();
+        if(!$data) return false;
+        return $data->getResult();
+    }
 }

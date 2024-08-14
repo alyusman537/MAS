@@ -16,4 +16,6 @@ class ModelTmpUmum extends Model
 
     protected bool $allowEmptyInserts = false;
 
+    
+
 }

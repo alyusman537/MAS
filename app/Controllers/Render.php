@@ -10,16 +10,23 @@ class Render extends BaseController
     use ResponseTrait;
     public function image($imageName)
     {
-        if(($image = file_get_contents(WRITEPATH.'uploads/profile/'.$imageName)) === FALSE) return $this->fail('foto tidak ditemukan', 404);;
-        
-        // choose the right mime type
         $mimeType = 'image/jpg';
+        try {
+            $image = file_get_contents(WRITEPATH.'uploads/profile/'.$imageName);
+            $this->response
+            ->setStatusCode(200)
+            ->setContentType($mimeType)
+            ->setBody($image)
+            ->send();
+        } catch (\Throwable) {
+            $no_image = file_get_contents(WRITEPATH.'/no_photo.jpg');
+            $this->response
+            ->setStatusCode(404)
+            ->setContentType($mimeType)
+            ->setBody($no_image)
+            ->send();
+        }
 
-        $this->response
-        ->setStatusCode(200)
-        ->setContentType($mimeType)
-        ->setBody($image)
-        ->send();
     }
 
     public function bukti($imageName)

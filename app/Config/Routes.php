@@ -8,6 +8,7 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Anggota::index');
 
 $routes->get('/api/render/bukti/(:any)', 'Render::bukti/$1');
+$routes->get('/api/render/foto/(:any)', 'Render::image/$1');
 
 $routes->post('/api/user-login', 'Login::auth');
 $routes->get('/api/user/refresh-token', 'Login::refreshToken');
@@ -17,16 +18,16 @@ $routes->get('/api/user/profile/edit/(:any)', 'Profile::edit/$1');
 $routes->put('/api/user/profile/update/(:any)', 'Profile::update/$1');
 $routes->get('/api/user/profile/edit-password', 'Profile::editPassword');
 $routes->put('/api/user/profile/update-password/(:any)', 'profile::updatePassword/$1');
-
-$routes->get('/api/user/home/infaq-belum', 'HomeUser::infaqBelum');
-$routes->get('/api/user/home/infaq-lunas', 'HomeUser::infaqlunas');
-$routes->get('/api/user/home/infaq-umum', 'HomeUser::infaqUmum');
+$routes->post('/api/user/profile/foto', 'Profile::foto');
 
 $routes->get('/api/user/infaq-umum/new', 'Umum::new');
 $routes->post('/api/user/infaq-umum/add', 'Umum::add');
 $routes->get('/api/user/infaq-umum/id/(:any)', 'Umum::byId/$1');
 $routes->get('/api/user/infaq-umum/edit/(:any)', 'Umum::edit/$1');
 $routes->put('/api/user/infaq-umum/update/(:any)', 'Umum::update/$1');
+
+$routes->get('/api/user/home/daftar-infaq/(:any)', 'HomeUser::daftarInfaq/$1');
+$routes->get('/api/user/home/infaq-umum', 'HomeUser::infaqUmum');
 
 $routes->put('/api/user/pembayaran/(:any)', 'Pembayaran::bayar/$1');
 $routes->post('/api/user/pembayaran-bukti/(:any)', 'Pembayaran::buktiBayar/$1');
@@ -62,3 +63,8 @@ $routes->put('/api/admin/infaq/(:num)', 'Infaq::update/$1');
 $routes->delete('/api/admin/infaq/(:num)', 'Infaq::delete/$1');
 $routes->post('/api/admin/infaq-generate', 'Infaq::generate');
 $routes->get('/api/admin/infaq-generate-all/(:any)', 'Infaq::generateSemua/$1');
+
+$routes->get('/api/admin/daftar-bayar-infaq/(:any)', 'Penerimaan::daftarTunggu/$1');
+$routes->get('/api/admin/daftar-bayar-umum/(:any)', 'Penerimaan::daftarUmum/$1');
+$routes->get('/api/admin/terima-infaq/(:any)', 'Penerimaan::terimaInfaq/$1');
+$routes->get('/api/admin/terima-umum/(:any)', 'Penerimaan::terimaUmum/$1');

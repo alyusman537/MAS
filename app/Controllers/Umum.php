@@ -95,10 +95,15 @@ class Umum extends BaseController
 
     public function update($id)
     {
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
+        $decoder = new JwtDecode();
+        $user = $decoder->decoder($header);
+        $nia = $user->sub; //dari token
+
         $mu = new ModelUmum();
         $infaq = $mu->find($id);
         $json = $this->request->getJSON();
-        $nia = '0000'; //dari token
+
         if(!$infaq) return $this->fail('Data Infaq umum tidak ditemukan', 400);
         if($infaq['nia'] != $nia) return $this->fail('Anda tidak berhak merubah data Infaq orang lain.', 400);
         $data = [
@@ -120,31 +125,34 @@ class Umum extends BaseController
         $mm = new ModelUmum();
 
         $fotoLama = $mm->find($id);
-        $foto = isset($fotoLama['image']) ? $fotoLama['image'] : false;
+        $foto = isset($fotoLama['bukti']) ? $fotoLama['bukti'] : false;
 
         $path_ori = WRITEPATH . 'uploads/foto/' . $foto;
-        $path_thumb = WRITEPATH . 'uploads/thumbnail/' . $foto;
-        $validateImg = $this->validate(
-            [
-                'file' => [
-                    'uploaded[file]',
-                    'mime_in[file,image/jpg,image/jpeg]',
-                    //'mime_in[file,image/jpg,image/jpeg,image/png,image/gif]',
-                    'max_size[file,4096]',
+        helper(['form', 'url']);
+        $validationRule = [
+            'bukti' => [
+                // 'label' => 'Image File',
+                'rules' => [
+                    'uploaded[bukti]',
+                    'is_image[bukti]',
+                    'mime_in[bukti,image/jpg,image/jpeg,image/png]',
+                    'max_size[bukti,4096]',
+                    // 'max_dims[userfile,1024,768]',
                 ],
-            ]
-        );
-        if (!$validateImg) {
-            return $this->fail('Ukuran foto maximal 4mb');
+                'errors' => [
+                    'uploaded' => 'tidak ada gambar yagn diupload',
+                    'is_image' => 'file harus berupa gambar',
+                    'mime_in' => 'gambar harus berupa jpg atau jpeg',
+                    'max_size' => 'ukurang gambar harus kurang dari 4mb'
+                ]
+            ],
+        ];
+        if (! $this->validateData([], $validationRule)) {
+            return $this->fail($this->validator->getErrors(), 400);
         }
 
-        $x_file = $this->request->getFile('file');
+        $x_file = $this->request->getFile('bukti');
         $namaFoto = $x_file->getRandomName();
-        $image = \Config\Services::image()
-            ->withFile($x_file)
-            ->resize(100, 100, true, 'height')
-            ->save(WRITEPATH . '/uploads/thumbnail/' . $namaFoto);
-
         $x_file->move(WRITEPATH . 'uploads/foto', $namaFoto);
 
         $mm->set(['image' => $namaFoto]);
@@ -155,11 +163,6 @@ class Umum extends BaseController
             if (file_exists($path_ori)) {
                 unlink($path_ori);
             }
-
-            if (file_exists($path_thumb)) {
-                unlink($path_thumb);
-            }
-
         }
 
         return $this->respond(['image' => $namaFoto]);

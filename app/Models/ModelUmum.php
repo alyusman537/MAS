@@ -73,4 +73,16 @@ class ModelUmum extends Model
         return $data->getResult();
     }
 
+    public function daftarUmum($status) 
+    {
+        $db = $this->db->table('umum as p');
+        $db->select('p.*, anggota.nama as nama');
+        $db->where('p.validator IS '.$status.' ');
+        $db->join('anggota', 'anggota.nia=p.nia', 'left');
+        $db->orderBy('p.tanggal', 'DESC');
+        $db->limit(50);
+        $data = $db->get();
+        if(!$data) return false;
+        return $data->getResult();
+    }
 }

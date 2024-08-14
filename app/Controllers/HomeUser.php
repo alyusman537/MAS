@@ -14,8 +14,9 @@ use App\Libraries\JwtDecode;
 class HomeUser extends BaseController
 {
 use ResponseTrait;
-    public function infaqBelum()
+    public function daftarInfaq($is_lunas)
     {
+        $status = $is_lunas == 'lunas'?  'NOT NULL' :'NULL';
         $header = $this->request->getServer('HTTP_AUTHORIZATION');
         $decoder = new JwtDecode();
         $user = $decoder->decoder($header);
@@ -23,7 +24,7 @@ use ResponseTrait;
         $nia = $user->sub; //dari token
         $mp = new ModelPembayaran();
         
-        $data = $mp->belum($nia);
+        $data = $mp->daftarInfaq($nia, $status);
 
         return $this->respond($data);
     }

@@ -180,7 +180,7 @@ class Profile extends BaseController
 
         $password_lama = $json->password_lama;
         $password_baru = $json->password_baru;
-        $konfirmasi_password = $json->konfirmasi_password;
+        // $konfirmasi_password = $json->konfirmasi_password;
 
         $cek = $ma->select('*')->where(['nia' => $nia])->first();
         if ($nia_from_token != $nia) return $this->fail('Anda tidak berhak mengganti password anggota lain.', 400);
@@ -194,5 +194,60 @@ class Profile extends BaseController
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage(), $th->getCode());
         }
+    }
+
+    public function foto()
+    {
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
+        $decoder = new JwtDecode();
+        $user = $decoder->decoder($header);
+        $nia = $user->sub; //dari token
+
+        helper(['form', 'url']);
+        $validationRule = [
+            'foto' => [
+                // 'label' => 'Image File',
+                'rules' => [
+                    'uploaded[foto]',
+                    'is_image[foto]',
+                    'mime_in[foto,image/jpg,image/jpeg]',
+                    'max_size[foto,4096]',
+                    // 'max_dims[userfile,1024,768]',
+                ],
+                'errors' => [
+                    'uploaded' => 'tidak ada gambar yagn diupload',
+                    'is_image' => 'file harus berupa gambar',
+                    'mime_in' => 'gambar harus berupa jpg atau jpeg',
+                    'max_size' => 'ukurang gambar harus kurang dari 4mb'
+                ]
+            ],
+        ];
+        if (! $this->validateData([], $validationRule)) {
+            return $this->fail($this->validator->getErrors());
+
+        }
+        $mm = new ModelAnggota();
+
+        $fotoLama = $mm->select('*')->where('nia', $nia)->first();
+
+        $foto = isset($fotoLama['foto']) ? $fotoLama['foto'] : false;
+        $path_ori = WRITEPATH . 'uploads/profile/' . $foto;
+
+        $x_file = $this->request->getFile('foto');
+        $namaFoto = $x_file->getRandomName();
+
+        $x_file->move(WRITEPATH . 'uploads/profile/', $namaFoto);
+
+        $mm->set(['foto' => $namaFoto]);
+        $mm->where('nia', $nia);
+        $mm->update();
+
+        if ($foto) {
+            if (file_exists($path_ori)) {
+                unlink($path_ori);
+            }
+        }
+
+        return $this->respond(['image' => $namaFoto]);
     }
 }

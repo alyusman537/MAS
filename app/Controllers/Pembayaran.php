@@ -5,8 +5,6 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
 
-use App\Models\ModelAnggota;
-use App\Models\ModelWilayah;
 use App\Models\ModelInfaq;
 use App\Models\ModelPembayaran;
 
@@ -82,6 +80,11 @@ class Pembayaran extends BaseController
 
     public function buktiBayar($nomor_pembayaran)
     {
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
+        $decoder = new JwtDecode();
+        $user = $decoder->decoder($header);
+        $nia = $user->sub; //dari token
+
         helper(['form', 'url']);
         $validationRule = [
             'bukti' => [
@@ -102,18 +105,15 @@ class Pembayaran extends BaseController
             ],
         ];
         if (! $this->validateData([], $validationRule)) {
-            return $this->fail($this->validator->getErrors());
-
+            return $this->fail($this->validator->getErrors(), 400);
         }
         $mm = new ModelPembayaran();
 
         $fotoLama = $mm->select('*')->where('nomor_pembayaran', $nomor_pembayaran)->first();
+        if($fotoLama['nia'] != $nia) return $this->fail('Anda tidak berhak upload bukti bayar orang lain.', 400);
 
         $foto = isset($fotoLama['bukti_bayar']) ? $fotoLama['bukti_bayar'] : false;
-        // return $this->respond(['res' => $foto]);
-
         $path_ori = WRITEPATH . 'uploads/bukti/' . $foto;
-        // $path_thumb = WRITEPATH . 'uploads/thumbnail/' . $foto;
 
         $x_file = $this->request->getFile('bukti');
         $namaFoto = $x_file->getRandomName();
@@ -133,35 +133,5 @@ class Pembayaran extends BaseController
         return $this->respond(['image' => $namaFoto]);
     }
 
-    public function terima($nomor_pembayaran)
-    {
-        $header = $this->request->getServer('HTTP_AUTHORIZATION');
-        $decoder = new JwtDecode();
-        $user = $decoder->decoder($header);
-
-        $mi = new ModelInfaq();
-        $mp = new ModelPembayaran();
-        $tgl_sekarang = date('Y-m-d H:i:s');
-        $validator = $user->sub; //dari token
-
-        $bayar = $mp->select('*')->where(['nomor_pembayaran' => $nomor_pembayaran])->first();
-        $infaq = $mi->select('*')->where('kode', $bayar['kode_infaq'])->first();
-        if (!$bayar) return $this->fail('Kode pembayaran infaq ' . $nomor_pembayaran . ' anda tidak ditemukan.', 400);
-        if ($bayar['bayar'] >= (int) $infaq['nominal'] && $bayar['validator'] != null) return $this->fail('Pembayaran iuran sudah tervalidasi.', 400);
-        if ((int) $bayar['bayar'] < (int) $infaq['nominal']) return $this->fail('Nominal iuran kurang dari ketentuan infaq.', 400);
-
-        $data = [
-            'validator' => $validator,
-            'tanggal_validasi' => $tgl_sekarang,
-        ];
-
-        try {
-            $mp->set($data);
-            $mp->where('nomor_pembayaran', $nomor_pembayaran);
-            $mp->update();
-            $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
-        } catch (\Throwable $th) {
-            return $this->fail($th->getMessage(), $th->getCode());
-        }
-    }
+    
 }
