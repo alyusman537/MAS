@@ -119,15 +119,22 @@ class Umum extends BaseController
         }
     }
     
-    public function unggahBukti($id)
+    public function unggahBukti($kode)
     {
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
+        $decoder = new JwtDecode();
+        $user = $decoder->decoder($header);
+        $nia = $user->sub; //dari token
+
         helper(['form', 'url']);
         $mm = new ModelUmum();
 
-        $fotoLama = $mm->find($id);
+        $fotoLama = $mm->select('*')->where('kode', $kode)->first();
+        if(!$fotoLama) return $this->fail('Kode infaq umum '.$kode.' tidak ditemukan.', 400);
+        if($fotoLama['nia'] != $nia) return $this->fail('Anda tidak berhak upload bukti transaksi pada kode infaq ini.', 400);
         $foto = isset($fotoLama['bukti']) ? $fotoLama['bukti'] : false;
 
-        $path_ori = WRITEPATH . 'uploads/foto/' . $foto;
+        $path_ori = WRITEPATH . 'uploads/bukti/' . $foto;
         helper(['form', 'url']);
         $validationRule = [
             'bukti' => [
@@ -153,10 +160,10 @@ class Umum extends BaseController
 
         $x_file = $this->request->getFile('bukti');
         $namaFoto = $x_file->getRandomName();
-        $x_file->move(WRITEPATH . 'uploads/foto', $namaFoto);
+        $x_file->move(WRITEPATH . 'uploads/bukti/', $namaFoto);
 
-        $mm->set(['image' => $namaFoto]);
-        $mm->where('id', $id);
+        $mm->set(['bukti' => $namaFoto]);
+        $mm->where('kode', $kode);
         $mm->update();
 
         if ($foto) {
