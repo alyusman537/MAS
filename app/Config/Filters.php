@@ -46,10 +46,10 @@ class Filters extends BaseConfig
             // 'invalidchars',
             'cors',
             'auth' => [
-                'except' => ['/api/user-login', '/api/admin*']
+                'except' => ['/api/render/*', '/api/user-login', '/api/admin*']
             ],
             'admin' => [
-                'except' => ['/api/admin-login', '/api/user*']
+                'except' => ['/api/render/*', '/api/admin-login', '/api/user*']
             ],
         ],
         'after' => [

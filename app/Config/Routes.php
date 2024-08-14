@@ -7,6 +7,8 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Anggota::index');
 
+$routes->get('/api/render/bukti/(:any)', 'Render::bukti/$1');
+
 $routes->post('/api/user-login', 'Login::auth');
 $routes->get('/api/user/refresh-token', 'Login::refreshToken');
 
@@ -27,7 +29,7 @@ $routes->get('/api/user/infaq-umum/edit/(:any)', 'Umum::edit/$1');
 $routes->put('/api/user/infaq-umum/update/(:any)', 'Umum::update/$1');
 
 $routes->put('/api/user/pembayaran/(:any)', 'Pembayaran::bayar/$1');
-$routes->put('/api/user/pembayaran-bukti/(:any)', 'Pembayaran::bayar/$1');
+$routes->post('/api/user/pembayaran-bukti/(:any)', 'Pembayaran::buktiBayar/$1');
 
 //////////// ADMIN /////////////////////
 
