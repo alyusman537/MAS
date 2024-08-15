@@ -10,6 +10,7 @@ use App\Models\ModelPembayaran;
 use App\Models\ModelUmum;
 
 use App\Libraries\JwtDecode;
+use App\Libraries\LibMutasi;
 
 class Penerimaan extends BaseController
 {
@@ -39,7 +40,7 @@ class Penerimaan extends BaseController
     {
         $header = $this->request->getServer('HTTP_AUTHORIZATION');
         $decoder = new JwtDecode();
-        $user = $decoder->decoder($header);
+        $user = $decoder->admin($header);
 
         $mi = new ModelInfaq();
         $mp = new ModelPembayaran();
@@ -47,10 +48,15 @@ class Penerimaan extends BaseController
         $validator = $user->sub; //dari token
 
         $bayar = $mp->select('*')->where(['nomor_pembayaran' => $nomor_pembayaran])->first();
-        $infaq = $mi->select('*')->where('kode', $bayar['kode_infaq'])->first();
         if (!$bayar) return $this->fail('Kode pembayaran infaq ' . $nomor_pembayaran . ' anda tidak ditemukan.', 400);
+        $infaq = $mi->select('*')->where('kode', $bayar['kode_infaq'])->first();
+        if(!$infaq) return $this->fail('Kode infaq ' . $bayar['kode_infaq'] . ' tidak ditemukan.', 400);
         if ($bayar['bayar'] >= (int) $infaq['nominal'] && $bayar['validator'] != null) return $this->fail('Pembayaran iuran sudah tervalidasi.', 400);
-        if ((int) $bayar['bayar'] < (int) $infaq['nominal']) return $this->fail('Nominal iuran kurang dari ketentuan infaq.', 400);
+        $terbayar = (int) $bayar['bayar'] - (int) $infaq['nominal'];
+        if ($terbayar < 0) {
+
+            return $this->fail('Nominal iuran kurang dari ketentuan infaq '.$infaq['acara'].'. Kurang bayar Rp. '.number_format($terbayar), 400);
+        } 
 
         $data = [
             'validator' => $validator,
@@ -60,8 +66,13 @@ class Penerimaan extends BaseController
         try {
             $mp->set($data);
             $mp->where('nomor_pembayaran', $nomor_pembayaran);
-            $mp->update();
-            $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
+            $update = $mp->update();
+            if($update) {
+                $libMutasi = new LibMutasi();
+                $mutasi = $libMutasi->transaksi('PI-'.time(), date('Y-m-d'), 'D', $bayar['bayar'], 'Penerimaan infaq nomor '.$nomor_pembayaran, $validator);
+                if(!$mutasi) return $this->fail('Infaq berhasil diterima namun gagal simpan pada mutasi.');
+                $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
+            }
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage(), $th->getCode());
         }
@@ -71,7 +82,7 @@ class Penerimaan extends BaseController
     {
         $header = $this->request->getServer('HTTP_AUTHORIZATION');
         $decoder = new JwtDecode();
-        $user = $decoder->decoder($header);
+        $user = $decoder->admin($header);
 
         $mp = new ModelUmum();
         $tgl_sekarang = date('Y-m-d H:i:s');
@@ -90,8 +101,13 @@ class Penerimaan extends BaseController
         try {
             $mp->set($data);
             $mp->where('kode', $kode);
-            $mp->update();
-            $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
+            $update = $mp->update();
+            if($update) {
+                $libMutasi = new LibMutasi();
+                $mutasi = $libMutasi->transaksi('PI-'.time(), date('Y-m-d'), 'D', $bayar['bayar'], 'Penerimaan infaq umum nomor '.$kode, $validator);
+                if(!$mutasi) return $this->fail('Infaq berhasil diterima namun gagal simpan pada mutasi.');
+                $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
+            }
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage(), $th->getCode());
         }

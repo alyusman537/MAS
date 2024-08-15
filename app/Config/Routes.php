@@ -69,3 +69,9 @@ $routes->get('/api/admin/daftar-bayar-infaq/(:any)', 'Penerimaan::daftarTunggu/$
 $routes->get('/api/admin/daftar-bayar-umum/(:any)', 'Penerimaan::daftarUmum/$1');
 $routes->get('/api/admin/terima-infaq/(:any)', 'Penerimaan::terimaInfaq/$1');
 $routes->get('/api/admin/terima-umum/(:any)', 'Penerimaan::terimaUmum/$1');
+
+$routes->get('/api/admin/mutasi', 'Mutasi::new');
+$routes->post('/api/admin/mutasi', 'Mutasi::add');
+$routes->get('/api/admin/mutasi-tanggal/(:any)/(:any)', 'Mutasi::list/$1/$2');
+$routes->get('/api/admin/mutasi-detail/(:any)', 'Mutasi::detail/$1');
+$routes->get('/api/admin/saldo-akhir', 'Mutasi::saldoAkhir');
