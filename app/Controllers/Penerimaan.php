@@ -50,32 +50,28 @@ class Penerimaan extends BaseController
         $bayar = $mp->select('*')->where(['nomor_pembayaran' => $nomor_pembayaran])->first();
         if (!$bayar) return $this->fail('Kode pembayaran infaq ' . $nomor_pembayaran . ' anda tidak ditemukan.', 400);
         $infaq = $mi->select('*')->where('kode', $bayar['kode_infaq'])->first();
-        if(!$infaq) return $this->fail('Kode infaq ' . $bayar['kode_infaq'] . ' tidak ditemukan.', 400);
-        if ($bayar['bayar'] >= (int) $infaq['nominal'] && $bayar['validator'] != null) return $this->fail('Pembayaran iuran sudah tervalidasi.', 400);
+        if (!$infaq) return $this->fail('Kode infaq ' . $bayar['kode_infaq'] . ' tidak ditemukan.', 400);
+        if ($bayar['validator'] != null) return $this->fail('Pembayaran iuran sudah diterima oleh '.$bayar['validator'].'.', 400);
         $terbayar = (int) $bayar['bayar'] - (int) $infaq['nominal'];
         if ($terbayar < 0) {
 
-            return $this->fail('Nominal iuran kurang dari ketentuan infaq '.$infaq['acara'].'. Kurang bayar Rp. '.number_format($terbayar), 400);
-        } 
+            return $this->fail('Nominal iuran kurang dari ketentuan infaq ' . $infaq['acara'] . '. Kurang bayar Rp. ' . number_format($terbayar), 400);
+        }
 
         $data = [
             'validator' => $validator,
             'tanggal_validasi' => $tgl_sekarang,
         ];
 
-        try {
-            $mp->set($data);
-            $mp->where('nomor_pembayaran', $nomor_pembayaran);
-            $update = $mp->update();
-            if($update) {
-                $libMutasi = new LibMutasi();
-                $mutasi = $libMutasi->transaksi('PI-'.time(), date('Y-m-d'), 'D', $bayar['bayar'], 'Penerimaan infaq nomor '.$nomor_pembayaran, $validator);
-                if(!$mutasi) return $this->fail('Infaq berhasil diterima namun gagal simpan pada mutasi.');
-                $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
-            }
-        } catch (\Throwable $th) {
-            return $this->fail($th->getMessage(), $th->getCode());
-        }
+        $mp->set($data);
+        $mp->where('nomor_pembayaran', $nomor_pembayaran);
+        $update = $mp->update();
+        if (!$update) return $this->fail('Gagal terima pembayaran infaq kode ' . $nomor_pembayaran . ' .', 400);
+        
+        $libMutasi = new LibMutasi();
+        $mutasi = $libMutasi->transaksi('PI-' . time(), date('Y-m-d'), 'D', $bayar['bayar'], 'Penerimaan infaq nomor ' . $nomor_pembayaran, $validator);
+        if (!$mutasi) return $this->fail('Infaq berhasil diterima namun gagal simpan pada mutasi.');
+        return $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
     }
 
     public function terimaUmum($kode)
@@ -89,27 +85,24 @@ class Penerimaan extends BaseController
         $validator = $user->sub; //dari token
 
         $bayar = $mp->select('*')->where(['kode' => $kode])->first();
-        
+
         if (!$bayar) return $this->fail('Kode infaq umum ' . $kode . ' tidak ditemukan.', 400);
         if ($bayar['bukti'] == null) return $this->fail('Bukti pembayaran masih belum diupload oleh anggota.', 400);
+        if($bayar['validator'] != null) return $this->fail('Pembayran infq umum kode '.$kode.' sudah diterima oleh '.$bayar['validator'].'.', 400);
 
         $data = [
             'validator' => $validator,
             'tanggal_validasi' => $tgl_sekarang,
         ];
 
-        try {
-            $mp->set($data);
-            $mp->where('kode', $kode);
-            $update = $mp->update();
-            if($update) {
-                $libMutasi = new LibMutasi();
-                $mutasi = $libMutasi->transaksi('PI-'.time(), date('Y-m-d'), 'D', $bayar['bayar'], 'Penerimaan infaq umum nomor '.$kode, $validator);
-                if(!$mutasi) return $this->fail('Infaq berhasil diterima namun gagal simpan pada mutasi.');
-                $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
-            }
-        } catch (\Throwable $th) {
-            return $this->fail($th->getMessage(), $th->getCode());
-        }
+        $mp->set($data);
+        $mp->where('kode', $kode);
+        $update = $mp->update();
+        if (!$update) return $this->fail('Gagal terima infaq umum nomor ' . $kode, 400);
+
+        $libMutasi = new LibMutasi();
+        $mutasi = $libMutasi->transaksi('PI-' . time(), date('Y-m-d'), 'D', $bayar['nominal'], 'Penerimaan infaq umum nomor ' . $kode, $validator);
+        if (!$mutasi) return $this->fail('Infaq berhasil diterima namun gagal simpan pada mutasi.');
+        return $this->respond(['pesan' => 'Pembayaran infaq umum kode ' . $kode . ' berhasil diterima oleh ' . $validator . '.']);
     }
 }
