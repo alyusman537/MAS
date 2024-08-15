@@ -75,3 +75,7 @@ $routes->post('/api/admin/mutasi', 'Mutasi::add');
 $routes->get('/api/admin/mutasi-tanggal/(:any)/(:any)', 'Mutasi::list/$1/$2');
 $routes->get('/api/admin/mutasi-detail/(:any)', 'Mutasi::detail/$1');
 $routes->get('/api/admin/saldo-akhir', 'Mutasi::saldoAkhir');
+
+///////////// VIEW USER ///////////////
+$routes->get('/login', 'View::userLogin');
+$routes->get('/profile', 'View::userProfile');

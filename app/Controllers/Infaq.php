@@ -79,11 +79,13 @@ class Infaq extends BaseController
         $json = $this->request->getJSON();
         $kode = time();
         $rutin = $json->rutin; // == 'ya' ? true : false;
+        $tanggal_acara = $json->tanggal_acara;
+        if($tanggal_acara < date('Y-m-d')) return $this->fail('Tanggal acara tidak boleh lebih kecil dari tanggal sekarang', 400);
         $data = [
             'tanggal' => date('Y-m-d', $kode),
             'kode' => $kode,
             'acara' => $json->acara,
-            'tanggal_acara' => $json->tanggal_acara,
+            'tanggal_acara' => $tanggal_acara,
             'keterangan' => $json->keterangan,
             'nominal' => $json->nominal,
             'rutin' => $rutin,
