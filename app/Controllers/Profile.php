@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
 
 use App\Models\ModelAnggota;
+use App\Models\ModelPembayaran;
 
 use App\Libraries\JwtDecode;
 
@@ -20,8 +21,11 @@ class Profile extends BaseController
 
         $nia = $user->sub; //dari token
         $ma = new ModelAnggota();
+        $mp = new ModelPembayaran();
         $profile = $ma->select('*')->where('nia',$nia)->first();
-        $foto = $profile['foto'] === null ? base_url() . 'render/image/null' : base_url() . 'render/image/' . $profile['foto'];
+        $foto = $profile['foto'] === null ? base_url() . 'api/render/foto/no_photo.jpg' : base_url() . 'api/render/foto/' . $profile['foto'];
+
+        $bayar = $mp->selectCount('nomor_pembayaran')->where(['nia' => $nia])->where('validator IS NULL')->first();
         $data = [
             'nia' => $profile['nia'],
             'nama' => strtoupper($profile['nama']),
@@ -32,6 +36,7 @@ class Profile extends BaseController
             'foto' => $foto,
             'email' => $profile['email'],
             'aktif' => $profile['aktif'],
+            'iuran_belum_terbayar' =>(int) $bayar['nomor_pembayaran']
         ];
 
         return $this->respond($data);

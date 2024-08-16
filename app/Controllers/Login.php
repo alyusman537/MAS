@@ -75,10 +75,13 @@ class Login extends BaseController
         );
 
         $token = JWT::encode($payload, $key, 'HS256');
+        $cek = WRITEPATH . 'uploads/profile/' . $user['foto'];
+        $foto = file_exists($cek) ? base_url().'api/render/foto/'.$user['foto'] : base_url(). 'api/render/foto/no_photo';
         $data = [
             'nia' => $nia,
             'nama' => $user['nama'],
-            'level' => $user['level']
+            'level' => $user['level'],
+            'foto' => $foto,
         ];
 
         $response = [
