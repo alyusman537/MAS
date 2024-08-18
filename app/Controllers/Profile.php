@@ -178,7 +178,7 @@ class Profile extends BaseController
             ],
         ];
 
-        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
         $ma = new ModelAnggota();
 
         $json = $this->request->getJSON();
@@ -253,6 +253,6 @@ class Profile extends BaseController
             }
         }
 
-        return $this->respond(['image' => $namaFoto]);
+        return $this->respond(['foto' => base_url().'api/render/foto/'.$namaFoto]);
     }
 }

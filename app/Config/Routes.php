@@ -9,6 +9,7 @@ $routes->get('/', 'Anggota::index');
 
 $routes->get('/api/render/bukti/(:any)', 'Render::bukti/$1');
 $routes->get('/api/render/foto/(:any)', 'Render::image/$1');
+$routes->get('/api/render/js/(:any)', 'Render::js/$1');
 
 $routes->post('/api/user-login', 'Login::auth');
 $routes->get('/api/user/refresh-token', 'Login::refreshToken');
@@ -79,3 +80,6 @@ $routes->get('/api/admin/saldo-akhir', 'Mutasi::saldoAkhir');
 ///////////// VIEW USER ///////////////
 $routes->get('/login', 'View::userLogin');
 $routes->get('/profile', 'View::userProfile');
+$routes->get('/infaq', 'View::userInfaq');
+$routes->get('/infaq-umum', 'View::userInfaqUmum');
+$routes->get('/laporan-kas', 'View::userKas');

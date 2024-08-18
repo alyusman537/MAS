@@ -105,6 +105,8 @@
           }
           await axios.post('<?= base_url(); ?>api/user-login', param)
             .then((res) => {
+              console.log(res.data);
+              
               const store = {
                 nama: res.data.user.nama,
                 nia: res.data.user.nia,

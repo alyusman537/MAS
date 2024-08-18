@@ -15,6 +15,19 @@ class View extends BaseController
     {
         return view('/user/profile');
     }
+    public function userInfaq()
+    {
+        return view('/user/infaq');
+    }
+    public function userInfaqUmum()
+    {
+        return view('/user/infaq-umum');
+    }
+    public function userKas()
+    {
+        return view('/user/laporan-kas');
+    }
+
 
     public function loginAdmin()
     {
