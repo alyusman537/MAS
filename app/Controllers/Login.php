@@ -39,7 +39,7 @@ class Login extends BaseController
             ],
         ];
 
-        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 400);
 
         $ma = new ModelAnggota();
 
@@ -50,17 +50,17 @@ class Login extends BaseController
         $user = $ma->where('nia', $nia)->first();
 
         if (is_null($user)) {
-            return $this->respond(['error' => 'NIA yang Anda masukkan salah.'], 401);
+            return $this->respond(['error' => 'NIA yang Anda masukkan salah.'], 409);
         }
 
         if($user['aktif'] == 'nonaktif') {
-            return $this->respond(['error' => 'NIA Anda telah dinonaktifkan. Silahkan hubungi admin.'], 401);
+            return $this->respond(['error' => 'NIA Anda telah dinonaktifkan. Silahkan hubungi admin.'], 409);
         }
 
         $pwd_verify = password_verify($password, $user['password']);
 
         if (!$pwd_verify) {
-            return $this->respond(['error' => 'Password yang Anda masukkan salah.'], 401);
+            return $this->respond(['error' => 'Password yang Anda masukkan salah.'], 409);
         }
 
         $key = getenv('JWT_KEY');

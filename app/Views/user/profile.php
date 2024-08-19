@@ -29,20 +29,40 @@
             </v-card>
             <v-card-text class="px-10">
               <v-row class="mt-2">
-                <v-col cols="6">
+                <v-col cols="4">
                   <div>ID Anggota</div>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="8">
                   <div class="font-weight-bold text-right">{{id_user}}</div>
                 </v-col>
               </v-row>
               <v-divider></v-divider>
               <v-row class="mt-2">
-                <v-col cols="6">
+                <v-col cols="4">
                   <div>Alamat</div>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="8">
                   <div class="font-weight-bold text-right">{{alamat_user}}</div>
+                </v-col>
+              </v-row>
+              <v-divider></v-divider>
+
+              <v-row class="mt-2">
+                <v-col cols="4">
+                  <div>WA</div>
+                </v-col>
+                <v-col cols="8">
+                  <div class="font-weight-bold text-right">{{wa}}</div>
+                </v-col>
+              </v-row>
+              <v-divider></v-divider>
+
+              <v-row class="mt-2">
+                <v-col cols="4">
+                  <div>Email</div>
+                </v-col>
+                <v-col cols="8">
+                  <div class="font-weight-bold text-right">{{email}}</div>
                 </v-col>
               </v-row>
               <v-divider></v-divider>
@@ -73,6 +93,9 @@
               <v-divider></v-divider>
               <v-row class="mt-4">
                 <v-col cols="12">
+                  <v-btn color="info" depressed block @click="loadDialogDiri()">Ubah Data Diri</v-btn>
+                </v-col>
+                <v-col cols="12">
                   <v-btn color="info" depressed block @click="dialogFoto = true">Ubah Foto</v-btn>
                 </v-col>
                 <v-col cols="12">
@@ -82,6 +105,43 @@
 
             </v-card-text>
           </v-card>
+
+          <v-dialog
+            v-model="dialogDiri">
+            <v-card flat max-width="500" class="mx-auto">
+              <v-toolbar color="primary" flat dark>
+                <v-toolbar-title>Ubah Data Diri</v-toolbar-title>
+              </v-toolbar>
+              <v-card-text class="py-8">
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      outlined
+                      label="Nama"
+                      v-model="diri.nama"></v-text-field>
+                    <v-text-field
+                      outlined
+                      label="Alamat"
+                      v-model="diri.alamat"></v-text-field>
+                    <v-text-field
+                      outlined
+                      label="Nomor WA"
+                      v-model="diri.wa"></v-text-field>
+                      <v-text-field
+                      outlined
+                      label="Alamat Email"
+                      v-model="diri.email"></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-btn color="success" block depressed @click="updatePassword()">Simpan</v-btn>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-btn color="error" block depressed @click="dialogDiri = false">Batal</v-btn>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
 
           <v-dialog
             v-model="dialogFoto">
@@ -178,15 +238,24 @@
       }),
       data: {
         title: "PROFILE",
+        config: null,
+        token: null,
         id_user: null,
         nama_user: null,
         alamat_user: null,
+        wa: null,
+        email: null,
         aktif_user: null,
         warna_aktif: null,
         iuran_belum_bayar: 0,
         foto: null,
-        config: null,
-        token: null,
+        dialogDiri: false,
+        diri: {
+          alamat: null,
+          email: null,
+          nama: null,
+          wa: null
+        },
         dialogFoto: false,
         attFile: null,
         dialogPassword: false,
@@ -212,7 +281,6 @@
           }
         }
         this.getProfile()
-
       },
       methods: {
         async getProfile() {
@@ -221,11 +289,28 @@
               this.id_user = res.data.nia
               this.nama_user = res.data.nama
               this.alamat_user = res.data.alamat
+              this.email = res.data.email
+              this.wa = res.data.wa
               this.aktif_user = res.data.aktif
               this.warna_aktif = res.data.aktif == 'aktif' ? 'green' : 'red'
               this.iuran_belum_bayar = res.data.iuran_belum_terbayar
               this.foto = res.data.foto
               console.log(res.data);
+            })
+            .catch((err) => {
+              console.log(err.response.data);
+
+            })
+        },
+        async loadDialogDiri() {
+          await axios.get('<?= base_url(); ?>api/user/profile/edit/' + this.id_user, this.config)
+            .then((res) => {
+              console.log(res.data);
+              this.diri.nama = res.data.nama
+              this.diri.alamat = res.data.alamat
+              this.diri.wa = res.data.wa
+              this.diri.email = res.data.email
+              this.dialogDiri = true
             })
             .catch((err) => {
               console.log(err.response.data);

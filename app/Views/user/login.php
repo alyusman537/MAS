@@ -11,38 +11,51 @@
 <body>
   <div id="app">
     <v-app>
+      <v-img :src="bgImg">
       <v-main>
         <v-container>
-          <v-card class="mx-auto justify-center" max-width="600" height="425" flat color="green lighten-5">
-            <v-toolbar color="primary" dark flat class="text-center">
-              <v-row>
-                <h3 class="mx-auto">AL WAFA BI'AHDILLAH</h3>
-              </v-row>
-            </v-toolbar>
-            <v-card-text>
-              <v-card class="mx-auto mt-5 ml-5 mr-5" flat color="green lighten-5">
+          <div class="mx-auto justify-center" max-width="600" height="425" flat> <!-- color="green lighten-5"-->
+            <v-card style="background-color: transparent; border: 0.5px solid rgba(255, 255, 255, 0.5);backdrop-filter: blur(2px);-webkit-backdrop-filter: blur(8px);" flat>
+              
+              <div flat class="py-3">
+                <!-- <div color="primary" dark flat class="py-3"> -->
+                  <v-img :src="logo" height="100%" width="150" class="mx-auto"></v-img>
+                  <!-- <v-row>
+                    <h3 class="mx-auto mt-2">AL WAFA BI'AHDILLAH</h3>
+                  </v-row> -->
+                </div>
+                <v-card-text>
+                
+              
+            <div>
+              <div class="mx-auto mt-5 ml-5 mr-5" max-width="450" flat > <!--color="green lighten-5"-->
                 <v-row class="text-center">
                   <v-col cols="12">
-                    <v-text-field
-                      label="ID Anggota"
-                      rounded
-                      outlined
-                      append-icon="mdi-account"
-                      v-model="nia"
-                      required></v-text-field>
+                        <v-text-field
+                          label="ID Anggota"
+                          rounded
+                          append-icon="mdi-account"
+                          v-model="nia"
+                          color="teal"
+                          outlined
+                          required
+                          filled
+                          class="text-white"
+                          ></v-text-field>
+                        
+                          <v-text-field
+                            label="Password"
+                            v-model="password"
+                            rounded
+                            outlined
+                            required
+                            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                            :type="showPassword ? 'text' : 'password'"
+                            @click:append="showPassword = !showPassword">
+                          </v-text-field>
                   </v-col>
-                  <v-col cols="12">
-                    <v-text-field
-                      label="Password"
-                      v-model="password"
-                      rounded
-                      outlined
-                      required
-                      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                      :type="showPassword ? 'text' : 'password'"
-                      @click:append="showPassword = !showPassword">
-                    </v-text-field>
-                  </v-col>
+                  <!-- <v-col cols="12">
+                  </v-col> -->
                   <v-col cols="12">
                     <v-btn color="primary" height="50" rounded depressed block @click="goLogin">SUBMIT</v-btn>
                     <v-row class="mt-1">
@@ -55,12 +68,16 @@
                     </v-row>
                   </v-col>
                 </v-row>
-              </v-card>
+              </div>
+            </div>
             </v-card-text>
-          </v-card>
+            </v-card>
+          </div>
+
         </v-container>
       </v-main>
     </v-app>
+  </v-img>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
@@ -96,6 +113,8 @@
         nia: null,
         password: null,
         showPassword: false,
+        logo: '<?= base_url();?>logo_alwafa_white.png',
+        bgImg: '<?= base_url()?>gunung.jpg',
       },
       methods: {
         async goLogin() {
@@ -119,13 +138,22 @@
               window.open('<?= base_url(); ?>profile', '_self')
             })
             .catch((err) => {
-              if (err.response.status === 400) {
+              console.log(err.response.data);
+              if (err.response.status === 409) {
                 Toast.fire({
                   icon: "error",
-                  title: "Gagal Login"
+                  title: err.response.data.error
                 });
               }
-
+              if (err.response.status === 400) {
+                const err_nia = !err.response.data.messages.nia ? '' : err.response.data.messages.nia
+                const err_pass = !err.response.data.messages.password ? '' : err.response.data.messages.password
+                const pesan = err_nia+'\n'+err_pass
+                Toast.fire({
+                  icon: "error",
+                  title: pesan
+                });
+              }
             })
         },
       }

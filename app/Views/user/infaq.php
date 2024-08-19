@@ -15,7 +15,7 @@
         <nav-bar :title="title"></nav-bar>
 
         <v-container>
-          <v-card class="mx-auto justify-center mt-5 pb-7" max-width="600" flat> <!--color="green lighten-5" -->
+          <v-card class="mx-auto justify-center mt-5 pb-7" max-width="600" flat>
             <v-card color="teal" flat class="text-center py-5">
               <div class="mx-auto">
                 <v-avatar
@@ -177,7 +177,9 @@
         },
       }),
       data: {
-        title: "PROFILE",
+        title: "DAFTAR INFAQ",
+        config: null,
+        token: null,
         id_user: null,
         nama_user: null,
         alamat_user: null,
@@ -185,8 +187,6 @@
         warna_aktif: null,
         iuran_belum_bayar: 0,
         foto: null,
-        config: null,
-        token: null,
         dialogFoto: false,
         attFile: null,
         dialogPassword: false,
@@ -200,9 +200,6 @@
         }
       },
       watch: {
-        group() {
-          this.drawer = false
-        },
       },
       created() {
         this.token = localStorage.getItem('token')
@@ -211,8 +208,6 @@
             Authorization: `Bearer ${this.token}`
           }
         }
-        this.getProfile()
-
       },
       methods: {
         async getProfile() {
