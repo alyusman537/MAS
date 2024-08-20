@@ -14,7 +14,7 @@
       <v-img :src="bgImg">
         <v-main>
           <v-container>
-            <v-card class="mx-auto my-auto justify-center" max-width="600" height="425" flat style="background-color: #fff;  opacity: .8;"> <!-- color="green lighten-5"-->
+            <v-card class="mx-auto my-auto justify-center" max-width="500" height="425" flat style="background-color: #fff;  opacity: .8;"> <!-- color="green lighten-5"-->
               <v-card style="background-color: #fff; border: 0.5px solid rgba(255, 255, 255, 0.5);backdrop-filter: blur(2px);-webkit-backdrop-filter: blur(8px);" flat>
 
                 <div flat class="py-3">

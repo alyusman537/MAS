@@ -115,7 +115,7 @@
                     </v-file-input>
                   </v-col>
                   <v-col cols="12">
-                    <v-btn color="success" block depressed @click="bayarInfaq()">Bayar sekarang</v-btn>
+                    <v-btn color="success" block depressed @click="uploadBuktiBayar()">Bayar sekarang</v-btn>
                   </v-col>
                   <v-col cols="12">
                     <v-btn color="error" block depressed @click="dialogBayar = false">Batal</v-btn>
@@ -124,7 +124,7 @@
               </v-card-text>
             </v-card>
           </v-dialog>
-
+          
         </v-container>
       </v-main>
     </v-app>
@@ -207,6 +207,8 @@
           tanggal_bayar: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         },
         menu2: false,
+        attFile: null,
+        linkFoto: null,
       },
       watch: {},
       created() {
@@ -275,7 +277,6 @@
           await axios.put('<?= base_url(); ?>/api/user/pembayaran/' + this.infaq.nomor_pembayaran, param, this.config)
             .then((res) => {
               console.log(res.data);
-              this.uploadBuktiBayar()
             })
             .catch((err) => {
               if (err.response.status === 402) {
@@ -310,6 +311,7 @@
             .post('<?= base_url(); ?>api/user/pembayaran-bukti' + this.infaq.nomor_pembayaran, fdata, this.config)
             .then((res) => {
               console.log(res.data);
+              this.bayarInfaq()
               const localData = JSON.parse(localStorage.getItem('user'))
               const store = {
                 nama: localData.nama,

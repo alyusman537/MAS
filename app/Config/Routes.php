@@ -27,6 +27,7 @@ $routes->get('/api/user/infaq-umum/id/(:any)', 'Umum::byId/$1');
 $routes->get('/api/user/infaq-umum/edit/(:any)', 'Umum::edit/$1');
 $routes->put('/api/user/infaq-umum/update/(:any)', 'Umum::update/$1');
 $routes->post('/api/user/infaq-umum-bukti/(:any)', 'Umum::unggahBukti/$1');
+$routes->delete('/api/user/infaq-umum/delete/(:any)', 'Umum::delete/$1');
 
 $routes->get('/api/user/home/daftar-infaq/(:any)', 'HomeUser::daftarInfaq/$1');
 $routes->get('/api/user/home/infaq-umum', 'HomeUser::infaqUmum');
