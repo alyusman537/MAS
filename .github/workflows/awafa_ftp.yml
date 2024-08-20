@@ -1,0 +1,28 @@
+name: al wafa publish
+on:
+  push:
+    branches: [ "usman" ]
+  pull_request:
+    branches: [ "usman" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        awalfa_server: ${{ secreet.ALWAFA_FTP }}
+        alwafa_username: ${{ secreet.ALWAFA_USER }}
+        alwafa_password: ${{ secreet.ALWAFA_PASS }}
