@@ -24,5 +24,5 @@ jobs:
       uses: actions/cache@v3
       with:
         awalfa_server: ${{ secreet.ALWAFA_FTP }}
-        alwafa_username: ${{ secreet.ALWAFA_USER }}
-        alwafa_password: ${{ secreet.ALWAFA_PASS }}
+        alwafa_username: ${{ secreet.ALWAFA_USERNAME }}
+        alwafa_password: ${{ secreet.ALWAFA_PASSWORD }}
