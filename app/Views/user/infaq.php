@@ -15,135 +15,110 @@
         <nav-bar :title="title"></nav-bar>
 
         <v-container>
-          <v-card class="mx-auto justify-center mt-5 pb-7" max-width="600" flat>
-            <v-card color="teal" flat class="text-center py-5">
-              <div class="mx-auto">
-                <v-avatar
-                  size="165"
-                  class="profile"
-                  color="grey">
-                  <img :src="foto" alt="alt">
-                </v-avatar>
-              </div>
-              <h3 class="text-center white--text mt-3">{{ String(nama_user).toUpperCase()}}</h3>
+          <v-card class="mx-auto justify-center mt-5 pb-7" max-width="800" flat>
+            <v-card color="teal" flat class="text-center mx-auto py-3" dark>
+              <h3 class="mx-auto">Daftar Infaq</h3>
             </v-card>
-            <v-card-text class="px-10">
-              <v-row class="mt-2">
-                <v-col cols="6">
-                  <div>ID Anggota</div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="font-weight-bold text-right">{{id_user}}</div>
-                </v-col>
-              </v-row>
-              <v-divider></v-divider>
-              <v-row class="mt-2">
-                <v-col cols="6">
-                  <div>Alamat</div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="font-weight-bold text-right">{{alamat_user}}</div>
-                </v-col>
-              </v-row>
-              <v-divider></v-divider>
-
-              <v-row class="mt-2">
-                <v-col cols="6">
-                  <div>Status</div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="text-right mb-2">
-                    <v-chip small :color="warna_aktif" text-color="white">{{aktif_user}}</v-chip>
-                  </div>
-                </v-col>
-              </v-row>
-              <v-divider></v-divider>
-
-              <v-row class="mt-2">
-                <v-col cols="6">
-                  <div>Iuran Belum Terbayar</div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="text-right mb-2">
-                    <v-btn color="warning" x-small rounded depressed width="55" height="25">{{iuran_belum_bayar}}</v-btn>
-                    <!-- <v-chip  small :color="warna_aktif" text-color="white">{{iuran_belum_bayar}}</v-chip> -->
-                  </div>
-                </v-col>
-              </v-row>
-              <v-divider></v-divider>
-              <v-row class="mt-4">
-                <v-col cols="12">
-                  <v-btn color="info" depressed block @click="dialogFoto = true">Ubah Foto</v-btn>
-                </v-col>
-                <v-col cols="12">
-                  <v-btn color="info" depressed block @click="loadUbahPassword()">Ubah Password</v-btn>
-                </v-col>
-              </v-row>
-
+            <v-card-text class="px-2">
+              <v-data-table
+                :headers="headerInfaq"
+                :items="listInfaq"
+                class="elevation-0">
+                <template v-slot:item.lunas="{ item }">
+                  <v-btn
+                    :color="item.warna_lunas"
+                    :disabled="item.status_lunas"
+                    depressed
+                    rounded
+                    small
+                    dark
+                    @click="loadPembayaran(item)">
+                    {{ item.lunas }}
+                  </v-btn>
+                </template>
+              </v-data-table>
             </v-card-text>
           </v-card>
 
           <v-dialog
-            v-model="dialogFoto">
+            v-model="dialogBayar">
             <v-card flat max-width="500" class="mx-auto">
               <v-toolbar color="primary" flat dark>
-                <v-toolbar-title>Ubah Foto Profile</v-toolbar-title>
-              </v-toolbar>
-              <v-card-text class="py-8">
-                <v-form id="upload-form" enctype="multipart/form-data" method="post" accept-charset="utf-8">
-                  <v-row>
-                    <v-col cols="12">
-                      <v-file-input
-                        label="Pilih Foto"
-                        outlined
-                        dense
-                        show-size
-                        hint="Harus berupa file jpg atau jpeg dan ukuran maximal 4mb"
-                        @change="upload"></v-file-input>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-btn color="success" block depressed type="submit" @click.prevent="gantiFoto()">Simpan</v-btn>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-btn color="error" block depressed @click="dialogFoto = false">Batal</v-btn>
-                    </v-col>
-                  </v-row>
-                </v-form>
-              </v-card-text>
-            </v-card>
-          </v-dialog>
-
-          <v-dialog
-            v-model="dialogPassword">
-            <v-card flat max-width="500" class="mx-auto">
-              <v-toolbar color="primary" flat dark>
-                <v-toolbar-title>Ubah Password</v-toolbar-title>
+                <v-toolbar-title>Pembayaran Infaq</v-toolbar-title>
               </v-toolbar>
               <v-card-text class="py-8">
                 <v-row>
                   <v-col cols="12">
+                    <v-simple-table>
+                      <template v-slot:default>
+                        <tbody>
+                          <tr>
+                            <td>Acara</td>
+                            <td class="text-right font-weight-bold">{{ infaq.acara }}</td>
+                          </tr>
+                          <tr>
+                            <td>Tanggal Acara</td>
+                            <td class="text-right font-weight-bold">{{ infaq.tanggal }}</td>
+                          </tr>
+                          <tr>
+                            <td>Nominal</td>
+                            <td class="text-right font-weight-bold">{{ infaq.nominal }}</td>
+                          </tr>
+                          <tr>
+                            <td>Nomor Pembayaran</td>
+                            <td class="text-right font-weight-bold">{{ infaq.nomor_pembayaran }}</td>
+                          </tr>
+                        </tbody>
+                      </template>
+                    </v-simple-table>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-menu
+                      v-model="menu2"
+                      :close-on-content-click="false"
+                      :nudge-right="40"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="auto">
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                          v-model="infaq.tanggal_bayar"
+                          label="Pilih Tanggal Pembayaran"
+                          readonly
+                          outlined
+                          v-bind="attrs"
+                          v-on="on"></v-text-field>
+                      </template>
+                      <v-date-picker
+                        v-model="infaq.tanggal_bayar"
+                        @input="menu2 = false"></v-date-picker>
+                    </v-menu>
+                  </v-col>
+                  <v-col cols="6">
                     <v-text-field
+                      class="text-right"
                       outlined
-                      label="Password Lama"
-                      :error="error_password.lama"
-                      v-model="password_lama"></v-text-field>
-                    <v-text-field
-                      outlined
-                      label="Password Baru"
-                      :error="error_password.baru"
-                      hint-error="Password harus terdiri dari 4 karakter atau lebih"
-                      v-model="password_baru"></v-text-field>
-                    <v-text-field
-                      outlined
-                      label="Konfirmasi Password"
-                      :error="error_password.konfirmasi"
-                      v-model="konfirmasi_password"></v-text-field>
+                      v-model="infaq.nominal_bayar"
+                      type="number"
+                      pattern="[0-9\s]{13,19}"
+                      label="Nominal Pembayaran"></v-text-field>
                   </v-col>
                   <v-col cols="12">
-                    <v-btn color="success" block depressed @click="updatePassword()">Simpan</v-btn>
+
+                    <v-file-input
+                      label="Pilih Foto"
+                      outlined
+                      dense
+                      show-size
+                      hint="Harus berupa file jpg atau jpeg dan ukuran maximal 4mb"
+                      @change="upload">
+                    </v-file-input>
                   </v-col>
                   <v-col cols="12">
-                    <v-btn color="error" block depressed @click="dialogPassword = false">Batal</v-btn>
+                    <v-btn color="success" block depressed @click="bayarInfaq()">Bayar sekarang</v-btn>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-btn color="error" block depressed @click="dialogBayar = false">Batal</v-btn>
                   </v-col>
                 </v-row>
               </v-card-text>
@@ -162,6 +137,17 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      }
+    });
     new Vue({
       el: '#app',
       vuetify: new Vuetify({
@@ -180,118 +166,132 @@
         title: "DAFTAR INFAQ",
         config: null,
         token: null,
-        id_user: null,
-        nama_user: null,
-        alamat_user: null,
-        aktif_user: null,
-        warna_aktif: null,
-        iuran_belum_bayar: 0,
-        foto: null,
-        dialogFoto: false,
-        attFile: null,
-        dialogPassword: false,
-        password_lama: null,
-        password_baru: null,
-        konfirmasi_password: null,
-        error_password: {
-          lama: null,
-          baru: null,
-          konfirmasi: null
-        }
+        nia: null,
+        headerInfaq: [{
+            text: 'Tanggal',
+            align: 'start', // sortable: false,
+            value: 'tanggal',
+          },
+          {
+            text: 'Acara',
+            value: 'acara'
+          },
+          {
+            text: 'nominal',
+            value: 'nominal',
+            align: 'end'
+          },
+          {
+            text: 'Bayar',
+            value: 'bayar',
+            align: 'end'
+          },
+          {
+            text: 'Lunas',
+            value: 'lunas'
+          },
+          {
+            text: 'Penerima',
+            value: 'validator'
+          },
+        ],
+        listInfaq: [],
+        dialogBayar: false,
+        infaq: {
+          nomor_pembayaran: null,
+          acara: null,
+          tanggal: null,
+          nominal: null,
+          terbayar: null,
+          nominal_bayar: 0,
+          tanggal_bayar: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        },
+        menu2: false,
       },
-      watch: {
-      },
+      watch: {},
       created() {
+        const localData = JSON.parse(localStorage.getItem("user"));
+        this.nia = localData.nia
         this.token = localStorage.getItem('token')
         this.config = {
           headers: {
             Authorization: `Bearer ${this.token}`
           }
         }
+        this.getListInfaq()
       },
       methods: {
-        async getProfile() {
-          await axios.get('<?= base_url(); ?>api/user/profile', this.config)
+        toast(ikon, pesan) {
+          Toast.fire({
+            icon: ikon,
+            title: pesan
+          });
+        },
+        async getListInfaq() {
+          await axios.get('<?= base_url(); ?>/api/user/home/daftar-infaq/' + this.nia, this.config)
             .then((res) => {
-              this.id_user = res.data.nia
-              this.nama_user = res.data.nama
-              this.alamat_user = res.data.alamat
-              this.aktif_user = res.data.aktif
-              this.warna_aktif = res.data.aktif == 'aktif' ? 'green' : 'red'
-              this.iuran_belum_bayar = res.data.iuran_belum_terbayar
-              this.foto = res.data.foto
-              console.log(res.data);
+              this.listInfaq = res.data.map((val) => {
+                const spTanggal = String(val.tanggal).split('-')
+                const dorong = {
+                  'nomor_pembayaran': val.nomor_pembayaran,
+                  'acara': val.acara,
+                  'tanggal': `${spTanggal[2]}-${spTanggal[1]}-${spTanggal[0]}`,
+                  'nominal': parseInt(val.nominal).toLocaleString('ID-id'),
+                  'bayar': parseInt(val.bayar).toLocaleString('ID-id'),
+                  'lunas': val.validator == null ? 'Bayar' : 'Lunas',
+                  'warna_lunas': val.validator == null ? 'error' : 'success',
+                  'status_lunas': val.validator == null ? false : true,
+                  'validator': val.validator
+
+                };
+                return dorong
+              })
+              console.log(this.listInfaq);
             })
             .catch((err) => {
-              console.log(err.response.data);
+              console.log('getlist infq ', err);
 
             })
         },
-        async loadUbahPassword() {
-          await axios.get('<?= base_url(); ?>api/user/profile/edit-password', this.config)
-            .then((res) => {
-              this.password_lama = res.data.password_lama
-              this.password_baru = res.data.password_baru
-              this.konfirmasi_password = res.data.konfirmasi_password
-              this.dialogPassword = true
-              console.log(res.data);
-            })
-            .catch((err) => {
-              console.log(err.response.data);
+        loadPembayaran(item) {
+          this.infaq.nomor_pembayaran = item.nomor_pembayaran
+          this.infaq.acara = item.acara
+          this.infaq.tanggal = item.tanggal
+          this.infaq.terbayar = item.bayar
+          this.infaq.nominal = item.nominal
+          this.infaq.pembayaran = null
 
-            })
+          this.dialogBayar = true
         },
-        async updatePassword() {
-          const param = {
-            password_lama: this.password_lama,
-            password_baru: this.password_baru,
-            konfirmasi_password: this.konfirmasi_password,
+        async bayarInfaq() {
+          if (this.infaq.nominal_bayar == 0 || this.infaq.nominal_bayar == '') {
+            this.toast('error', 'Anda belum memasukkan nominal pembayaran')
+            return false
           }
-          await axios.put('<?= base_url(); ?>api/user/profile/update-password/' + this.id_user, param, this.config)
+          const param = {
+            bayar: this.infaq.nominal_bayar,
+            tanggal_bayar: this.infaq.tanggal_bayar
+          }
+          await axios.put('<?= base_url(); ?>/api/user/pembayaran/' + this.infaq.nomor_pembayaran, param, this.config)
             .then((res) => {
-
-              this.dialogPassword = false
               console.log(res.data);
-              Swal.fire({
-                title: "Pergantian password telah berhasil Anda lakukan.",
-                showDenyButton: false,
-                confirmButtonText: "OK",
-              }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                  localStorage.clear()
-                  window.open('<?= base_url(); ?>login', '_self')
-                }
-              });
+              this.uploadBuktiBayar()
             })
             .catch((err) => {
-              console.log(err.response.data);
-              // if(err.response.data.messages.konfirmasi_password) {
-              //   console.log('konfir masine error');
-
-              // }
-              if (err.response.status === 409) {
-                const err_respon = err.response.data.messages
-                if (err_respon.password_baru) this.error_password.baru = true // err_respon.password_baru
-                if (err_respon.password_lama) this.error_password.lama = true // err_respon.password_baru
-                if (err_respon.konfirmasi_password) this.error_password.konfirmasi = true // err_respon.password_baru
-                Swal.fire({
-                  title: "Gagal!",
-                  text: "Password anda gagal diubah.",
-                  icon: "error"
-                });
+              if (err.response.status === 402) {
+                this.toast('error', err.response.data.messages.error)
               }
+              console.log(err.response.data);
 
             })
         },
-
         upload(event) {
           console.log("nama", event);
           console.log("type", event.type);
           console.log("ukuran", event.size);
 
           if (event.type != "image/jpeg") {
-            alert("Silakan upload file yang dengan ekstensi .jpeg atau.jpg");
+            this.toast('error', "Silakan upload file yang dengan ekstensi .jpeg atau.jpg");
             this.linkFoto = "";
             this.attFile = null;
             return false;
@@ -299,15 +299,15 @@
           this.attFile = event;
           this.linkFoto = URL.createObjectURL(event);
         },
-        gantiFoto() {
+        async uploadBuktiBayar() {
           if (this.attFile == null) {
-            alert("Anda belum memilih foto");
+            this.toast('error', "Anda belum memilih foto");
             return false;
           }
           let fdata = new FormData();
           fdata.append("foto", this.attFile);
-          axios
-            .post('<?= base_url(); ?>api/user/profile/foto', fdata, this.config)
+          await axios
+            .post('<?= base_url(); ?>api/user/pembayaran-bukti' + this.infaq.nomor_pembayaran, fdata, this.config)
             .then((res) => {
               console.log(res.data);
               const localData = JSON.parse(localStorage.getItem('user'))
@@ -333,7 +333,6 @@
               console.log(err.response);
             });
         },
-        ///////
 
       }
     })

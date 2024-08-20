@@ -25,7 +25,7 @@ class ModelPembayaran extends Model
     public function daftarInfaq($nia, $status)
     {
         $db = $this->db->table('pembayaran as p');
-        $db->select('p.*, infaq.acara, infaq.rutin');
+        $db->select('p.*, infaq.acara, infaq.rutin, infaq.nominal');
         $db->where('p.validator IS '.$status.' AND infaq.aktif = "1"');
         $db->where('p.nia', $nia);
         $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');

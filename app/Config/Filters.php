@@ -50,14 +50,17 @@ class Filters extends BaseConfig
                 '/login',
                 '/profile',
                 '/infaq',
-                '/infaq-umum',
+                '/infaq*',
                 '/laporan-kas',
                 ]
             ],
             'admin' => [
                 'except' => ['/api/render/*', '/api/admin-login', '/api/user*', 
                 '/login',
-                '/profile'
+                '/profile',
+                '/infaq',
+                '/infaq*',
+                '/laporan-kas',
                 ]
             ],
         ],
