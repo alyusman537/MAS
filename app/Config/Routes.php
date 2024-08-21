@@ -35,6 +35,8 @@ $routes->get('/api/user/home/infaq-umum', 'HomeUser::infaqUmum');
 $routes->put('/api/user/pembayaran/(:any)', 'Pembayaran::bayar/$1');
 $routes->post('/api/user/pembayaran-bukti/(:any)', 'Pembayaran::buktiBayar/$1');
 
+$routes->get('/api/user/laporan-kas/(:any)/(:any)', 'Mutasi::list/$1/$2');
+
 //////////// ADMIN /////////////////////
 
 $routes->post('/api/admin-login', 'Login::adminAuth');

@@ -132,7 +132,7 @@ Vue.component("nav-bar", {
       window.open(this.url + "/infaq-umum", "_self");
     },
     gotoKas() {
-      window.open(this.url + "/kas", "_self");
+      window.open(this.url + "/laporan-kas", "_self");
     },
   },
 });
