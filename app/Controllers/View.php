@@ -7,6 +7,10 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class View extends BaseController
 {
+    public function index()
+    {
+        return view('/welcome_message');
+    }
     public function userLogin()
     {
         return view('/user/login');
@@ -28,9 +32,36 @@ class View extends BaseController
         return view('/user/laporan-kas');
     }
 
-
-    public function loginAdmin()
+///////////// ADMIN ///////////////////
+    public function adminLogin()
     {
-        return view('/user/login');
+        return view('/admin/admin-login');
+    }
+
+    public function adminDashboard()
+    {
+        return view('/admin/admin-dashboard');
+    }
+
+    public function adminWilayah()
+    {
+        return view('/admin/admin-wilayah');
+    }
+
+    public function adminAnggota()
+    {
+        return view('/admin/admin-anggota');
+    }
+    public function adminInfaq()
+    {
+        return view('/admin/admin-infaq');
+    }
+    public function adminPenerimaanInfaq()
+    {
+        return view('/admin/admin-terima-infaq');
+    }
+    public function adminPenerimaanInfaqUmum()
+    {
+        return view('/admin/admin-terima-infaq-umum');
     }
 }

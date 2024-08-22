@@ -16,10 +16,10 @@
 
         <v-container>
           <v-card class="mx-auto justify-center mt-5 pb-7" max-width="800" flat>
-            <v-toolbar color="teal" flat class="text-center mx-auto" dark>
-              <v-toolbar-title>Daftar Infaq Umum</v-toolbar-title>
+            <v-toolbar color="white" flat class="text-center mx-auto" dark>
+              <!-- <v-toolbar-title>Daftar Infaq Umum</v-toolbar-title> -->
               <v-spacer></v-spacer>
-              <v-btn outlined @click="loadDialogInfaq()"><v-icon>mdi-plus</v-icon> infaq</v-btn>
+              <v-btn color="primary" depressed @click="loadDialogInfaq()"><v-icon>mdi-plus</v-icon> infaq</v-btn>
             </v-toolbar>
             <v-card-text class="px-2">
               <v-data-table

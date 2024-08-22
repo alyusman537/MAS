@@ -13,21 +13,14 @@
     <v-app>
       <v-img :src="bgImg">
         <v-main>
-          <v-container>
+          <v-container> <br>
             <v-card class="mx-auto my-auto justify-center" max-width="500" height="425" flat style="background-color: #fff;  opacity: .8;"> <!-- color="green lighten-5"-->
               <v-card style="background-color: #fff; border: 0.5px solid rgba(255, 255, 255, 0.5);backdrop-filter: blur(2px);-webkit-backdrop-filter: blur(8px);" flat>
-
-                <div flat class="py-3">
-                  <!-- <div color="primary" dark flat class="py-3"> -->
-                  <v-img :src="logo" height="100%" width="150" class="mx-auto"></v-img>
-                  <!-- <v-row>
-                    <h3 class="mx-auto mt-2">AL WAFA BI'AHDILLAH</h3>
-                  </v-row> -->
-                </div>
+                <v-card class="mx-auto mt-3" flat>
+                    <h3 class="text-center teal--text mt-2">AL WAFA BI'AHDILLAH</h3>
+                    <h3 class="text-center teal--text mt-2">ADMINISTRATOR</h3>    
+                </v-card>
                 <v-card-text>
-
-
-                  <div>
                     <div class="mx-auto mt-5 ml-5 mr-5" max-width="450" flat> <!--color="green lighten-5"-->
                       <v-row class="text-center">
                         <v-col cols="12">
@@ -55,19 +48,18 @@
                         </v-col>
 
                         <v-col cols="12">
-                          <v-btn color="primary" height="50" rounded depressed block @click="goLogin">LOGIN</v-btn>
-                          <v-row class="mt-1">
+                          <v-btn color="primary" height="50" rounded depressed block @click="goLogin">LOGIN</v-btn> <br>
+                          <a href="#" class="teal--text text-center mt-2" style="text-decoration: none;">User Page</a>
+                          <!-- <v-row class="mt-1">
                             <v-col cols="6">
-                              <a href="#" class="teal--text" style="text-decoration: none;" @click="goAdmin">Admin Page</a>
                             </v-col>
                             <v-col cols="6">
                               <a href="#" class="teal--text text-decoration-none">Lupa Password</a>
                             </v-col>
-                          </v-row>
+                          </v-row> -->
                         </v-col>
                       </v-row>
                     </div>
-                  </div>
                 </v-card-text>
               </v-card>
             </v-card>
@@ -116,57 +108,34 @@
         config: null,
       },
       created() {
-        this.token = localStorage.getItem('token')
-        this.config = {
-          headers: {
-            Authorization: `Bearer ${this.token}`
-          }
-        }
-        if(this.token != null) {
-          this.getProfile()
-        }
+        // const tokenAdmin = localStorage.getItem('admin-token')
+        // if(tokenAdmin) {
+        //     localStorage.removeItem('admin-token')
+        // }
       },
       methods: {
-        async getProfile() {
-          await axios.get('<?= base_url(); ?>api/user/profile', this.config)
-            .then(() => {
-              window.open('<?= base_url(); ?>profile', '_self')
-            })
-            .catch((err) => {
-              if(err.response.status === 401) {
-                localStorage.removeItem('token')
-                return false
-              };
-              
-            })
+        toast(ikon, pesan){
+            Toast.fire({
+                  icon: ikon,
+                  title: pesan
+                });
         },
         async goLogin() {
           const param = {
             nia: this.nia,
             password: this.password
           }
-          await axios.post('<?= base_url(); ?>api/user-login', param)
+          await axios.post('<?= base_url(); ?>api/admin-login', param)
             .then((res) => {
               console.log(res.data);
-
-              const store = {
-                nama: res.data.user.nama,
-                nia: res.data.user.nia,
-                foto: res.data.user.foto
-              }
-              localStorage.setItem('user', JSON.stringify(store))
-              localStorage.setItem('token', res.data.token)
-
-
-              window.open('<?= base_url(); ?>profile', '_self')
+              localStorage.clear()
+              localStorage.setItem('admin-token', res.data.token)
+              window.open('<?= base_url(); ?>administrator/dashboard', '_self')
             })
             .catch((err) => {
               console.log(err.response.data);
               if (err.response.status === 409) {
-                Toast.fire({
-                  icon: "error",
-                  title: err.response.data.error
-                });
+                
               }
               if (err.response.status === 400) {
                 const err_nia = !err.response.data.messages.nia ? '' : err.response.data.messages.nia
@@ -179,8 +148,8 @@
               }
             })
         },
-        goAdmin(){
-          window.open('<?= base_url();?>administrator/login', '_self')
+        goUser(){
+          window.open('<?= base_url();?>user-login', '_self')
         },
       }
     })

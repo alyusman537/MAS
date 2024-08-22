@@ -16,9 +16,9 @@
 
         <v-container>
           <v-card class="mx-auto justify-center mt-5 pb-7" max-width="800" flat>
-            <v-card color="teal" flat class="text-center mx-auto py-3" dark>
+            <!--v-card color="teal" flat class="text-center mx-auto py-3" dark>
               <h3 class="mx-auto">Daftar Infaq</h3>
-            </v-card>
+            </v-card-->
             <v-card-text class="px-2">
               <v-data-table
                 :headers="headerInfaq"
@@ -27,7 +27,6 @@
                 <template v-slot:item.lunas="{ item }">
                   <v-btn
                     :color="item.warna_lunas"
-                    :disabled="item.status_lunas"
                     depressed
                     rounded
                     small
@@ -187,7 +186,7 @@
             align: 'end'
           },
           {
-            text: 'Lunas',
+            text: 'Status',
             value: 'lunas'
           },
           {
@@ -234,16 +233,21 @@
             .then((res) => {
               this.listInfaq = res.data.map((val) => {
                 const spTanggal = String(val.tanggal).split('-')
+                const nominal = parseInt(val.nominal)
+                const bayar = parseInt(val.bayar)
+                const status_lunas = bayar >= nominal ? true : false
                 const dorong = {
                   'nomor_pembayaran': val.nomor_pembayaran,
                   'acara': val.acara,
                   'tanggal': `${spTanggal[2]}-${spTanggal[1]}-${spTanggal[0]}`,
-                  'nominal': parseInt(val.nominal).toLocaleString('ID-id'),
-                  'bayar': parseInt(val.bayar).toLocaleString('ID-id'),
-                  'lunas': val.validator == null ? 'Bayar' : 'Lunas',
-                  'warna_lunas': val.validator == null ? 'error' : 'success',
-                  'status_lunas': val.validator == null ? false : true,
-                  'validator': val.validator
+                  'nominal': nominal.toLocaleString('ID-id'),
+                  'bayar': bayar.toLocaleString('ID-id'),
+                  'lunas': val.validator != null && status_lunas === true? 'Lunas' : ( val.validator == null && status_lunas === false ? 'Bayar' : 'Pending'),
+                  'warna_lunas': val.validator != null && status_lunas === true? 'success' : ( val.validator == null && status_lunas === false ? 'eroor' : 'warning'),
+                  'validator': val.validator,
+                  'intBayar': bayar,
+                  'intNominal': nominal
+
 
                 };
                 return dorong
@@ -256,6 +260,11 @@
             })
         },
         loadPembayaran(item) {
+          if(item.intBayar >= item.intNominal) {
+            this.toast('warning', 'Infaq ini sedang menunggu penerimaan oleh admin.')
+            return false
+          };
+          
           this.infaq.nomor_pembayaran = item.nomor_pembayaran
           this.infaq.acara = item.acara
           this.infaq.tanggal = item.tanggal
@@ -277,6 +286,8 @@
           await axios.put('<?= base_url(); ?>/api/user/pembayaran/' + this.infaq.nomor_pembayaran, param, this.config)
             .then((res) => {
               console.log(res.data);
+              this.toast('success', res.data.pesan)
+              this.dialogBayar = false
             })
             .catch((err) => {
               if (err.response.status === 402) {
@@ -306,30 +317,12 @@
             return false;
           }
           let fdata = new FormData();
-          fdata.append("foto", this.attFile);
+          fdata.append("bukti", this.attFile);
           await axios
-            .post('<?= base_url(); ?>api/user/pembayaran-bukti' + this.infaq.nomor_pembayaran, fdata, this.config)
+            .post('<?= base_url(); ?>api/user/pembayaran-bukti/' + this.infaq.nomor_pembayaran, fdata, this.config)
             .then((res) => {
               console.log(res.data);
               this.bayarInfaq()
-              const localData = JSON.parse(localStorage.getItem('user'))
-              const store = {
-                nama: localData.nama,
-                nia: localData.nia,
-                foto: res.data.foto
-              }
-              localStorage['user'] = JSON.stringify(store)
-              Swal.fire({
-                title: "Foto profile Anda telah berhasil diubah.",
-                showDenyButton: false,
-                confirmButtonText: "OK",
-              }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                  location.reload();
-                }
-              });
-
             })
             .catch((err) => {
               console.log(err.response);

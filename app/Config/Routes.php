@@ -5,7 +5,7 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Anggota::index');
+$routes->get('/', 'View::index');
 
 $routes->get('/api/render/bukti/(:any)', 'Render::bukti/$1');
 $routes->get('/api/render/foto/(:any)', 'Render::image/$1');
@@ -79,6 +79,7 @@ $routes->post('/api/admin/mutasi', 'Mutasi::add');
 $routes->get('/api/admin/mutasi-tanggal/(:any)/(:any)', 'Mutasi::list/$1/$2');
 $routes->get('/api/admin/mutasi-detail/(:any)', 'Mutasi::detail/$1');
 $routes->get('/api/admin/saldo-akhir', 'Mutasi::saldoAkhir');
+$routes->get('/api/admin/saldo-perbulan', 'Mutasi::saldoBulan');
 
 ///////////// VIEW USER ///////////////
 $routes->get('/login', 'View::userLogin');
@@ -86,3 +87,13 @@ $routes->get('/profile', 'View::userProfile');
 $routes->get('/infaq', 'View::userInfaq');
 $routes->get('/infaq-umum', 'View::userInfaqUmum');
 $routes->get('/laporan-kas', 'View::userKas');
+
+
+///////////// VIEW ADMIN ///////////////
+$routes->get('/administrator/login', 'View::adminLogin');
+$routes->get('/administrator/dashboard', 'View::adminDashboard');//administrator/dashboard
+$routes->get('/administrator/wilayah', 'View::adminWilayah');
+$routes->get('/administrator/anggota', 'View::adminAnggota');
+$routes->get('/administrator/infaq', 'View::adminInfaq');
+$routes->get('/administrator/penerimaan-infaq', 'View::adminPenerimaanInfaq');
+$routes->get('/administrator/penerimaan-infaq-umum', 'View::adminPenerimaanInfaqUmum');

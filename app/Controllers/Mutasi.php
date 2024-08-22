@@ -32,7 +32,31 @@ class Mutasi extends BaseController
             'pemasukan' => $plus,
             'pengeluaran' => $minus,
             'saldo_akhir' => $saldoAkhir,
-            'tanggal' => $tglAwal
+            'tanggal' => $date
+        ];
+        return $this->respond($data);
+    }
+
+    public function saldoBulan()
+    {
+        $mm = new ModelMutasi();
+        $date = date('m');
+        $bulanSekarang = date('m');
+        $bulanLalu= date("Y-n-j", strtotime("last day of previous month"));
+
+        $saldoAwalPlus = $mm->selectSum('nominal')->where('substring(tanggal, 5, 2) = "' . $bulanSekarang . '" ')->where('jenis', 'D')->first();
+        $saldoAwalMinus = $mm->selectSum('nominal')->where('substring(tanggal, 5, 2) = "' . $bulanSekarang . '" ')->where('jenis', 'K')->first();
+
+        $saldoAwalJadi = (int) $saldoAwalPlus['nominal'] - (int) $saldoAwalMinus['nominal'];
+        $plus = !$saldoAwalPlus ? 0 : (int) $saldoAwalPlus['nominal'];
+        $minus = !$saldoAwalMinus ? 0 : (int) $saldoAwalMinus['nominal'];
+        $saldoAkhir = $plus - $minus;
+        $data = [
+            'saldo_awal' => $saldoAwalJadi,
+            'pemasukan' => $plus,
+            'pengeluaran' => $minus,
+            'saldo_akhir' => $saldoAkhir,
+            'tanggal' => $date
         ];
         return $this->respond($data);
     }
@@ -40,7 +64,7 @@ class Mutasi extends BaseController
     public function list($tglAwal, $tglAkhir)
     {
         $mm = new ModelMutasi();
-        $date = $tglAwal;
+        // $date = $tglAwal;
         // $newDate = date('Y-m-d', strtotime($date . ' - 1 days')); 
         $plus = $mm->selectSum('nominal')->where('tanggal < "' . $tglAwal . '" ')->where('jenis', 'D')->first();
         $minus = $mm->selectSum('nominal')->where('tanggal < "' . $tglAwal . '" ')->where('jenis', 'K')->first();
