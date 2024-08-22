@@ -42,6 +42,8 @@ $routes->get('/api/user/laporan-kas/(:any)/(:any)', 'Mutasi::list/$1/$2');
 $routes->post('/api/admin-login', 'Login::adminAuth');
 $routes->get('/api/admin-refresh', 'Login::adminRefresh');
 
+$routes->get('/api/admin/home', 'HomeAdmin::index');
+
 $routes->get('/api/admin/wilayah', 'Wilayah::index');
 $routes->get('/api/admin/wilayah/(:num)', 'Wilayah::wilayahById/$1');
 $routes->post('/api/admin/wilayah', 'Wilayah::add');
@@ -79,7 +81,6 @@ $routes->post('/api/admin/mutasi', 'Mutasi::add');
 $routes->get('/api/admin/mutasi-tanggal/(:any)/(:any)', 'Mutasi::list/$1/$2');
 $routes->get('/api/admin/mutasi-detail/(:any)', 'Mutasi::detail/$1');
 $routes->get('/api/admin/saldo-akhir', 'Mutasi::saldoAkhir');
-$routes->get('/api/admin/saldo-perbulan', 'Mutasi::saldoBulan');
 
 ///////////// VIEW USER ///////////////
 $routes->get('/login', 'View::userLogin');

@@ -23,16 +23,16 @@
             <v-card-text class="px-2">
               <v-row class="px-4">
                 <v-col cols="8">
-                <p>Saldo Kas Awal Bulan</p>  
-                <p> Pemasukan</p>
-                  <p>Pengeluaran</p>
-                  <p>Saldo Kas Akhir Bulan</p>
+                <p>Saldo Kas Bulan Kemarin</p>  
+                <p> Pemasukan Bulan Ini</p>
+                  <p>Pengeluaran Bulan Ini</p>
+                  <p>Saldo Kas Akhir</p>
                 </v-col>
                 <v-col cols="4">
-                <p class="font-weight-bold text-right">300.000</p>  
-                <p class="font-weight-bold text-right">1.000.000</p>
-                  <p class="font-weight-bold text-right">500.000</p>
-                  <p class="font-weight-bold text-right">800.000</p>
+                <p class="font-weight-bold text-right">{{ saldo_kas_bulan_kemarin }}</p>  
+                <p class="font-weight-bold text-right">{{ pemasukan_bulan_ini }}</p>
+                  <p class="font-weight-bold text-right">{{ pengeluaran_bulan_ini }}</p>
+                  <p class="font-weight-bold text-right">{{ saldo_akhir_bulan_ini }}</p>
                 </v-col>
               </v-row>
               <template>
@@ -43,20 +43,26 @@
                       <tr>
                         <td>Jumlah Anggota Aktif</td>
                         <td class="text-right">
-                          <v-btn color="info" small depressed rounded width="75">2025</v-btn>
+                          <v-btn color="info" small depressed rounded width="75">{{ anggota_aktif }}</v-btn>
                         </td>
                       </tr>
                       <tr>
                         <td>Tagihan infaq belum terbayar</td>
-                        <td class="text-right"><v-btn color="info" small depressed>2025</v-btn></td>
+                        <td class="text-right">
+                          <v-btn color="info" small depressed rounded width="75">{{ infaq_belum_terbayar }}</v-btn>
+                        </td>
                       </tr>
                       <tr>
                         <td>Tagihan infaq belum Diterima</td>
-                        <td class="text-right"><v-btn color="info" small depressed>2025</v-btn></td>
+                        <td class="text-right">
+                          <v-btn color="info" small depressed rounded width="75">{{ infaq_belum_diterima}}</v-btn>
+                        </td>
                       </tr>
                       <tr>
-                        <td>Infaq belum Diterima</td>
-                        <td class="text-right"><v-btn color="info" small depressed>2025</v-btn></td>
+                        <td>Infaq Umum belum Diterima</td>
+                        <td class="text-right">
+                          <v-btn color="info" small depressed rounded width="75">{{ umum_belum_diterima }}</v-btn>
+                        </td>
                       </tr>
                       <tr></tr>
                     </tbody>
@@ -107,49 +113,14 @@
         title: "DASHBOARD",
         config: null,
         token: null,
-        nia: null,
-        headerInfaq: [{
-            text: 'Tanggal',
-            align: 'start', // sortable: false,
-            value: 'tanggal',
-          },
-          {
-            text: 'Acara',
-            value: 'acara'
-          },
-          {
-            text: 'nominal',
-            value: 'nominal',
-            align: 'end'
-          },
-          {
-            text: 'Bayar',
-            value: 'bayar',
-            align: 'end'
-          },
-          {
-            text: 'Status',
-            value: 'lunas'
-          },
-          {
-            text: 'Penerima',
-            value: 'validator'
-          },
-        ],
-        listInfaq: [],
-        dialogBayar: false,
-        infaq: {
-          nomor_pembayaran: null,
-          acara: null,
-          tanggal: null,
-          nominal: null,
-          terbayar: null,
-          nominal_bayar: 0,
-          tanggal_bayar: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-        },
-        menu2: false,
-        attFile: null,
-        linkFoto: null,
+        saldo_kas_bulan_kemarin: 0,
+        pemasukan_bulan_ini: 0,
+        pengeluaran_bulan_ini: 0,
+        saldo_akhir_bulan_ini: 0,
+        anggota_aktif: 0,
+        infaq_belum_terbayar: 0,
+        infaq_belum_diterima: 0,
+        umum_belum_diterima: 0
       },
       watch: {},
       created() {
@@ -160,7 +131,7 @@
           }
         }
         // this.getListInfaq()
-        this.getSaldoPerbulan()
+        this.getHome()
       },
       methods: {
         toast(ikon, pesan) {
@@ -169,10 +140,20 @@
             title: pesan
           });
         },
-        async getListInfaq() {
-          await axios.get('<?= base_url(); ?>api/admin/saldo-akhir', this.config)
+        async getHome() {
+          // const tglSekarang = 
+          await axios.get('<?= base_url(); ?>api/admin/home', this.config)
             .then((res) => {
               console.log(res.data);
+              this.saldo_kas_bulan_kemarin = parseInt(res.data.saldo.saldo_bulan_lalu).toLocaleString('ID-id')
+              this.pemasukan_bulan_ini = parseInt(res.data.saldo.pemasukan_bulan_ini).toLocaleString('ID-id')
+              this.pengeluaran_bulan_ini = parseInt(res.data.saldo.pengeluaran_bulan_ini).toLocaleString('ID-id')
+              this.saldo_akhir_bulan_ini = parseInt(res.data.saldo.saldo_akhir_bulan_ini).toLocaleString('ID-id')
+
+              this.anggota_aktif = parseInt(res.data.anggota).toLocaleString('ID-id')
+        this.infaq_belum_terbayar = parseInt(res.data.belum).toLocaleString('ID-id')
+        this.infaq_belum_diterima = parseInt(res.data.pending).toLocaleString('ID-id')
+        this.umum_belum_diterima = parseInt(res.data.umum).toLocaleString('ID-id')
               
             })
             .catch((err) => {
@@ -180,12 +161,12 @@
 
             })
         },
-
-        async getSaldoPerbulan() {
+        async getAnggotaAktif() {
           // const tglSekarang = 
-          await axios.get('<?= base_url(); ?>api/admin/saldo-perbulan', this.config)
+          await axios.get('<?= base_url(); ?>api/admin/anggota-jumlah', this.config)
             .then((res) => {
               console.log(res.data);
+              this.anggota_aktif = parseInt(res.data.jumlah_anggota_aktif).toLocaleString('ID-id')
               
             })
             .catch((err) => {

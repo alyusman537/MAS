@@ -37,30 +37,6 @@ class Mutasi extends BaseController
         return $this->respond($data);
     }
 
-    public function saldoBulan()
-    {
-        $mm = new ModelMutasi();
-        $date = date('m');
-        $bulanSekarang = date('m');
-        $bulanLalu= date("Y-n-j", strtotime("last day of previous month"));
-
-        $saldoAwalPlus = $mm->selectSum('nominal')->where('substring(tanggal, 5, 2) = "' . $bulanSekarang . '" ')->where('jenis', 'D')->first();
-        $saldoAwalMinus = $mm->selectSum('nominal')->where('substring(tanggal, 5, 2) = "' . $bulanSekarang . '" ')->where('jenis', 'K')->first();
-
-        $saldoAwalJadi = (int) $saldoAwalPlus['nominal'] - (int) $saldoAwalMinus['nominal'];
-        $plus = !$saldoAwalPlus ? 0 : (int) $saldoAwalPlus['nominal'];
-        $minus = !$saldoAwalMinus ? 0 : (int) $saldoAwalMinus['nominal'];
-        $saldoAkhir = $plus - $minus;
-        $data = [
-            'saldo_awal' => $saldoAwalJadi,
-            'pemasukan' => $plus,
-            'pengeluaran' => $minus,
-            'saldo_akhir' => $saldoAkhir,
-            'tanggal' => $date
-        ];
-        return $this->respond($data);
-    }
-
     public function list($tglAwal, $tglAkhir)
     {
         $mm = new ModelMutasi();
