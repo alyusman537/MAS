@@ -119,7 +119,13 @@ class Pembayaran extends BaseController
         $x_file = $this->request->getFile('bukti');
         $namaFoto = $x_file->getRandomName();
 
-        $x_file->move(WRITEPATH . 'uploads/bukti', $namaFoto);
+        // $x_file->move(WRITEPATH . 'uploads/bukti', $namaFoto);
+        $image = service('image');
+        $image->withFile($x_file)
+            ->resize(500, 500, true, 'height')
+            ->save(WRITEPATH . '/uploads/bukti/' . $namaFoto);
+
+        unlink($x_file);
 
         $mm->set(['bukti_bayar' => $namaFoto]);
         $mm->where('nomor_pembayaran', $nomor_pembayaran);

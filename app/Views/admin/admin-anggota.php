@@ -466,7 +466,14 @@
             })
         },
         async update() {
-          const param = {}
+          const param = {
+            alamat: this.anggota.alamat,
+            email: this.anggota.email,
+            level: this.anggota.level,
+            nama: String(this.anggota.nama).toUpperCase(),
+            wa: this.anggota.wa,
+            wilayah: this.anggota.wilayah
+          }
           await axios.put('<?= base_url() ?>api/admin/anggota/' + this.anggota.id, param, this.config)
             .then((res) => {
               console.log(res.data);

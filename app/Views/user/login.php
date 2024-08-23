@@ -112,7 +112,7 @@
         password: null,
         showPassword: false,
         logo: '<?= base_url(); ?>logo_alwafa_hijau.png',
-        bgImg: '<?= base_url() ?>gunung.jpg',
+        bgImg: '<?= base_url() ?>payung.jpg',
         config: null,
       },
       created() {

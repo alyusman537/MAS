@@ -14,9 +14,9 @@
       <v-img :src="bgImg">
         <v-main>
           <v-container> <br>
-            <v-card class="mx-auto my-auto justify-center" max-width="500" height="425" flat style="background-color: #fff;  opacity: .8;"> <!-- color="green lighten-5"-->
-              <v-card style="background-color: #fff; border: 0.5px solid rgba(255, 255, 255, 0.5);backdrop-filter: blur(2px);-webkit-backdrop-filter: blur(8px);" flat>
-                <v-card class="mx-auto mt-3" flat>
+            <v-card class="mx-auto my-auto justify-center" max-width="500" height="425" flat style="background-color: #BAB7B7;  opacity: .8;"> <!-- color="green lighten-5"-->
+              <v-card style="background-color: #BAB7B7; border: 0.5px solid rgba(255, 255, 255, 0.5);backdrop-filter: blur(2px);-webkit-backdrop-filter: blur(8px);" flat>
+                <v-card class="mx-auto mt-3" flat color="#BAB7B7">
                     <h3 class="text-center teal--text mt-2">AL WAFA BI'AHDILLAH</h3>
                     <h3 class="text-center teal--text mt-2">ADMINISTRATOR</h3>    
                 </v-card>
@@ -105,7 +105,7 @@
         password: null,
         showPassword: false,
         logo: '<?= base_url(); ?>logo_alwafa_hijau.png',
-        bgImg: '<?= base_url() ?>gunung.jpg',
+        bgImg: '<?= base_url() ?>payung.jpg',
         config: null,
       },
       created() {
