@@ -21,9 +21,82 @@
               <h3 class="mx-auto">Daftar Infaq</h3>
             </v-card-->
             <v-card-text class="px-2">
-<p>hkjhk kjhkj</p>
+              <v-row class="px-3">
+                <v-col cols="8">
+                  <v-text-field
+                    label="Cari Wilayah"
+                    v-model="cari"></v-text-field>
+                </v-col>
+                <v-col cols="4">
+                  <v-btn class="mt-4" color="info" small depressed @click="loadDialogWilayahBaru()"><v-icon>mdi-plus</v-icon>Wilayah</v-btn>
+                </v-col>
+              </v-row>
+              <v-data-table
+                :headers="headerWilayah"
+                :items="listWilayah"
+                :search="cari"
+                class="elevation-0">
+                <!--status: el.aktif == '1' ? true : false,
+                  aktif: el.aktif == '1' ? 'Aktif' : 'Nonaktif',
+                  warna: el.aktif == '1' ? 'success' : 'error'-->
+                <template v-slot:item.aktif="{ item }">
+                  <div v-if="item.status" class="green--text">{{ item.aktif }}</div>
+                  <div v-else class="red--text">{{ item.aktif }}</div>
+                </template>
+                <template v-slot:item.aksi="{ item }">
+                  <v-btn
+                    :color="item.warna"
+                    depressed
+                    rounded
+                    small
+                    dark
+                    @click="loadDialogWilayahEdit(item.id)">
+                    Edit
+                  </v-btn>
+                  <v-btn color="error" small rounded depressed dark @click="hapusWilayah(item.id)">hapus</v-btn>
+                </template>
+              </v-data-table>
             </v-card-text>
           </v-card>
+
+          <v-dialog
+            v-model="dialogWilayah">
+            <v-card flat max-width="500" class="mx-auto">
+              <v-toolbar color="primary" flat dark>
+                <v-toolbar-title>{{ titileDialog }}</v-toolbar-title>
+              </v-toolbar>
+              <v-card-text class="py-8">
+                <v-text-field
+                  label="Kode"
+                  v-model="wilayah.kode"
+                  :disabled="isEdit"></v-text-field>
+                <v-text-field
+                  label="Keterangan"
+                  v-model="wilayah.keterangan"></v-text-field>
+
+                <v-radio-group
+                v-if="isEdit"
+                  v-model="wilayah.aktif"
+                  row>
+                  <v-radio
+                    label="Aktif"
+                    value="1"></v-radio>
+                  <v-radio
+                    label="Nonaktif"
+                    value="0"></v-radio>
+                </v-radio-group>
+                <v-row>
+                  <v-col cols="12">
+                    <v-btn v-if="isEdit" color="success" block depressed @click="updateDataWilayah()">Simpan Update</v-btn>
+                    <v-btn v-else="isEdit" color="success" block depressed @click="addWilayah()">Simpan Baru</v-btn>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-btn color="error" block depressed @click="dialogWilayah = false">Batal</v-btn>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
 
         </v-container>
       </v-main>
@@ -66,6 +139,35 @@
         title: "DATA WILAYAH",
         config: null,
         token: null,
+        headerWilayah: [{
+            text: 'Kode',
+            align: 'start', // sortable: false,
+            value: 'kode',
+          },
+          {
+            text: 'Keterangan',
+            value: 'keterangan'
+          },
+          {
+            text: 'Status',
+            value: 'aktif',
+          },
+          {
+            text: 'Aksi',
+            value: 'aksi',
+          },
+        ],
+        listWilayah: [],
+        cari: null,
+        dialogWilayah: false,
+        titileDialog: null,
+        wilayah: {
+          id: 0,
+          kode: null,
+          keterangan: null,
+          aktif: true,
+        },
+        isEdit: false,
       },
       watch: {},
       created() {
@@ -75,7 +177,6 @@
             Authorization: `Bearer ${this.token}`
           }
         }
-        // this.getListInfaq()
         this.getWilayah()
       },
       methods: {
@@ -89,9 +190,99 @@
           await axios.get('<?= base_url(); ?>api/admin/wilayah', this.config)
             .then((res) => {
               console.log(res.data);
+              this.listWilayah = res.data.map((el) => {
+                const dorong = {
+                  id: el.id,
+                  kode: el.kode,
+                  keterangan: el.keterangan,
+                  status: el.aktif == '1' ? true : false,
+                  aktif: el.aktif == '1' ? 'Aktif' : 'Nonaktif',
+                  warna: el.aktif == '1' ? 'success' : 'error'
+                }
+                return dorong
+              })
             })
             .catch((err) => {
               console.log('getlist infq ', err);
+            })
+        },
+        loadDialogWilayahBaru() {
+          this.wilayah.kode = null
+          this.wilayah.keterangan = null
+          this.isEdit = false
+          this.titileDialog = 'Tambah Wilayah Baru'
+          this.dialogWilayah = true
+        },
+        async addWilayah() {
+          const param = {
+            kode: this.wilayah.kode,
+            keterangan: this.wilayah.keterangan
+          }
+          await axios.post('<?= base_url() ?>api/admin/wilayah', param, this.config)
+            .then((res) => {
+              console.log(res.data);
+              this.toast('success', 'Tambah data wilayah '+res.data.kode+ ' berhasil disimpan.')
+              this.dialogWilayah = false
+              this.isEdit = true
+            })
+            .catch((err) => {
+              if(err.response.status === 409) {
+                const errKode = err.response.data.messages.kode ? err.response.data.messages.kode : ''
+                const errKeterangan = err.response.data.messages.keterangan ? err.response.data.messages.keterangan : ''
+                const pesan = 
+                this.toast('error', errKode +'\n' +errKeterangan)
+                return false
+              }
+              if(err.response.status === 402) {
+                this.toast('error', err.response.data.messages.error)
+              }
+              this.toast('error', JSON.stringify(err.response.data));
+            })
+        },
+        async loadDialogWilayahEdit(id) {
+          await axios.get('<?= base_url() ?>api/admin/wilayah/' + id, this.config)
+            .then((res) => {
+              console.log(res.data);
+              this.wilayah.id = parseInt(res.data.id)
+              this.wilayah.kode = res.data.kode
+              this.wilayah.keterangan = res.data.keterangan
+              this.wilayah.aktif = res.data.aktif
+              this.isEdit = true
+              this.titileDialog = 'Edit Data Wilayah'
+              this.dialogWilayah = true
+              console.log(this.wilayah);
+              
+            })
+            .catch((err) => {
+              console.log(err.response.data);
+            })
+        },
+        async updateDataWilayah() {
+          const param = {
+            keterangan: this.wilayah.keterangan,
+            aktif: this.wilayah.aktif
+          }
+          await axios.put('<?= base_url() ?>api/admin/wilayah/' + this.wilayah.id, param, this.config)
+            .then((res) => {
+              console.log(res.data);
+              this.toast('success', 'Data wilayah '+this.wilayah.kode+ ' berhasil diperbarui.')
+              this.getWilayah()
+              this.dialogWilayah = false
+            })
+            .catch((err) => {
+              if(err.response.status == 409) {
+                const errKode = err.response.data.messages.kode ? err.response.data.messages.kode : ''
+                const errKeterangan = err.response.data.messages.keterangan ? err.response.data.messages.keterangan : ''
+                const pesan = 
+                this.toast('error', errKode +'\n' +errKeterangan)
+                return false
+              }
+              if(err.response.status == 402) {
+                this.toast('error', err.response.data.messages.error)
+              } else {
+                this.toast('error', JSON.stringify(err.response.data));
+              }
+              console.log('status error : ',err.response.status);
             })
         },
       }

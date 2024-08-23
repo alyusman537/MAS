@@ -35,11 +35,18 @@ class Anggota extends BaseController
     {
         $ma = new ModelAnggota();
         $mw = new ModelWilayah();
-        $anggota = $ma->select('id, nia, nama, alamat, wa, wilayah, level, aktif')->where('id', $id)->first();
-        if (!$anggota) return $this->fail('ID anggota ' . $id . ' tidak ditemukan.', 400);
+        $anggota = $ma->select('*')->where('id', $id)->first();
+        if (!$anggota) return $this->fail('ID anggota ' . $id . ' tidak ditemukan.', 402);
         $data = [
-            'anggota' => $anggota,
-            'wilayah' => $mw->select('keterangan')->where('kode', $anggota['wilayah'])->first()
+            'nia' => $anggota['nia'],
+            'nama' => $anggota['nama'],
+            'wa'  => $anggota['wa'],
+            'alamat' => $anggota['alamat'],
+            'wilayah' => $anggota['wilayah'],
+            'level' => $anggota['level'],
+            'foto' => !$anggota['foto'] ? base_url() . 'no_photo.jpg' : base_url() . 'api/render/foto/' . $anggota['foto'],
+            'email' => $anggota['email'],
+            'aktif' => $anggota['aktif'],
         ];
         return $this->respond($data);
     }
@@ -49,9 +56,9 @@ class Anggota extends BaseController
         $ma = new ModelAnggota();
         $mw = new ModelWilayah();
         $cekWilayah = $mw->select('*')->where('kode', $wilayah)->first();
-        if(!$cekWilayah) return $this->fail('Kode wilayah '.$wilayah.' tidak ada.', 400);
+        if (!$cekWilayah) return $this->fail('Kode wilayah ' . $wilayah . ' tidak ada.', 402);
         $anggota = $ma->select('id, nia, nama, alamat, wa, wilayah, level, aktif')->where(['wilayah' => $wilayah, 'aktif' => 'aktif'])->findAll();
-        // if (!$anggota) return $this->fail('ID anggota ' . $id . ' tidak ditemukan.', 400);
+        // if (!$anggota) return $this->fail('ID anggota ' . $id . ' tidak ditemukan.', 402);
         // $data = [
         //     'anggota' => $anggota,
         //     'wilayah' => $mw->select('keterangan')->where('kode', $anggota['wilayah'])->first()
@@ -125,7 +132,7 @@ class Anggota extends BaseController
             ]
         ];
 
-        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
         $ma = new ModelAnggota();
         $mw = new ModelWilayah();
         $json = $this->request->getJSON();
@@ -133,12 +140,12 @@ class Anggota extends BaseController
         $email = $json->email;
 
         $cek = $ma->select('*')->where('nia', $nia)->first();
-        if ($cek) return $this->fail('Nomor induk anggota ' . $nia . ' sudah ada.', 400);
-        // if ($cek['email'] == $email) return $this->fail('Alamat email ' . $nia . ' sudah ada.', 400);
+        if ($cek) return $this->fail('Nomor induk anggota ' . $nia . ' sudah ada.', 402);
+        // if ($cek['email'] == $email) return $this->fail('Alamat email ' . $nia . ' sudah ada.', 402);
 
         $wilayah = $json->wilayah;
         $cekWilayah = $mw->select('*')->where(['kode' => $wilayah, 'aktif' => '1'])->first();
-        if (!$cekWilayah) return $this->fail('Kode wilayah ' . $wilayah . ' tidak terdaftar.', 400);
+        if (!$cekWilayah) return $this->fail('Kode wilayah ' . $wilayah . ' tidak terdaftar.', 402);
         $data = [
             'nia' => $nia,
             'nama' => $json->nama,
@@ -164,7 +171,7 @@ class Anggota extends BaseController
         $ma = new ModelAnggota();
         $mw = new ModelWilayah();
         $anggota = $ma->select('*')->where('id', $id)->first();
-        if (!$anggota) return $this->fail('ID anggota tidak ditemukan.', 400);
+        if (!$anggota) return $this->fail('ID anggota tidak ditemukan.', 402);
         $wilayah = $mw->select('*')->where('aktif', '1')->findAll();
         // $cekWilayah = $mw->select('*')->where('kode', $wilayah)->first();
         $data = [
@@ -174,16 +181,16 @@ class Anggota extends BaseController
                 'nama' => $anggota['nama'],
                 'alamat' => $anggota['alamat'],
                 'wa' => $anggota['wa'],
-                'wilayah' => $anggota['wilayah'],
+                'wilayah' => strtoupper($anggota['wilayah']),
                 'email' => $anggota['email'],
                 'level' => $anggota['level'],
-                'aktif' => $anggota['aktif'] == 'aktif' ? true : false
+                'aktif' => $anggota['aktif'],
             ],
             'ubah' => [
                 'nama' => $anggota['nama'],
                 'alamat' => $anggota['alamat'],
                 'wa' => $anggota['wa'],
-                'wilayah' => $anggota['wilayah'],
+                'wilayah' => strtoupper($anggota['wilayah']),
                 'email' => $anggota['email'],
                 'level' => $anggota['level'],
             ],
@@ -255,10 +262,10 @@ class Anggota extends BaseController
         $input_wilayah = strtoupper($json->wilayah);
 
         $cek = $ma->select('*')->where('id', $id)->first();
-        if (!$cek) return $this->fail('ID anggota tidak ditemukan.', 400);
+        if (!$cek) return $this->fail('ID anggota tidak ditemukan.', 402);
 
         $wilayah = $mw->select('*')->where(['kode' => $input_wilayah, 'aktif' => '1'])->first();
-        if (!$wilayah) return $this->fail('Kode ' . $input_wilayah . ' yang anda masukkan tidak terdaftar.', 400);
+        if (!$wilayah) return $this->fail('Kode ' . $input_wilayah . ' yang anda masukkan tidak terdaftar.', 402);
         $data = [
             'nama' => $json->nama,
             'alamat' => $json->alamat,
@@ -267,14 +274,14 @@ class Anggota extends BaseController
             'email' => $email,
             'level' => $json->level,
         ];
-        
+
         try {
             $ma->set($data);
             $ma->where('id', $id);
             $ma->update();
             return $this->respond(['pesan' => 'Data anggota berhasil diperbarui.']);
         } catch (\Throwable $th) {
-            return $this->fail(['error' => $th->getMessage()], 400);
+            return $this->fail(['error' => $th->getMessage()], 402);
         }
     }
 
@@ -296,8 +303,8 @@ class Anggota extends BaseController
     {
         $ma = new ModelAnggota();
         $cek = $ma->select('*')->where('nia', $nia)->first();
-        if(!$cek) return $this->fail('Data anggota NIA '.$nia.' tidak ada.', 400);
-        if($cek['aktif'] != 'aktif') return $this->fail('Data anggota NIA '.$nia.' masuk dalam daftar anggota nonaktif.', 400);
+        if (!$cek) return $this->fail('Data anggota NIA ' . $nia . ' tidak ada.', 402);
+        if ($cek['aktif'] != 'aktif') return $this->fail('Data anggota NIA ' . $nia . ' masuk dalam daftar anggota nonaktif.', 402);
         $data = [
             'password' => password_hash($nia, PASSWORD_DEFAULT),
         ];

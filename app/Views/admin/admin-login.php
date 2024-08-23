@@ -48,8 +48,9 @@
                         </v-col>
 
                         <v-col cols="12">
-                          <v-btn color="primary" height="50" rounded depressed block @click="goLogin">LOGIN</v-btn> <br>
-                          <a href="#" class="teal--text text-center mt-2" style="text-decoration: none;">User Page</a>
+                          <v-btn color="primary" height="50" rounded depressed block @click="goLogin">LOGIN</v-btn>
+                          <v-btn color="teal" text @click="goUser">User Page</v-btn>
+                          <!-- <a href="#" class="teal--text text-center mt-2" style="text-decoration: none;">User Page</a> -->
                           <!-- <v-row class="mt-1">
                             <v-col cols="6">
                             </v-col>
@@ -149,7 +150,7 @@
             })
         },
         goUser(){
-          window.open('<?= base_url();?>user-login', '_self')
+          window.open('<?= base_url();?>login', '_self')
         },
       }
     })
