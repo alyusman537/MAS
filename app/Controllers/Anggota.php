@@ -136,7 +136,7 @@ class Anggota extends BaseController
         $ma = new ModelAnggota();
         $mw = new ModelWilayah();
         $json = $this->request->getJSON();
-        $nia = $json->nia;
+        $nia = strtoupper($json->nia);
         $email = $json->email;
 
         $cek = $ma->select('*')->where('nia', $nia)->first();

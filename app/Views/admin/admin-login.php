@@ -123,8 +123,8 @@
         },
         async goLogin() {
           const param = {
-            nia: this.nia,
-            password: this.password
+            nia: String(this.nia).toUpperCase(),
+            password: String(this.password).toUpperCase()
           }
           await axios.post('<?= base_url(); ?>api/admin-login', param)
             .then((res) => {
