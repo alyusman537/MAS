@@ -62,6 +62,15 @@
                     @click="loadDialogEdit(item.id)">
                     Edit
                   </v-btn>
+                  <v-btn
+                    color="warning"
+                    depressed
+                    rounded
+                    small
+                    dark
+                    @click="resetPassword(item)">
+                    Reset
+                  </v-btn>
                   <v-btn color="error" small rounded depressed dark @click="hapusAnggota(item.id)">hapus</v-btn>
                 </template>
               </v-data-table>
@@ -496,6 +505,31 @@
               }
               console.log('status error : ', err.response.status);
             })
+        },
+
+        resetPassword(anggota) {
+          Swal.fire({
+            title: "Yakin akan mereset password anggota " + anggota.nia + "?",
+            showDenyButton: true,
+            confirmButtonText: "Ya",
+            denyButtonText: "Tidak",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.get('<?= base_url(); ?>api/admin/anggota-reset/' + anggota.nia, this.config)
+                .then((res) => {
+                  console.log();
+                  Swal.fire({
+                    title: "Berhasil!",
+                    text: "Password anggota " + anggota.nia + ' berhasil di reset.',
+                    icon: "success"
+                  });
+                })
+                .catch((err) => {
+                  console.log(err.response.data);
+                  
+                })
+            }
+          });
         },
       }
     })
