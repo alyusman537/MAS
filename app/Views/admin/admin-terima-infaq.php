@@ -476,8 +476,8 @@
           tanggal_validasi: null,
         },
         isEdit: false,
-        isLunas: 'belum',
-        lunasataubelum: ['lunas', 'belum'],
+        isLunas: 'pending',
+        lunasataubelum: ['baru', 'pending','lunas'],
         /////
         modal: false,
         dialogGenerate: false,

@@ -262,7 +262,7 @@ class Infaq extends BaseController
             if (!$cek_tagihan) {
                 $dorong = [
                     'tanggal' => $tanggal,
-                    'nomor_pembayaran' => time() . '-' . $val['nia'],
+                    'nomor_pembayaran' => $json->kode_infaq . '-' . $val['nia'],
                     'kode_infaq' => $json->kode_infaq,
                     'nia' => $val['nia'],
                 ];
@@ -291,7 +291,7 @@ class Infaq extends BaseController
             if (!$cek_tagihan) {
                 $dorong = [
                     'tanggal' => $tanggal,
-                    'nomor_pembayaran' => time() . '-' . $val['nia'],
+                    'nomor_pembayaran' => $kode_infaq . '-' . $val['nia'],
                     'kode_infaq' => $kode_infaq,
                     'nia' => $val['nia'],
                 ];

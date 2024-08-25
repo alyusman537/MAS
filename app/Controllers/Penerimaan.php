@@ -22,9 +22,18 @@ class Penerimaan extends BaseController
 
     public function daftarTunggu($status)
     {
-        $is_lunas = $status == 'lunas' ? 'NOT NULL' : 'NULL';
+        $is_lunas = null;
+        $data = [];
         $mp = new ModelPembayaran();
-        $data = $mp->daftarTunggu($is_lunas);
+        if ($status == 'lunas') {
+            $data = $mp->daftarTungguLunas();
+        } else if ($status == 'pending') {
+            $data = $mp->daftarTungguPending();
+        } elseif ($status == 'baru') {
+            $data = $mp->daftarTungguBaru();
+        } else {
+            return $this->fail('Status pembayaran tidak ditemukan.', 402);
+        }
         return $this->respond($data);
     }
 
@@ -51,7 +60,7 @@ class Penerimaan extends BaseController
         if (!$bayar) return $this->fail('Kode pembayaran infaq ' . $nomor_pembayaran . ' anda tidak ditemukan.', 400);
         $infaq = $mi->select('*')->where('kode', $bayar['kode_infaq'])->first();
         if (!$infaq) return $this->fail('Kode infaq ' . $bayar['kode_infaq'] . ' tidak ditemukan.', 400);
-        if ($bayar['validator'] != null) return $this->fail('Pembayaran iuran sudah diterima oleh '.$bayar['validator'].'.', 400);
+        if ($bayar['validator'] != null) return $this->fail('Pembayaran iuran sudah diterima oleh ' . $bayar['validator'] . '.', 400);
         $terbayar = (int) $bayar['bayar'] - (int) $infaq['nominal'];
         if ($terbayar < 0) {
 
@@ -67,7 +76,7 @@ class Penerimaan extends BaseController
         $mp->where('nomor_pembayaran', $nomor_pembayaran);
         $update = $mp->update();
         if (!$update) return $this->fail('Gagal terima pembayaran infaq kode ' . $nomor_pembayaran . ' .', 400);
-        
+
         $libMutasi = new LibMutasi();
         $mutasi = $libMutasi->transaksi('PI-' . time(), date('Y-m-d'), 'D', $bayar['bayar'], 'Penerimaan infaq nomor ' . $nomor_pembayaran, $validator);
         if (!$mutasi) return $this->fail('Infaq berhasil diterima namun gagal simpan pada mutasi.');
@@ -88,7 +97,7 @@ class Penerimaan extends BaseController
 
         if (!$bayar) return $this->fail('Kode infaq umum ' . $kode . ' tidak ditemukan.', 400);
         if ($bayar['bukti'] == null) return $this->fail('Bukti pembayaran masih belum diupload oleh anggota.', 400);
-        if($bayar['validator'] != null) return $this->fail('Pembayran infq umum kode '.$kode.' sudah diterima oleh '.$bayar['validator'].'.', 400);
+        if ($bayar['validator'] != null) return $this->fail('Pembayran infq umum kode ' . $kode . ' sudah diterima oleh ' . $bayar['validator'] . '.', 400);
 
         $data = [
             'validator' => $validator,
