@@ -367,6 +367,8 @@
             return false;
           }
           this.attFile = event;
+          console.log(this.attFile);
+          
           // this.linkFoto = URL.createObjectURL(event);
         },
         async uploadBuktiBayar(kode) {
@@ -383,6 +385,8 @@
               this.toast('success', 'Silahkan hubungi admin untuk menerima infaq umum Anda.')
               this.getListInfaq()
               this.dialogInfaq = false
+              this.attFile = null
+              fdata.delete("bukti")
             })
             .catch((err) => {
               if (err.response.status > 400) {

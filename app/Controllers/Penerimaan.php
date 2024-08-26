@@ -8,6 +8,7 @@ use CodeIgniter\API\ResponseTrait;
 use App\Models\ModelInfaq;
 use App\Models\ModelPembayaran;
 use App\Models\ModelUmum;
+use App\Models\ModelAnggota;
 
 use App\Libraries\JwtDecode;
 use App\Libraries\LibMutasi;
@@ -22,7 +23,6 @@ class Penerimaan extends BaseController
 
     public function daftarTunggu($status)
     {
-        $is_lunas = null;
         $data = [];
         $mp = new ModelPembayaran();
         if ($status == 'lunas') {
@@ -45,6 +45,31 @@ class Penerimaan extends BaseController
         return $this->respond($data);
     }
 
+    public function pembayaranInfaqDetail($nomor_pembayaran)
+    {
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
+        $decoder = new JwtDecode();
+        $user = $decoder->admin($header);
+
+        $mi = new ModelInfaq();
+        $mp = new ModelPembayaran();
+        $ma = new ModelAnggota();
+
+        $bayar = $mp->select('*')->where(['nomor_pembayaran' => $nomor_pembayaran])->first();
+        if (!$bayar) return $this->fail('Kode pembayaran infaq ' . $nomor_pembayaran . ' anda tidak ditemukan.', 400);
+        $infaq = $mi->select('*')->where('kode', $bayar['kode_infaq'])->first();
+        if (!$infaq) return $this->fail('Kode infaq ' . $bayar['kode_infaq'] . ' tidak ditemukan.', 400);
+        $anggota = $ma->select('nama')->where(['nia' => $bayar['nia']])->first();
+        
+        $data = [
+            'pembayaran' => $bayar,
+            'infaq' => $infaq,
+            'anggota' => $anggota
+        ];
+
+        return $this->respond($data);
+    }
+
     public function terimaInfaq($nomor_pembayaran)
     {
         $header = $this->request->getServer('HTTP_AUTHORIZATION');
@@ -63,7 +88,6 @@ class Penerimaan extends BaseController
         if ($bayar['validator'] != null) return $this->fail('Pembayaran iuran sudah diterima oleh ' . $bayar['validator'] . '.', 400);
         $terbayar = (int) $bayar['bayar'] - (int) $infaq['nominal'];
         if ($terbayar < 0) {
-
             return $this->fail('Nominal iuran kurang dari ketentuan infaq ' . $infaq['acara'] . '. Kurang bayar Rp. ' . number_format($terbayar), 400);
         }
 

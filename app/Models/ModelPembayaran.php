@@ -53,7 +53,7 @@ class ModelPembayaran extends Model
     public function daftarTungguBaru()
     {
         $db = $this->db->table('pembayaran as p');
-        $db->select('p.*, infaq.acara, infaq.rutin, anggota.nama');
+        $db->select('p.*, infaq.acara, infaq.rutin, infaq.tanggal_acara, anggota.nama');
         $db->where('p.bayar = 0 AND p.validator IS NULL AND infaq.aktif = 1');
         $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
         $db->join('anggota', 'anggota.nia=p.nia', 'left');
@@ -66,7 +66,7 @@ class ModelPembayaran extends Model
     public function daftarTungguPending()
     {
         $db = $this->db->table('pembayaran as p');
-        $db->select('p.*, infaq.acara, infaq.rutin, anggota.nama');
+        $db->select('p.*, infaq.acara, infaq.rutin, infaq.tanggal_acara, anggota.nama');
         $db->where('p.bayar >= infaq.nominal AND p.validator IS NULL AND infaq.aktif = 1');
         $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
         $db->join('anggota', 'anggota.nia=p.nia', 'left');
@@ -80,7 +80,7 @@ class ModelPembayaran extends Model
     public function daftarTungguLunas()
     {
         $db = $this->db->table('pembayaran as p');
-        $db->select('p.*, infaq.acara, infaq.rutin, anggota.nama');
+        $db->select('p.*, infaq.acara, infaq.rutin, infaq.tanggal_acara, anggota.nama');
         $db->where('p.bayar >= infaq.nominal AND p.validator IS NOT NULL AND infaq.aktif = 1');
         $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
         $db->join('anggota', 'anggota.nia=p.nia', 'left');
