@@ -100,3 +100,4 @@ $routes->get('/administrator/anggota', 'View::adminAnggota');
 $routes->get('/administrator/infaq', 'View::adminInfaq');
 $routes->get('/administrator/penerimaan-infaq', 'View::adminPenerimaanInfaq');
 $routes->get('/administrator/penerimaan-infaq-umum', 'View::adminPenerimaanInfaqUmum');
+$routes->get('/administrator/transaksi-kas', 'View::adminTransaksiKas');

@@ -28,7 +28,7 @@ class ModelMutasi extends Model
         $db->select('m.*, anggota.nama as nama');
         $db->join('anggota', 'anggota.nia=m.admin');
         $db->where('m.tanggal BETWEEN "' . $tglAwal . '" AND "' . $tglAkhir . '"');
-        $db->orderBy('m.tanggal', 'ASC');
+        $db->orderBy('m.created_at', 'ASC');
         $data = $db->get();
         if (!$data) return false;
         return $data->getResult();

@@ -64,4 +64,8 @@ class View extends BaseController
     {
         return view('/admin/admin-terima-infaq-umum');
     }
+    public function adminTransaksiKas()
+    {
+        return view('/admin/admin-transaksi-kas');
+    }
 }

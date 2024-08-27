@@ -87,7 +87,7 @@ class Mutasi extends BaseController
     public function new()
     {
         $data = [
-            'tanggal' => date('Y-m-d'),
+            // 'tanggal' => date('Y-m-d'),
             'jenis' => null,
             'nominal' => 0,
             'keterangan' => null
@@ -106,18 +106,10 @@ class Mutasi extends BaseController
 
         helper(['form']);
         $rules = [
-            'tanggal'         => [
-                'rules' =>  'required',
-                'errors' => [
-                    'required' => '{field} tidak boleh kosong.',
-                ]
-            ],
             'jenis'          => [
                 'rules'  => 'required',
                 'errors' => [
                     'required' => '{field} tidak boleh kosong.',
-                    'min_length' => '{field} tidak boleh kurang dari 4 karakter',
-                    'max_length' => '{field} tidak boleh lebih dari 20 karakter'
                 ]
             ],
             'nominal'         => [
@@ -136,17 +128,17 @@ class Mutasi extends BaseController
             ],
         ];
 
-        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
 
         $jenis = $json->jenis;
-        // if ($jenis != 'D' || $jenis != 'K') return $this->fail('Nilai jenis mutasi harus berupa D atau K', 400);
+
         $prefix = $jenis == 'D' ? 'MD' : 'MK';
         $nominal = $json->nominal;
-        if (!is_numeric($nominal)) return $this->fail('Nilai nominal harus berupa angka.', 400);
+        if (!is_numeric($nominal)) return $this->fail('Nilai nominal harus berupa angka.', 402);
         $nomor = $prefix . '-' . time();
 
         $libMutasi = new LibMutasi();
-        $simpan = $libMutasi->transaksi($nomor, $json->tanggal, $jenis, $nominal, $json->keterangan, $admin->sub);
+        $simpan = $libMutasi->transaksi($nomor, date('Y-m-d'), $jenis, $nominal, $json->keterangan, $admin->sub);
 
         if (!$simpan) return $this->fail('Gagal simpan mutasi', 400);
         return $this->respondCreated(['pesan' => 'Mutasi transaksi berhasil disimpan.']);

@@ -32,8 +32,7 @@
                     :items="lunasataubelum"
                     v-model="isLunas"
                     label="Status"
-                    @change="getList()"
-                  ></v-select>
+                    @change="getList()"></v-select>
                 </v-col>
                 <!-- <v-col cols="4">
                   <v-btn class="mt-4" color="info" small depressed @click="loadDialogBaru()">
@@ -60,7 +59,7 @@
                     rounded
                     small
                     dark
-                    @click="lihatDetail(item.nomor_pembayaran)">detail</v-btn>
+                    @click="lihatDetail(item.nomor_pembayaran)">Lihat dan terima</v-btn>
                   <!--v-btn
                     :color="item.warna"
                     depressed
@@ -414,7 +413,7 @@
             value: 'bayar',
             align: 'end',
           },
-          
+
           {
             text: 'Tgl. Pembayaran',
             value: 'tanggal_bayar'
@@ -455,7 +454,7 @@
         },
         isEdit: false,
         isLunas: 'pending',
-        lunasataubelum: ['baru', 'pending','lunas'],
+        lunasataubelum: ['baru', 'pending', 'lunas'],
         isTerima: false,
         /////
         modal: false,
@@ -518,7 +517,7 @@
                 }
                 return dorong
               })
-              if(this.isLunas == 'pending') {
+              if (this.isLunas == 'pending') {
                 this.isTerima = true
               } else {
                 this.isTerima = false
@@ -542,12 +541,12 @@
               this.infaq.acara = res.data.infaq.acara
               this.infaq.tanggal_acara = res.data.infaq.tanggal_acara
               this.infaq.nominal = parseInt(res.data.infaq.nominal).toLocaleString('ID-id')
-              this.infaq.rutin = res.data.infaq.rutin
+              this.infaq.rutin = res.data.infaq.rutin == '1' ? 'Rutin' : 'Insidential'
               this.infaq.nia = res.data.pembayaran.nia
               this.infaq.nama = res.data.anggota.nama
               this.infaq.nomor_pembayaran = res.data.pembayaran.nomor_pembayaran
               this.infaq.bayar = parseInt(res.data.pembayaran.bayar).toLocaleString('ID-id')
-              this.infaq.bukti_bayar = res.data.pembayaran.bukti_bayar == null ? '<?= base_url()?>No_Image_Available.jpg' : '<?= base_url()?>api/render/bukti/'+res.data.pembayaran.bukti_bayar
+              this.infaq.bukti_bayar = res.data.pembayaran.bukti_bayar == null ? '<?= base_url() ?>No_Image_Available.jpg' : '<?= base_url() ?>api/render/bukti/' + res.data.pembayaran.bukti_bayar
               this.infaq.tanggal_bayar = res.data.pembayaran.tanggal_bayar
               this.infaq.validator = res.data.pembayaran.validator
               this.infaq.tanggal_validasi = res.data.pembayaran.tanggal_validasi
@@ -560,37 +559,33 @@
             })
         },
 
-        async terimaInfaq() {
+        terimaInfaq() {
           Swal.fire({
-  title: "Penerimaan infaq?",
-  text: "Yakin akan melakukan penerimaan infaq nomor pembayaran "+this.infaq.nomor_pembayaran,
-  icon: "warning",
-  showCancelButton: true,
-  confirmButtonColor: "#3085d6",
-  cancelButtonColor: "#d33",
-  confirmButtonText: "Terima"
-}).then((result) => {
-  if (result.isConfirmed) {
-    Swal.fire({
-      title: "Sukses!",
-      text: "Nomor pembayaran infaq "+this.infaq.nomor_pembayaran+" berhasil diterima.",
-      icon: "success"
-    });
-  }
-});
-          // await axios.get('<?= base_url(); ?>api/admin/terima-infaq/' + nomor_pembayaran, this.config)
-          //   .then((res) => {
-          //     this.refresh()
-          //     console.log('detail ', res.data);
+            title: "Penerimaan infaq?",
+            text: "Yakin akan melakukan penerimaan infaq nomor pembayaran " + this.infaq.nomor_pembayaran,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Terima"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.get('<?= base_url(); ?>api/admin/terima-infaq/' + this.infaq.nomor_pembayaran, this.config)
+                .then((res) => {
+                  this.refresh()
+                  console.log('detail ', res.data);
+                  swal('Berhasil!', "Nomor pembayaran infaq "+this.infaq.nomor_pembayaran+" berhasil diterima.", 'success')
 
-          //     this.dialogDetail = false
-          //   })
-          //   .catch((err) => {
-          //     console.log(err.response.data);
+                  this.dialogDetail = false
+                })
+                .catch((err) => {
+                  console.log(err.response.data);
 
-          //   })
+                })
+            }
+          });
         },
-        
+
       }
     })
   </script>

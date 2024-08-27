@@ -68,6 +68,13 @@ Vue.component("admin-nav-bar", {
         </v-list-item>
         <v-divider></v-divider>
 
+        <v-list-item @click="gotoTransaksiKas">
+            <v-list-item-content>
+            <v-list-item-title>Transaksi Kas</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider></v-divider>
+
         <v-list-item @click="keluar">
             <v-list-item-content>
             <v-list-item-title>Keluar</v-list-item-title>
@@ -132,6 +139,9 @@ Vue.component("admin-nav-bar", {
     },
     gotoPenerimaanInfaqUmum() {
       window.open(this.url + "/administrator/penerimaan-infaq-umum", "_self");
+    },
+    gotoTransaksiKas() {
+      window.open(this.url + "/administrator/transaksi-kas", "_self");
     },
   },
 });
