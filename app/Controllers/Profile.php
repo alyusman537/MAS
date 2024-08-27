@@ -216,14 +216,14 @@ class Profile extends BaseController
                     'uploaded[foto]',
                     'is_image[foto]',
                     'mime_in[foto,image/jpg,image/jpeg]',
-                    'max_size[foto,4096]',
+                    'max_size[foto,2048]',
                     // 'max_dims[userfile,1024,768]',
                 ],
                 'errors' => [
                     'uploaded' => 'tidak ada gambar yagn diupload',
                     'is_image' => 'file harus berupa gambar',
                     'mime_in' => 'gambar harus berupa jpg atau jpeg',
-                    'max_size' => 'ukurang gambar harus kurang dari 4mb'
+                    'max_size' => 'ukurang gambar harus kurang dari 2mb'
                 ]
             ],
         ];

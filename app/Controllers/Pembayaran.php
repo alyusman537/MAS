@@ -94,14 +94,14 @@ class Pembayaran extends BaseController
                     'uploaded[bukti]',
                     'is_image[bukti]',
                     'mime_in[bukti,image/jpg,image/jpeg,image/png]',
-                    'max_size[bukti,4096]',
+                    'max_size[bukti,2048]',
                     // 'max_dims[userfile,1024,768]',
                 ],
                 'errors' => [
                     'uploaded' => 'tidak ada gambar yagn diupload',
                     'is_image' => 'file harus berupa gambar',
                     'mime_in' => 'gambar harus berupa jpg atau jpeg',
-                    'max_size' => 'ukurang gambar harus kurang dari 4mb'
+                    'max_size' => 'ukurang gambar harus kurang dari 2mb'
                 ]
             ],
         ];

@@ -190,14 +190,14 @@ class Umum extends BaseController
                     'uploaded[bukti]',
                     'is_image[bukti]',
                     'mime_in[bukti,image/jpg,image/jpeg,image/png]',
-                    'max_size[bukti,4096]',
+                    'max_size[bukti,2048]',
                     // 'max_dims[userfile,1024,768]',
                 ],
                 'errors' => [
                     'uploaded' => 'tidak ada gambar yagn diupload',
                     'is_image' => 'file harus berupa gambar',
                     'mime_in' => 'gambar harus berupa jpg atau jpeg',
-                    'max_size' => 'ukurang gambar harus kurang dari 4mb'
+                    'max_size' => 'ukurang gambar harus kurang dari 2mb'
                 ]
             ],
         ];
@@ -207,7 +207,13 @@ class Umum extends BaseController
 
         $x_file = $this->request->getFile('bukti');
         $namaFoto = $x_file->getRandomName();
-        $x_file->move(WRITEPATH . 'uploads/bukti/', $namaFoto);
+        // $x_file->move(WRITEPATH . 'uploads/bukti/', $namaFoto);
+        $image = service('image');
+        $image->withFile($x_file)
+            ->resize(500, 500, true, 'height')
+            ->save(WRITEPATH . '/uploads/bukti/' . $namaFoto);
+
+        unlink($x_file);
 
         $mm->set(['bukti' => $namaFoto]);
         $mm->where('kode', $kode);
