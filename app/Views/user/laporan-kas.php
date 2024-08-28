@@ -210,7 +210,7 @@
         },
         keluar() {
           localStorage.clear()
-          window.open('<?= base_url(); ?>user-login', '_self')
+          window.open('<?= base_url(); ?>login', '_self')
         },
         async refresh() {
           await axios.get('<?= base_url() ?>api/user/refresh-token', this.config)

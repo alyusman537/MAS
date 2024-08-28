@@ -71,21 +71,7 @@ Vue.component("nav-bar", {
     </div>
     `,
   props: ["title"],
-  created() {
-    const token = localStorage.getItem("token");
-    // const localData = JSON.parse(localStorage.getItem("user"));
-    // this.namaUser = localData.nama;
-    // this.kodeUser = localData.nia;
-    // this.foto = localData.foto;
-    // console.log("foto ", this.foto);
-
-    this.config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-      this.getProfile()
-  },
+  
   data() {
     return {
       // title: "titlenya navbar",
@@ -98,6 +84,24 @@ Vue.component("nav-bar", {
       levelUser: null,
       foto: null,
     };
+  },
+  created() {
+    if(!localStorage.getItem('token')) {
+      window.open(this.url+'/login', '_self')
+    }
+    const token = localStorage.getItem("token");
+    const localData = JSON.parse(localStorage.getItem("user"));
+    this.namaUser = localData.nama;
+    this.kodeUser = localData.nia;
+    this.foto = localData.foto;
+    // console.log("foto ", this.foto);
+
+    // this.config = {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // };
+    //   this.getProfile()
   },
   methods: {
     async getProfile() {
