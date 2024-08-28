@@ -284,6 +284,17 @@
         this.getProfile()
       },
       methods: {
+        keluar() {
+          localStorage.clear()
+          window.open('<?= base_url(); ?>user-login', '_self')
+        },
+        async refresh() {
+          await axios.get('<?= base_url() ?>api/user/refresh-token', this.config)
+            .then((res) => {
+              localStorage.setItem('token', res.data.new_token)
+            })
+            .catch()
+        },
         async getProfile() {
           await axios.get('<?= base_url(); ?>api/user/profile', this.config)
             .then((res) => {
@@ -296,9 +307,13 @@
               this.warna_aktif = res.data.aktif == 'aktif' ? 'green' : 'red'
               this.iuran_belum_bayar = res.data.iuran_belum_terbayar
               this.foto = res.data.foto
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
             })
             .catch((err) => {
+              if(err.response.status == 401){
+                this.keluar()
+              }
               console.log(err.response.data);
 
             })
@@ -306,7 +321,8 @@
         async loadDialogDiri() {
           await axios.get('<?= base_url(); ?>api/user/profile/edit/' + this.id_user, this.config)
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
               this.diri.nama = res.data.nama
               this.diri.alamat = res.data.alamat
               this.diri.wa = res.data.wa
@@ -314,6 +330,9 @@
               this.dialogDiri = true
             })
             .catch((err) => {
+              if(err.response.status == 401){
+                this.keluar()
+              }
               console.log(err.response.data);
 
             })
@@ -325,9 +344,13 @@
               this.password_baru = res.data.password_baru
               this.konfirmasi_password = res.data.konfirmasi_password
               this.dialogPassword = true
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
             })
             .catch((err) => {
+              if(err.response.status == 401){
+                this.keluar()
+              }
               console.log(err.response.data);
 
             })
@@ -342,7 +365,8 @@
             .then((res) => {
 
               this.dialogPassword = false
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
               Swal.fire({
                 title: "Pergantian password telah berhasil Anda lakukan.",
                 showDenyButton: false,
@@ -356,6 +380,9 @@
               });
             })
             .catch((err) => {
+              if(err.response.status == 401){
+                this.keluar()
+              }
               console.log(err.response.data);
               // if(err.response.data.messages.konfirmasi_password) {
               //   console.log('konfir masine error');
@@ -400,7 +427,8 @@
           axios
             .post('<?= base_url(); ?>api/user/profile/foto', fdata, this.config)
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
               const localData = JSON.parse(localStorage.getItem('user'))
               const store = {
                 nama: localData.nama,
@@ -421,6 +449,9 @@
 
             })
             .catch((err) => {
+              if(err.response.status == 401){
+                this.keluar()
+              }
               console.log(err.response);
             });
         },

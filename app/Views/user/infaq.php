@@ -228,6 +228,17 @@
             title: pesan
           });
         },
+        keluar() {
+          localStorage.clear()
+          window.open('<?= base_url(); ?>user-login', '_self')
+        },
+        async refresh() {
+          await axios.get('<?= base_url() ?>api/user/refresh-token', this.config)
+            .then((res) => {
+              localStorage.setItem('token', res.data.new_token)
+            })
+            .catch()
+        },
         async getListInfaq() {
           await axios.get('<?= base_url(); ?>/api/user/home/daftar-infaq/' + this.nia, this.config)
             .then((res) => {

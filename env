@@ -145,3 +145,4 @@ database.default.port = 3306
 ADMIN_KEY=alhamdulillah
 JWT_KEY=bismillah
 JWT_EXP=60 #dalam menit
+TOKEN_FONNTE=DsQ4

@@ -140,11 +140,22 @@
             title: pesan
           });
         },
+        keluar() {
+          localStorage.clear()
+          window.open('<?= base_url(); ?>administrator/login', '_self')
+        },
+        async refresh() {
+          await axios.get('<?= base_url() ?>api/admin-refresh', this.config)
+            .then((res) => {
+              localStorage.setItem('admin-token', res.data.new_token)
+            })
+            .catch()
+        },
         async getHome() {
           // const tglSekarang = 
           await axios.get('<?= base_url(); ?>api/admin/home', this.config)
             .then((res) => {
-              console.log(res.data);
+              this.refresh()
               this.saldo_kas_bulan_kemarin = parseInt(res.data.saldo.saldo_bulan_lalu).toLocaleString('ID-id')
               this.pemasukan_bulan_ini = parseInt(res.data.saldo.pemasukan_bulan_ini).toLocaleString('ID-id')
               this.pengeluaran_bulan_ini = parseInt(res.data.saldo.pengeluaran_bulan_ini).toLocaleString('ID-id')
@@ -157,6 +168,9 @@
               
             })
             .catch((err) => {
+              if(err.response.status == 401 ){
+                this.keluar()
+              }
               console.log('getlist infq ', err);
 
             })

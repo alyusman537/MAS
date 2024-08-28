@@ -256,10 +256,22 @@
             title: pesan
           });
         },
+        keluar() {
+          localStorage.clear()
+          window.open('<?= base_url(); ?>user-login', '_self')
+        },
+        async refresh() {
+          await axios.get('<?= base_url() ?>api/user/refresh-token', this.config)
+            .then((res) => {
+              localStorage.setItem('token', res.data.new_token)
+            })
+            .catch()
+        },
         async getListInfaq() {
           await axios.get('<?= base_url(); ?>api/user/home/infaq-umum', this.config)
             .then((res) => {
-              console.log('res ', res.data);
+              // console.log('res ', res.data);
+              this.refresh()
               this.listInfaq = res.data.map((val) => {
                 const tgl = String(val.tanggal).split(' ')
                 const spTanggal = String(tgl[0]).split('-')
@@ -280,6 +292,9 @@
               console.log(this.listInfaq);
             })
             .catch((err) => {
+              if(err.response.status == 401 ){
+                this.keluar()
+              }
               console.log('getlist infq ', err);
 
             })
@@ -287,7 +302,8 @@
         async getInfaqDetail(kode) {
           await axios.get('<?= base_url(); ?>api/user/infaq-umum/id/' + kode, this.config)
             .then((res) => {
-              console.log('detail ', res.data);
+              // console.log('detail ', res.data);
+              this.refresh()
               this.detail.bukti = res.data.bukti
               this.detail.jam_validasi = res.data.jam_validasi
           this.detail.keterangan = res.data.keterangan
@@ -302,6 +318,9 @@
 
             })
             .catch((err) => {
+              if(err.response.status == 401 ){
+                this.keluar()
+              }
               console.log('getlist infq ', err);
 
             })
@@ -309,13 +328,17 @@
         async loadDialogInfaq() {
           await axios.get('<?= base_url(); ?>api/user/infaq-umum/new', this.config)
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
               this.infaq.nominal = null
               this.infaq.keterangan = null
               this.attFile = null;
               this.dialogInfaq = true
             })
             .catch((err) => {
+              if(err.response.status == 401 ){
+                this.keluar()
+              }
               console.log(err.response);
 
             })
@@ -339,10 +362,14 @@
           }
           await axios.post('<?= base_url(); ?>/api/user/infaq-umum/add', param, this.config)
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
               this.uploadBuktiBayar(res.data.kode)
             })
             .catch((err) => {
+              if(err.response.status == 401 ){
+                this.keluar()
+              }
               if (err.response.status === 402) {
                 this.toast('error', err.response.data.messages.error)
               }

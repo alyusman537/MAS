@@ -208,10 +208,22 @@
             title: pesan
           });
         },
+        keluar() {
+          localStorage.clear()
+          window.open('<?= base_url(); ?>user-login', '_self')
+        },
+        async refresh() {
+          await axios.get('<?= base_url() ?>api/user/refresh-token', this.config)
+            .then((res) => {
+              localStorage.setItem('token', res.data.new_token)
+            })
+            .catch()
+        },
         async getLaporanKas() {
           await axios.get('<?= base_url(); ?>api/user/laporan-kas/' + this.dateAwal + '/' + this.dateAkhir, this.config)
             .then((res) => {
-              console.log('res ', res.data);
+              // console.log('res ', res.data);
+              this.refresh()
               this.saldoAwal = parseInt(res.data.saldo_awal)
               let saldo = this.saldoAwal
               let urut = 0
@@ -233,6 +245,9 @@
               })
             })
             .catch((err) => {
+              if(err.response.status == 401) {
+                this.keluar()
+              }
               console.log('getlist infq ', err);
 
             })

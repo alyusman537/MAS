@@ -186,10 +186,22 @@
             title: pesan
           });
         },
+        keluar() {
+          localStorage.clear()
+          window.open('<?= base_url(); ?>administrator/login', '_self')
+        },
+        async refresh() {
+          await axios.get('<?= base_url() ?>api/admin-refresh', this.config)
+            .then((res) => {
+              localStorage.setItem('admin-token', res.data.new_token)
+            })
+            .catch()
+        },
         async getWilayah() {
           await axios.get('<?= base_url(); ?>api/admin/wilayah', this.config)
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
               this.listWilayah = res.data.map((el) => {
                 const dorong = {
                   id: el.id,
@@ -203,6 +215,9 @@
               })
             })
             .catch((err) => {
+              if(err.response.status == 401){
+                this.keluar()
+              }
               console.log('getlist infq ', err);
             })
         },
@@ -220,12 +235,16 @@
           }
           await axios.post('<?= base_url() ?>api/admin/wilayah', param, this.config)
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
               this.toast('success', 'Tambah data wilayah '+res.data.kode+ ' berhasil disimpan.')
               this.dialogWilayah = false
               this.isEdit = true
             })
             .catch((err) => {
+              if(err.response.status == 401){
+                this.keluar()
+              }
               if(err.response.status === 409) {
                 const errKode = err.response.data.messages.kode ? err.response.data.messages.kode : ''
                 const errKeterangan = err.response.data.messages.keterangan ? err.response.data.messages.keterangan : ''
@@ -242,7 +261,8 @@
         async loadDialogWilayahEdit(id) {
           await axios.get('<?= base_url() ?>api/admin/wilayah/' + id, this.config)
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
               this.wilayah.id = parseInt(res.data.id)
               this.wilayah.kode = res.data.kode
               this.wilayah.keterangan = res.data.keterangan
@@ -254,6 +274,9 @@
               
             })
             .catch((err) => {
+              if(err.response.status == 401){
+                this.keluar()
+              }
               console.log(err.response.data);
             })
         },
@@ -264,12 +287,16 @@
           }
           await axios.put('<?= base_url() ?>api/admin/wilayah/' + this.wilayah.id, param, this.config)
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
               this.toast('success', 'Data wilayah '+this.wilayah.kode+ ' berhasil diperbarui.')
               this.getWilayah()
               this.dialogWilayah = false
             })
             .catch((err) => {
+              if(err.response.status == 401){
+                this.keluar()
+              }
               if(err.response.status == 409) {
                 const errKode = err.response.data.messages.kode ? err.response.data.messages.kode : ''
                 const errKeterangan = err.response.data.messages.keterangan ? err.response.data.messages.keterangan : ''

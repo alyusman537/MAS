@@ -342,10 +342,22 @@
             title: pesan
           });
         },
+        keluar() {
+          localStorage.clear()
+          window.open('<?= base_url(); ?>administrator/login', '_self')
+        },
+        async refresh() {
+          await axios.get('<?= base_url() ?>api/admin-refresh', this.config)
+            .then((res) => {
+              localStorage.setItem('admin-token', res.data.new_token)
+            })
+            .catch()
+        },
         async getAnggota() {
           await axios.get('<?= base_url(); ?>api/admin/anggota', this.config)
             .then((res) => {
               console.log(res.data);
+              this.refresh()
               this.listAnggota = res.data.map((el) => {
                 const dorong = {
                   id: el.id,
@@ -364,6 +376,9 @@
               })
             })
             .catch((err) => {
+              if(err.response.status == 401) {
+                this.keluar()
+              }
               console.log('getlist infq ', err);
             })
         },
@@ -371,6 +386,7 @@
           await axios.get('<?= base_url(); ?>api/admin/anggota/' + id, this.config)
             .then((res) => {
               console.log('detail ', res.data);
+              this.refresh()
               this.anggota.id = res.data.id
               this.anggota.nia = res.data.nia
               this.anggota.foto = res.data.foto
@@ -384,6 +400,9 @@
               this.dialogDetail = true
             })
             .catch((err) => {
+              if(err.response.status == 401) {
+                this.keluar()
+              }
               console.log(err.response.data);
 
             })
@@ -391,6 +410,7 @@
         async loadDialogBaru() {
           await axios.get('<?= base_url(); ?>api/admin/anggota/new', this.config)
             .then((res) => {
+              this.refresh()
               console.log(res.data);
               this.anggota.alamat = null
               this.anggota.email = null
@@ -404,6 +424,9 @@
               this.listWilayah = res.data.wilayah
             })
             .catch((err) => {
+              if(err.response.status == 401) {
+                this.keluar()
+              }
               this.toast('error', JSON.stringify(err.response.data));
             })
 
@@ -420,12 +443,16 @@
           await axios.post('<?= base_url() ?>api/admin/anggota', param, this.config)
             .then((res) => {
               console.log(res.data);
+              this.refresh()
               this.toast('success', 'Tambah data anggota ' + this.anggota.nia + ' berhasil disimpan.')
               this.dialog = false
               this.isEdit = true
               this.getAnggota()
             })
             .catch((err) => {
+              if(err.response.status) {
+                this.keluar()
+              }
               if (err.response.status === 409) {
                 const errNia = err.response.data.messages.nia ? err.response.data.messages.nia + '\n' : ''
                 const errNama = err.response.data.messages.nama ? err.response.data.messages.nama + '\n' : ''
@@ -450,6 +477,7 @@
           await axios.get('<?= base_url() ?>api/admin/anggota/edit/' + id, this.config)
             .then((res) => {
               console.log(res.data);
+              this.refresh()
               const ra = res.data.anggota
               this.anggota.alamat = ra.alamat
               this.anggota.email = ra.email
@@ -471,7 +499,11 @@
 
             })
             .catch((err) => {
+              if(err.response.status == 401) {
+                this.keluar()
+              }
               console.log(err.response.data);
+
             })
         },
         async update() {
@@ -486,11 +518,15 @@
           await axios.put('<?= base_url() ?>api/admin/anggota/' + this.anggota.id, param, this.config)
             .then((res) => {
               console.log(res.data);
+              this.refresh()
               this.toast('success', 'Data anggota ' + this.anggota.nia + ' berhasil diperbarui.')
               this.getAnggota()
               this.dialog = false
             })
             .catch((err) => {
+              if(err.response.status == 401) {
+                this.keluar()
+              }
               if (err.response.status == 409) {
                 // const errKode = err.response.data.messages.kode ? err.response.data.messages.kode : ''
                 // const errKeterangan = err.response.data.messages.keterangan ? err.response.data.messages.keterangan : ''
@@ -517,7 +553,7 @@
             if (result.isConfirmed) {
               axios.get('<?= base_url(); ?>api/admin/anggota-reset/' + anggota.nia, this.config)
                 .then((res) => {
-                  console.log();
+                  this.refresh()
                   Swal.fire({
                     title: "Berhasil!",
                     text: "Password anggota " + anggota.nia + ' berhasil di reset.',
@@ -525,6 +561,9 @@
                   });
                 })
                 .catch((err) => {
+                  if(err.response.status == 401) {
+                this.keluar()
+              }
                   console.log(err.response.data);
                   
                 })
