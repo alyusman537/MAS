@@ -7,8 +7,10 @@ use CodeIgniter\API\ResponseTrait;
 
 use App\Models\ModelInfaq;
 use App\Models\ModelPembayaran;
+use App\Models\ModelAnggota;
 
 use App\Libraries\JwtDecode;
+use App\Libraries\LibFonnte;
 
 class Pembayaran extends BaseController
 {
@@ -73,9 +75,22 @@ class Pembayaran extends BaseController
             $mp->set($data);
             $mp->where(['nomor_pembayaran' => $nomor_pembayaran]);
             $mp->update();
+
+            $fonnte = new LibFonnte();
+            $ma = new ModelAnggota();
+            $admin = $ma->select('wa')->where(['level' => 'admin'])->findAll();
+            $nomoradmin = [];
+            foreach ($admin as $key => $val) {
+                $nomoradmin [] = $val['wa'];
+            }
+            $nomor = implode(",", $nomoradmin);
+            $pesan = 'Mohon segera terima pembayaran infaq *'.$infaq['acara'].'* dari Nomor anggoa *'.$bayar['nia'].'*';
+            $kirim = $fonnte::kirimPesan($nomor, $pesan);
+            // return print_r($kirim);
+
             return $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil dilakukan.']);
         } catch (\Throwable $th) {
-            return $this->fail($th->getMessage(), $th->getCode());
+            return $this->fail($th->getMessage(), 500);
         }
     }
 

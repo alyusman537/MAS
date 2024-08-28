@@ -296,15 +296,20 @@
           }
           await axios.put('<?= base_url(); ?>/api/user/pembayaran/' + this.infaq.nomor_pembayaran, param, this.config)
             .then((res) => {
-              console.log(res.data);
+              // console.log(res.data);
+              this.refresh()
               this.toast('success', res.data.pesan)
+              this.getListInfaq()
               this.dialogBayar = false
             })
             .catch((err) => {
+              if(err.response.status == 401) {
+                this.keluar()
+              }
               if (err.response.status === 402) {
                 this.toast('error', err.response.data.messages.error)
               }
-              console.log(err.response.data);
+              console.log(err);
 
             })
         },

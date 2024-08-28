@@ -6,8 +6,10 @@ use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\ModelUmum;
 use App\Models\ModelTmpUmum;
+use App\Models\ModelAnggota;
 
 use App\Libraries\JwtDecode;
+use App\Libraries\LibFonnte;
 
 class Umum extends BaseController
 {
@@ -89,9 +91,21 @@ class Umum extends BaseController
         try {
             $insert = $mu->insert($data);
             if (!$insert) return $this->fail($mu->errors(), 409);
+
+            $fonnte = new LibFonnte();
+            $ma = new ModelAnggota();
+            $admin = $ma->select('wa')->where(['level' => 'admin'])->findAll();
+            $nomoradmin = [];
+            foreach ($admin as $key => $val) {
+                $nomoradmin [] = $val['wa'];
+            }
+            $nomor = implode(",", $nomoradmin);
+            $pesan = 'Mohon segera terima pembayaran infaq Umum untuk *'.$json->keterangan.'* dari Nomor anggoa *'.$nia.'*';
+            $kirim = $fonnte::kirimPesan($nomor, $pesan);
+
             return $this->respondCreated($data);
         } catch (\Throwable $th) {
-            return $this->fail($th->getMessage(), $th->getCode());
+            return $this->fail($th->getMessage(), 500);
         }
     }
 
