@@ -134,7 +134,7 @@
                       v-model="diri.email"></v-text-field>
                   </v-col>
                   <v-col cols="12">
-                    <v-btn color="success" block depressed @click="updatePassword()">Simpan</v-btn>
+                    <v-btn color="success" block depressed @click="updateProfile()">Simpan</v-btn>
                   </v-col>
                   <v-col cols="12">
                     <v-btn color="error" block depressed @click="dialogDiri = false">Batal</v-btn>
@@ -223,6 +223,18 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      }
+    });
+
     new Vue({
       el: '#app',
       vuetify: new Vuetify({
@@ -284,6 +296,12 @@
         this.getProfile()
       },
       methods: {
+        toast(ikon, pesan) {
+          Toast.fire({
+            icon: ikon,
+            title: pesan
+          });
+        },
         keluar() {
           localStorage.clear()
           window.open('<?= base_url(); ?>user-login', '_self')
@@ -336,6 +354,28 @@
               console.log(err.response.data);
 
             })
+        },
+        async updateProfile(){
+          const param = {
+            nama: this.diri.nama,
+            alamat: this.diri.alamat,
+            wa: this.diri.wa,
+            email: this.diri.email
+          }
+          await axios.put('<?= base_url()?>api/user/profile/update/'+this.id_user, param, this.config)
+          .then((res) => {
+            console.log(res.data);
+            this.refresh()
+            this.getProfile()
+            this.dialogDiri = false
+            this.toast('success', 'Data profile berhasil diupdate.')
+          })
+          .catch((err) => {
+            if(err.response.status == 401) {
+              this.keluar()
+            }
+            
+          })
         },
         async loadUbahPassword() {
           await axios.get('<?= base_url(); ?>api/user/profile/edit-password', this.config)

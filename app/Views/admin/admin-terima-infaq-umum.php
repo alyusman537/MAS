@@ -59,7 +59,7 @@
                     rounded
                     small
                     dark
-                    @click="lihatDetail(item.nomor_pembayaran)">Lihat dan terima</v-btn>
+                    @click="lihatDetail(item)">Lihat dan terima</v-btn>
                   <!--v-btn
                     :color="item.warna"
                     depressed
@@ -185,7 +185,7 @@
             v-model="dialogDetail">
             <v-card flat max-width="500" class="mx-auto">
               <v-toolbar color="primary" flat dark>
-                <v-toolbar-title>Data Infaq {{ infaq.acara }}</v-toolbar-title>
+                <!-- <v-toolbar-title>Data Infaq {{ infaq.acara }}</v-toolbar-title> -->
                 <v-spacer></v-spacer>
                 <v-btn outlined @click="dialogDetail = false"><v-icon>mdi-close</v-icon></v-btn>
               </v-toolbar>
@@ -195,112 +195,73 @@
                     <img :src="anggota.foto" width="100%" height="150" alt="alt">
                   </div>
                 </v-card> -->
-                <!-- this.infaq.kode_infaq = res.data.infaq.kode
-              this.infaq.acara = res.data.infaq.acara
-              this.infaq.tanggal_acara = res.data.infaq.tanggal_acara
-              this.infaq.nominal = parseInt(res.data.infaq.nominal).toLocaleString('ID-id')
-              this.infaq.rutin = res.data.infaq.rutin
-              this.infaq.nia = res.data.pembayaran.nia
-              this.infaq.nama = res.data.anggota.nama
-              this.infaq.bayar = parseInt(res.data.pembayaran.bayar).toLocaleString('ID-id')
-              this.infaq.tanggal_bayar = res.data.pembayaran.tanggal_bayar
-              this.infaq.validator = res.data.pembayaran.validator
-              this.infaq.tanggal_validasi = res.data.pembayaran.tanggal_validasi -->
+                <!-- this.infaq.id = item.id
+          this.infaq.kode = item.kode
+          this.infaq.keterangan = item.keterangan
+          this.infaq.tanggal = item.tanggal
+          this.infaq.nominal = item.nominal
+          this.infaq.bukti = item.bukti
+          this.infaq.nia = item.nia
+          this.infaq.nama = item.nama
+          this.infaq.tanggal_validasi = item.tanggal_validasi
+          this.infaq.validator = item.validator-->
                 <v-card-text class="px-5">
                   <v-row class="mt-2">
                     <v-col cols="4">
-                      <div>Tujuan Infaq</div>
+                      <div>Kode Infaq</div>
                     </v-col>
                     <v-col cols="8">
-                      <div class="font-weight-bold text-right">{{infaq.acara}}</div>
+                      <div class="font-weight-bold text-right">{{infaq.kode}}</div>
                     </v-col>
                   </v-row>
                   <v-divider></v-divider>
+
+                  <v-divider></v-divider>
                   <v-row class="mt-2">
                     <v-col cols="4">
-                      <div>Tagihan Infaq</div>
+                      <div>Tanggal</div>
+                    </v-col>
+                    <v-col cols="8">
+                      <div class="font-weight-bold text-right">{{ infaq.tanggal }}</div>
+                    </v-col>
+                  </v-row>
+                  <v-divider></v-divider>
+
+                  <v-row class="mt-2">
+                    <v-col cols="4">
+                      <div>Keterangan</div>
+                    </v-col>
+                    <v-col cols="8">
+                      <div class="font-weight-bold text-right">{{infaq.keterangan}}</div>
+                    </v-col>
+                  </v-row>
+
+                  <v-row class="mt-2">
+                    <v-col cols="4">
+                      <div>Nominal</div>
                     </v-col>
                     <v-col cols="8">
                       <div class="font-weight-bold text-right">{{infaq.nominal}}</div>
                     </v-col>
                   </v-row>
-                  <v-divider></v-divider>
-                  <v-row class="mt-2">
-                    <v-col cols="4">
-                      <div>Batas Pembayaran</div>
-                    </v-col>
-                    <v-col cols="8">
-                      <div class="font-weight-bold text-right">{{ infaq.tanggal_acara }}</div>
-                    </v-col>
-                  </v-row>
-                  <v-divider></v-divider>
+                  
 
                   <v-row class="mt-2">
                     <v-col cols="4">
-                      <div>Tgl. Acara</div>
+                      <div>Munfiq</div>
                     </v-col>
                     <v-col cols="8">
-                      <div class="font-weight-bold text-right">{{ infaq.tanggal_acara }}</div>
+                      <div class="font-weight-bold text-right">{{ infaq.nia }} - {{ infaq.nama }}</div>
                     </v-col>
                   </v-row>
                   <v-divider></v-divider>
 
                   <v-row class="mt-2">
                     <v-col cols="4">
-                      <div>Sifat Infaq</div>
+                      <div>Tgl. Penerimaan</div>
                     </v-col>
                     <v-col cols="8">
-                      <div class="font-weight-bold text-right">{{ infaq.rutin}}</div>
-                    </v-col>
-                  </v-row>
-                  <v-divider></v-divider>
-
-                  <v-row class="mt-2">
-                    <v-col cols="6">
-                      <div>Nomor Pembayaran</div>
-                    </v-col>
-                    <v-col cols="6">
-                      <div class="font-weight-bold text-right">{{ infaq.nomor_pembayaran }}</div>
-                    </v-col>
-                  </v-row>
-                  <v-divider></v-divider>
-
-                  <v-row class="mt-2">
-                    <v-col cols="6">
-                      <div>NIA</div>
-                    </v-col>
-                    <v-col cols="6">
-                      <div class="font-weight-bold text-right">{{ infaq.nia }}</div>
-                    </v-col>
-                  </v-row>
-                  <v-divider></v-divider>
-
-                  <v-row class="mt-2">
-                    <v-col cols="6">
-                      <div>Nama Anggota</div>
-                    </v-col>
-                    <v-col cols="6">
-                      <div class="font-weight-bold text-right">{{ infaq.nama }}</div>
-                    </v-col>
-                  </v-row>
-                  <v-divider></v-divider>
-
-                  <v-row class="mt-2">
-                    <v-col cols="6">
-                      <div>Nominal Pembayaran</div>
-                    </v-col>
-                    <v-col cols="6">
-                      <div class="font-weight-bold text-right">{{ infaq.bayar }}</div>
-                    </v-col>
-                  </v-row>
-                  <v-divider></v-divider>
-
-                  <v-row class="mt-2">
-                    <v-col cols="6">
-                      <div>Tanggal Pembayaran</div>
-                    </v-col>
-                    <v-col cols="6">
-                      <div class="font-weight-bold text-right">{{ infaq.tanggal_bayar }}</div>
+                      <div class="font-weight-bold text-right">{{ infaq.tanggal_validasi}}</div>
                     </v-col>
                   </v-row>
                   <v-divider></v-divider>
@@ -316,17 +277,11 @@
                   <v-divider></v-divider>
 
                   <v-row class="mt-2">
-                    <v-col cols="6">
-                      <div>Tanggal Penerimaan</div>
-                    </v-col>
-                    <v-col cols="6">
-                      <div class="font-weight-bold text-right">{{ infaq.tanggal_validasi }}</div>
-                    </v-col>
                     <v-col cols="12">
-                      <v-img :src="infaq.bukti_bayar" width="400" height="100%"></v-img>
+                      <v-img :src="infaq.bukti" width="400" height="100%"></v-img>
                     </v-col>
                     <v-col cols="12" v-if="isTerima">
-                      <v-btn color="success" depressed small block @click="terimaInfaq()">Terima Pembayaran</v-btn>
+                      <v-btn color="success" depressed small block @click="terimaInfaq()">Terima Infaq</v-btn>
                     </v-col>
                   </v-row>
 
@@ -382,25 +337,7 @@
         title: "PENERIMAAN INFAQ UMUM",
         config: null,
         token: null,
-        header: [
-          // {
-          //   text: 'Kode Infaq',
-          //   align: 'start', // sortable: false,
-          //   value: 'kode_infaq',
-          // },
-          {
-            text: 'Acara',
-            value: 'acara'
-          },
-          {
-            text: 'Tgl. Pembayaran max',
-            value: 'tanggal_acara'
-          },
-          {
-            text: 'Nomor Pembayaran',
-            value: 'nomor_pembayaran'
-          },
-          {
+        header: [{
             text: 'NIA',
             value: 'nia'
           },
@@ -409,14 +346,26 @@
             value: 'nama'
           },
           {
-            text: 'Bayar',
-            value: 'bayar',
+            text: 'Kode Infaq ',
+            value: 'kode'
+          },
+          {
+            text: 'Tgl. Infaq',
+            value: 'tanggal'
+          },
+          {
+            text: 'Keterangan',
+            value: 'keterangan'
+          },
+          {
+            text: 'Nominal',
+            value: 'nominal',
             align: 'end',
           },
 
           {
-            text: 'Tgl. Pembayaran',
-            value: 'tanggal_bayar'
+            text: 'Tgl. Penerimaan',
+            value: 'tanggal_validasi'
           },
           {
             text: 'Penerima',
@@ -438,23 +387,19 @@
         titileDialog: null,
         infaq: {
           id: null,
-          kode_infaq: null,
-          acara: null,
-          tanggal_acara: null,
-          nominal: null,
-          rutin: null,
-          nia: null,
+          bukti: null,
+          keterangan: null,
+          kode: null,
           nama: null,
-          nomor_pembayaran: null,
-          bayar: null,
-          bukti_bayar: null,
-          tanggal_bayar: null,
-          validator: null,
+          nia: null,
+          nominal: null,
+          tanggal: null,
           tanggal_validasi: null,
+          validator: null,
         },
         isEdit: false,
         isLunas: 'pending',
-        lunasataubelum: ['baru', 'pending', 'lunas'],
+        lunasataubelum: ['pending', 'lunas'],
         isTerima: false,
         /////
         modal: false,
@@ -492,28 +437,22 @@
             .catch()
         },
         async getList() {
-          await axios.get('<?= base_url(); ?>api/admin/daftar-bayar-infaq/' + this.isLunas, this.config)
+          await axios.get('<?= base_url(); ?>api/admin/daftar-bayar-umum/' + this.isLunas, this.config)
             .then((res) => {
               console.log(res.data);
               this.refresh()
               this.list = res.data.map((el) => {
                 const dorong = {
                   id: el.id,
-                  tanggal_acara: el.tanggal_acara,
-                  nomor_pembayaran: el.nomor_pembayaran,
-                  kode_infaq: el.kode_infaq,
-                  acara: el.acara,
-                  rutin: el.rutin,
-                  nia: el.nia,
+                  bukti: el.bukti,
+                  keterangan: el.keterangan,
+                  kode: el.kode,
                   nama: el.nama,
-                  bayar: parseInt(el.bayar).toLocaleString('ID-id'),
-                  bukti_bayar: el.bukti_bayar,
-                  tanggal_bayar: el.tanggal_bayar,
-                  validator: el.validator,
+                  nia: el.nia,
+                  nominal: parseInt(el.nominal).toLocaleString('ID-id'),
+                  tanggal: el.tanggal,
                   tanggal_validasi: el.tanggal_validasi,
-                  status: el.aktif == '1' ? true : false,
-                  aktif: el.aktif == '1' ? 'Aktif' : 'Nonaktif',
-                  warna: el.aktif == '1' ? 'success' : 'error'
+                  validator: el.validator
                 }
                 return dorong
               })
@@ -531,38 +470,49 @@
               console.log('getlist infq ', err.response);
             })
         },
-        async lihatDetail(kode_pembayaran) {
-          await axios.get('<?= base_url(); ?>api/admin/detail-bayar-infaq/' + kode_pembayaran, this.config)
-            .then((res) => {
-              this.refresh()
-              console.log('detail ', res.data);
-              this.infaq.id = res.data.pembayaran.id
-              this.infaq.kode_infaq = res.data.infaq.kode
-              this.infaq.acara = res.data.infaq.acara
-              this.infaq.tanggal_acara = res.data.infaq.tanggal_acara
-              this.infaq.nominal = parseInt(res.data.infaq.nominal).toLocaleString('ID-id')
-              this.infaq.rutin = res.data.infaq.rutin == '1' ? 'Rutin' : 'Insidential'
-              this.infaq.nia = res.data.pembayaran.nia
-              this.infaq.nama = res.data.anggota.nama
-              this.infaq.nomor_pembayaran = res.data.pembayaran.nomor_pembayaran
-              this.infaq.bayar = parseInt(res.data.pembayaran.bayar).toLocaleString('ID-id')
-              this.infaq.bukti_bayar = res.data.pembayaran.bukti_bayar == null ? '<?= base_url() ?>No_Image_Available.jpg' : '<?= base_url() ?>api/render/bukti/' + res.data.pembayaran.bukti_bayar
-              this.infaq.tanggal_bayar = res.data.pembayaran.tanggal_bayar
-              this.infaq.validator = res.data.pembayaran.validator
-              this.infaq.tanggal_validasi = res.data.pembayaran.tanggal_validasi
+        async lihatDetail(item) {
+          console.log(item);
+          
+          this.infaq.id = item.id
+          this.infaq.kode = item.kode
+          this.infaq.keterangan = item.keterangan
+          this.infaq.tanggal = item.tanggal
+          this.infaq.nominal = item.nominal
+          this.infaq.bukti = item.bukti
+          this.infaq.nia = item.nia
+          this.infaq.nama = item.nama
+          this.infaq.tanggal_validasi = item.tanggal_validasi
+          this.infaq.validator = item.validator
 
-              this.dialogDetail = true
-            })
-            .catch((err) => {
-              console.log(err.response.data);
+          this.dialogDetail = true
 
-            })
+          // await axios.get('<?= base_url(); ?>api/admin/detail-bayar-umum/' + item.kode, this.config)
+          //   .then((res) => {
+          //     this.refresh()
+          //     console.log('detail ', res.data);
+          // this.infaq.id: null,
+          // this.infaq.bukti: null,
+          // this.infaq.keterangan: null,
+          // this.infaq.kode: null,
+          // this.infaq.nama: null,
+          // this.infaq.nia: null,
+          // this.infaq.nominal: null,
+          // this.infaq.tanggal: null,
+          // this.infaq.tanggal_validasi: null,
+          // this.infaq.validator: null,
+
+          // this.dialogDetail = true
+          // })
+          // .catch((err) => {
+          //   console.log(err.response.data);
+
+          // })
         },
 
         terimaInfaq() {
           Swal.fire({
             title: "Penerimaan infaq?",
-            text: "Yakin akan melakukan penerimaan infaq nomor pembayaran " + this.infaq.nomor_pembayaran,
+            text: "Yakin akan melakukan penerimaan infaq Umum nomor  " + this.infaq.kode,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -570,11 +520,13 @@
             confirmButtonText: "Terima"
           }).then((result) => {
             if (result.isConfirmed) {
-              axios.get('<?= base_url(); ?>api/admin/terima-infaq/' + this.infaq.nomor_pembayaran, this.config)
+              axios.get('<?= base_url(); ?>api/admin/terima-umum/' + this.infaq.kode, this.config)
                 .then((res) => {
                   this.refresh()
                   console.log('detail ', res.data);
-                  swal('Berhasil!', "Nomor pembayaran infaq "+this.infaq.nomor_pembayaran+" berhasil diterima.", 'success')
+                  this.toast('success', "Nomor pembayaran infaq " + this.infaq.kode + " berhasil diterima.")
+                  
+                  this.getList()
 
                   this.dialogDetail = false
                 })

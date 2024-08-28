@@ -74,7 +74,7 @@ $routes->get('/api/admin/infaq-generate-all/(:any)', 'Infaq::generateSemua/$1');
 $routes->get('/api/admin/daftar-bayar-infaq/(:any)', 'Penerimaan::daftarTunggu/$1');
 $routes->get('/api/admin/daftar-bayar-umum/(:any)', 'Penerimaan::daftarUmum/$1');
 $routes->get('/api/admin/detail-bayar-infaq/(:any)', 'Penerimaan::pembayaranInfaqDetail/$1');
-$routes->get('/api/admin/detail-bayar-umum/(:any)', 'Penerimaan::pembayaranUmumDetail/$1');
+// $routes->get('/api/admin/detail-bayar-umum/(:any)', 'Penerimaan::pembayaranUmumDetail/$1');
 $routes->get('/api/admin/terima-infaq/(:any)', 'Penerimaan::terimaInfaq/$1');
 $routes->get('/api/admin/terima-umum/(:any)', 'Penerimaan::terimaUmum/$1');
 

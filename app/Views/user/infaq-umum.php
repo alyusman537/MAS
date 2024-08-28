@@ -78,11 +78,11 @@
                   <v-col cols="12">
 
                     <v-file-input
-                      label="Pilih Foto"
+                      label="Unggah bukti infaq"
                       outlined
                       dense
                       show-size
-                      hint="Harus berupa file jpg atau jpeg dan ukuran maximal 4mb"
+                      hint="Harus berupa file jpg atau jpeg dan ukuran maximal 2mb"
                       @change="upload">
                     </v-file-input>
                   </v-col>

@@ -42,7 +42,23 @@ class Penerimaan extends BaseController
     {
         $is_lunas = $status == 'lunas' ? 'NOT NULL' : 'NULL';
         $mp = new ModelUmum();
-        $data = $mp->daftarUmum($is_lunas);
+        $umum = $mp->daftarUmum($is_lunas);
+        $data = [];
+        foreach ($umum as $key => $val) {
+            $dorong = [
+                'id' => $val->id,
+                'bukti' => !$val->bukti ? base_url() . 'No_Image_Available.jpeg' : base_url() . 'api/render/bukti/' . $val->bukti,
+                'keterangan' => $val->keterangan,
+                'kode' => $val->kode,
+                'nama' => $val->nama,
+                'nia' => $val->nia,
+                'nominal' => $val->nominal,
+                'tanggal' => $val->tanggal,
+                'tanggal_validasi' => $val->tanggal_validasi,
+                'validator' => $val->validator
+            ];
+            $data[] = $dorong;
+        }
         return $this->respond($data);
     }
 
