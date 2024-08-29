@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
 
+use App\Models\ModelAnggota;
 use App\Models\ModelWilayah;
 
 class Wilayah extends BaseController
@@ -20,7 +21,7 @@ class Wilayah extends BaseController
     {
         $mw = new ModelWilayah();
         $data = $mw->select('*')->where('id', $id )->first();
-        if(!$data) return $this->fail('ID wilayah tidak ada.',400);
+        if(!$data) return $this->fail('ID wilayah tidak ada.',402);
         return $this->respond($data);
     }
 
@@ -47,12 +48,12 @@ class Wilayah extends BaseController
             ],
         ];
 
-        if(!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if(!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
         $mw = new ModelWilayah();
         $json = $this->request->getJSON();
         $kode = strtoupper($json->kode);
         $cek = $mw->select('*')->where('kode', $kode)->first();
-        if($cek) return $this->fail('Kode Wilayah '.$kode.' sudah terpakai.', 400);
+        if($cek) return $this->fail('Kode Wilayah '.$kode.' sudah terpakai.', 402);
         $data = [
             'kode' => $kode,
             'keterangan' => $json->keterangan,
@@ -78,15 +79,27 @@ class Wilayah extends BaseController
                     'max_length' => '{field} tidak boleh lebih dari 300 karakter.',
                 ]
             ],
+            'aktif'      => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} tidak boleh kosong',
+                ]
+            ],
         ];
 
-        if(!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if(!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
         $mw = new ModelWilayah();
+        $ma = new ModelAnggota();
         $json = $this->request->getJSON();
-        $cek = $mw->where('id', $id)->first();
-        if(!$cek) return $this->fail('Data wilayah tidak ditemukan', 400);
+        $cek = $mw->select('*')->where('id', $id)->first();
+        if(!$cek) return $this->fail('Data wilayah tidak ditemukan', 402);
+        if($json->aktif == '0') {
+            $anggota = $ma->where(['wilayah' => $cek['kode'], 'aktif' => 'aktif'])->first();
+            if($anggota) return $this->fail('Wilayah yang masih terdapat anggota aktif tidak boleh dihapus.', 402);
+        }
         $data = [
             'keterangan' => $json->keterangan,
+            'aktif' => $json->aktif,
         ];
         try {
             $mw->set($data);

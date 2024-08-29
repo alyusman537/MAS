@@ -46,10 +46,48 @@ class Filters extends BaseConfig
             // 'invalidchars',
             'cors',
             'auth' => [
-                'except' => ['/api/render/*', '/api/user-login', '/api/admin*']
+                'except' => [
+                    '/api/render/*',
+                    '/api/user-login',
+                    '/api/admin*',
+                    '/login',
+                    '/profile',
+                    '/infaq',
+                    '/infaq*',
+                    '/laporan-kas',
+                    '/',
+                    ////////// ADMIN /////////////
+                    '/administrator/login',
+                    '/administrator/dashboard',
+                    '/administrator/wilayah',
+                    '/administrator/anggota',
+                    '/administrator/infaq',
+                    '/administrator/penerimaan-infaq',
+                    '/administrator/penerimaan-infaq-umum',
+                    '/administrator/transaksi-kas',
+                ]
             ],
             'admin' => [
-                'except' => ['/api/render/*', '/api/admin-login', '/api/user*']
+                'except' => [
+                    '/api/render/*',
+                    '/api/admin-login',
+                    '/api/user*',
+                    '/login',
+                    '/profile',
+                    '/infaq',
+                    '/infaq*',
+                    '/laporan-kas',
+                    '/',
+                    ////////// ADMIN /////////////
+                    '/administrator/login',
+                    '/administrator/dashboard',
+                    '/administrator/wilayah',
+                    '/administrator/anggota',
+                    '/administrator/infaq',
+                    '/administrator/penerimaan-infaq',
+                    '/administrator/penerimaan-infaq-umum',
+                    '/administrator/transaksi-kas',
+                ]
             ],
         ],
         'after' => [

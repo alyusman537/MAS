@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
 
 use App\Models\ModelAnggota;
+use App\Models\ModelPembayaran;
 
 use App\Libraries\JwtDecode;
 
@@ -20,8 +21,11 @@ class Profile extends BaseController
 
         $nia = $user->sub; //dari token
         $ma = new ModelAnggota();
-        $profile = $ma->select('*')->where('nia',$nia)->first();
-        $foto = $profile['foto'] === null ? base_url() . 'render/image/null' : base_url() . 'render/image/' . $profile['foto'];
+        $mp = new ModelPembayaran();
+        $profile = $ma->select('*')->where('nia', $nia)->first();
+        $foto = $profile['foto'] === null ? base_url() . 'no_photo.jpg' : base_url() . 'api/render/foto/' . $profile['foto'];
+
+        $bayar = $mp->selectCount('nomor_pembayaran')->where(['nia' => $nia])->where('validator IS NULL')->first();
         $data = [
             'nia' => $profile['nia'],
             'nama' => strtoupper($profile['nama']),
@@ -32,6 +36,7 @@ class Profile extends BaseController
             'foto' => $foto,
             'email' => $profile['email'],
             'aktif' => $profile['aktif'],
+            'iuran_belum_terbayar' => (int) $bayar['nomor_pembayaran']
         ];
 
         return $this->respond($data);
@@ -57,7 +62,7 @@ class Profile extends BaseController
     {
         $header = $this->request->getServer('HTTP_AUTHORIZATION'); // header("Authorization");
         $decoder = new JwtDecode();
-        $user = $decoder->decoder($header); 
+        $user = $decoder->decoder($header);
         $nia_from_token = $user->sub; //dari token
         if ($nia != $nia_from_token) return $this->fail('Anda tidak berhak mengedit data anggota lainnya.', 400);
 
@@ -73,7 +78,7 @@ class Profile extends BaseController
                 ],
             ],
             'email'         => [
-                'rules' => 'required|min_length[4]|max_length[100]|valid_email',//|is_unique[anggota.email]',
+                'rules' => 'required|min_length[4]|max_length[100]|valid_email', //|is_unique[anggota.email]',
                 'errors' => [
                     'required' => '{field} tidak boleh kosong',
                     'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
@@ -143,7 +148,7 @@ class Profile extends BaseController
     {
         $header = $this->request->getServer('HTTP_AUTHORIZATION'); // header("Authorization");
         $decoder = new JwtDecode();
-        $user = $decoder->decoder($header); 
+        $user = $decoder->decoder($header);
         $nia_from_token = $user->sub; //dari token
 
         helper(['form']);
@@ -173,7 +178,7 @@ class Profile extends BaseController
             ],
         ];
 
-        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
         $ma = new ModelAnggota();
 
         $json = $this->request->getJSON();
@@ -211,20 +216,19 @@ class Profile extends BaseController
                     'uploaded[foto]',
                     'is_image[foto]',
                     'mime_in[foto,image/jpg,image/jpeg]',
-                    'max_size[foto,4096]',
+                    'max_size[foto,2048]',
                     // 'max_dims[userfile,1024,768]',
                 ],
                 'errors' => [
                     'uploaded' => 'tidak ada gambar yagn diupload',
                     'is_image' => 'file harus berupa gambar',
                     'mime_in' => 'gambar harus berupa jpg atau jpeg',
-                    'max_size' => 'ukurang gambar harus kurang dari 4mb'
+                    'max_size' => 'ukurang gambar harus kurang dari 2mb'
                 ]
             ],
         ];
         if (! $this->validateData([], $validationRule)) {
             return $this->fail($this->validator->getErrors());
-
         }
         $mm = new ModelAnggota();
 
@@ -236,7 +240,14 @@ class Profile extends BaseController
         $x_file = $this->request->getFile('foto');
         $namaFoto = $x_file->getRandomName();
 
-        $x_file->move(WRITEPATH . 'uploads/profile/', $namaFoto);
+        $image = service('image');
+        $image->withFile($x_file)
+            ->resize(500, 500, true, 'height')
+            ->save(WRITEPATH . '/uploads/profile/' . $namaFoto);
+
+        unlink($x_file);
+
+        // $x_file->move(WRITEPATH . 'uploads/profile/', $namaFoto);
 
         $mm->set(['foto' => $namaFoto]);
         $mm->where('nia', $nia);
@@ -248,6 +259,6 @@ class Profile extends BaseController
             }
         }
 
-        return $this->respond(['image' => $namaFoto]);
+        return $this->respond(['foto' => base_url() . 'api/render/foto/' . $namaFoto]);
     }
 }

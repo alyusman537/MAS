@@ -15,6 +15,15 @@ class JwtDecode {
         return $decoded;
     }
 
+    public function admin($header)
+    {
+        $key = getenv('ADMIN_KEY');
+        $jwt = explode(' ', $header)[1];
+        $decoded = JWT::decode($jwt, new Key($key, 'HS256'));
+
+        return $decoded;
+    }
+
     public function refresh($header) 
     {
         $key = getenv('JWT_KEY');

@@ -5,10 +5,11 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Anggota::index');
+$routes->get('/', 'View::index');
 
 $routes->get('/api/render/bukti/(:any)', 'Render::bukti/$1');
 $routes->get('/api/render/foto/(:any)', 'Render::image/$1');
+$routes->get('/api/render/js/(:any)', 'Render::js/$1');
 
 $routes->post('/api/user-login', 'Login::auth');
 $routes->get('/api/user/refresh-token', 'Login::refreshToken');
@@ -25,6 +26,8 @@ $routes->post('/api/user/infaq-umum/add', 'Umum::add');
 $routes->get('/api/user/infaq-umum/id/(:any)', 'Umum::byId/$1');
 $routes->get('/api/user/infaq-umum/edit/(:any)', 'Umum::edit/$1');
 $routes->put('/api/user/infaq-umum/update/(:any)', 'Umum::update/$1');
+$routes->post('/api/user/infaq-umum-bukti/(:any)', 'Umum::unggahBukti/$1');
+$routes->delete('/api/user/infaq-umum/delete/(:any)', 'Umum::delete/$1');
 
 $routes->get('/api/user/home/daftar-infaq/(:any)', 'HomeUser::daftarInfaq/$1');
 $routes->get('/api/user/home/infaq-umum', 'HomeUser::infaqUmum');
@@ -32,10 +35,14 @@ $routes->get('/api/user/home/infaq-umum', 'HomeUser::infaqUmum');
 $routes->put('/api/user/pembayaran/(:any)', 'Pembayaran::bayar/$1');
 $routes->post('/api/user/pembayaran-bukti/(:any)', 'Pembayaran::buktiBayar/$1');
 
+$routes->get('/api/user/laporan-kas/(:any)/(:any)', 'Mutasi::list/$1/$2');
+
 //////////// ADMIN /////////////////////
 
 $routes->post('/api/admin-login', 'Login::adminAuth');
 $routes->get('/api/admin-refresh', 'Login::adminRefresh');
+
+$routes->get('/api/admin/home', 'HomeAdmin::index');
 
 $routes->get('/api/admin/wilayah', 'Wilayah::index');
 $routes->get('/api/admin/wilayah/(:num)', 'Wilayah::wilayahById/$1');
@@ -66,5 +73,31 @@ $routes->get('/api/admin/infaq-generate-all/(:any)', 'Infaq::generateSemua/$1');
 
 $routes->get('/api/admin/daftar-bayar-infaq/(:any)', 'Penerimaan::daftarTunggu/$1');
 $routes->get('/api/admin/daftar-bayar-umum/(:any)', 'Penerimaan::daftarUmum/$1');
+$routes->get('/api/admin/detail-bayar-infaq/(:any)', 'Penerimaan::pembayaranInfaqDetail/$1');
+// $routes->get('/api/admin/detail-bayar-umum/(:any)', 'Penerimaan::pembayaranUmumDetail/$1');
 $routes->get('/api/admin/terima-infaq/(:any)', 'Penerimaan::terimaInfaq/$1');
 $routes->get('/api/admin/terima-umum/(:any)', 'Penerimaan::terimaUmum/$1');
+
+$routes->get('/api/admin/mutasi', 'Mutasi::new');
+$routes->post('/api/admin/mutasi', 'Mutasi::add');
+$routes->get('/api/admin/mutasi-tanggal/(:any)/(:any)', 'Mutasi::list/$1/$2');
+$routes->get('/api/admin/mutasi-detail/(:any)', 'Mutasi::detail/$1');
+$routes->get('/api/admin/saldo-akhir', 'Mutasi::saldoAkhir');
+
+///////////// VIEW USER ///////////////
+$routes->get('/login', 'View::userLogin');
+$routes->get('/profile', 'View::userProfile');
+$routes->get('/infaq', 'View::userInfaq');
+$routes->get('/infaq-umum', 'View::userInfaqUmum');
+$routes->get('/laporan-kas', 'View::userKas');
+
+
+///////////// VIEW ADMIN ///////////////
+$routes->get('/administrator/login', 'View::adminLogin');
+$routes->get('/administrator/dashboard', 'View::adminDashboard');//administrator/dashboard
+$routes->get('/administrator/wilayah', 'View::adminWilayah');
+$routes->get('/administrator/anggota', 'View::adminAnggota');
+$routes->get('/administrator/infaq', 'View::adminInfaq');
+$routes->get('/administrator/penerimaan-infaq', 'View::adminPenerimaanInfaq');
+$routes->get('/administrator/penerimaan-infaq-umum', 'View::adminPenerimaanInfaqUmum');
+$routes->get('/administrator/transaksi-kas', 'View::adminTransaksiKas');

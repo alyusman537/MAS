@@ -26,7 +26,7 @@ class Infaq extends BaseController
     {
         $mi = new ModelInfaq();
         $data = $mi->select('*')->where('id', $id)->first();
-        if (!$data) return $this->fail('Data infaq tidak ditemukan.', 400);
+        if (!$data) return $this->fail('Data infaq tidak ditemukan.', 402);
         return $this->respond($data);
     }
 
@@ -37,7 +37,7 @@ class Infaq extends BaseController
             'tanggal_acara' => null,
             'keterangan' => null,
             'nominal' => 0,
-            'rutin' => true,
+            'rutin' => '1',
         ];
         return $this->respond($data);
     }
@@ -69,21 +69,24 @@ class Infaq extends BaseController
             'nominal'  => [
                 'rules' => 'required',
                 'errors' => [
-                    'matches' => '{field} tidak boleh kosong.'
+                    'required' => '{field} tidak boleh kosong',
                 ]
             ],
         ];
 
-        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
         $mi = new ModelInfaq();
         $json = $this->request->getJSON();
+        if ((int) $json->nominal < 1000) return $this->fail('Nominal infaq tidak boleh kurang dari Rp. 1.000 rupiah.', 402);
         $kode = time();
         $rutin = $json->rutin; // == 'ya' ? true : false;
+        $tanggal_acara = $json->tanggal_acara;
+        if ($tanggal_acara < date('Y-m-d')) return $this->fail('Tanggal acara tidak boleh lebih kecil dari tanggal sekarang', 402);
         $data = [
             'tanggal' => date('Y-m-d', $kode),
             'kode' => $kode,
             'acara' => $json->acara,
-            'tanggal_acara' => $json->tanggal_acara,
+            'tanggal_acara' => $tanggal_acara,
             'keterangan' => $json->keterangan,
             'nominal' => $json->nominal,
             'rutin' => $rutin,
@@ -93,7 +96,7 @@ class Infaq extends BaseController
             $mi->insert($data);
             return $this->respondCreated($data);
         } catch (\Throwable $th) {
-            return $this->fail($th->getMessage(), $th->getCode());
+            return $this->fail(json_encode($th->getMessage()), 500);
         }
     }
 
@@ -101,17 +104,18 @@ class Infaq extends BaseController
     {
         $mi = new ModelInfaq();
         $infaq = $mi->select('*')->where('id', $id)->first();
-        if (!$infaq) return $this->fail('Data infaq tidak ditemukan', 400);
+        if (!$infaq) return $this->fail('Data infaq tidak ditemukan', 402);
         $data = [
             'data' => [
+                'id' => $infaq['id'],
                 'tanggal' => $infaq['tanggal'],
                 'kode' => $infaq['kode'],
                 'acara' => $infaq['acara'],
                 'tanggal_acara' => $infaq['tanggal_acara'],
                 'keterangan' => $infaq['keterangan'],
                 'nominal' => $infaq['nominal'],
-                'rutin' => $infaq['rutin'] == '1' ? true : false,
-                'aktif' => $infaq['aktif'] == '1' ? true : false
+                'rutin' => $infaq['rutin'],
+                'aktif' => $infaq['aktif']
             ],
             'ubah' => [
                 'acara' => $infaq['acara'],
@@ -128,6 +132,12 @@ class Infaq extends BaseController
     {
         helper(['form']);
         $rules = [
+            'kode'          => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} tidak boleh kosong.',
+                ],
+            ],
             'acara'          => [
                 'rules' => 'required',
                 'errors' => [
@@ -162,9 +172,12 @@ class Infaq extends BaseController
             ],
         ];
 
-        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
         $mi = new ModelInfaq();
+        $cek = $mi->select('*')->find($id);
+        if (!$cek) return $this->fail('ID acara tidak ditemukan.', 402);
         $json = $this->request->getJSON();
+        if ($cek['kode'] != $json->kode) return $this->fail('ID dan KODE acara tidak cocok.', 402);
         $data = [
             'acara' => $json->acara,
             'tanggal_acara' => $json->tanggal_acara,
@@ -178,7 +191,7 @@ class Infaq extends BaseController
             $mi->update();
             return $this->respond($data);
         } catch (\Throwable $th) {
-            return $this->fail($th->getMessage(), $th->getCode());
+            return $this->fail(json_encode($th->getMessage()), 500);
         }
     }
 
@@ -187,8 +200,8 @@ class Infaq extends BaseController
         $mi = new ModelInfaq();
         $mp = new ModelPembayaran();
         $infaq = $mi->select('*')->find($id);
-        if (!$infaq) return $this->fail('Data infaq tidak ditemukan.', 400);
-        if ($infaq['aktif'] == '0') return $this->fail('Anda tidak bisa menonaktifkan data yang sudah dihapus.', 400);
+        if (!$infaq) return $this->fail('Data infaq tidak ditemukan.', 402);
+        if ($infaq['aktif'] == '0') return $this->fail('Anda tidak bisa menonaktifkan data yang sudah dihapus.', 402);
         $data = [
             'aktif' => '0'
         ];
@@ -205,7 +218,7 @@ class Infaq extends BaseController
             }
             return $this->respond(['pesan' => 'Data infaq berhasil dihapus.']);
         } else {
-            return $this->fail('Data infaq tidak berhasil dihapus.', 400);
+            return $this->fail('Data infaq tidak berhasil dihapus.', 402);
         }
     }
 
@@ -227,7 +240,7 @@ class Infaq extends BaseController
             ],
         ];
 
-        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors());
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
         $mi = new ModelInfaq();
         $mw = new ModelWilayah();
         $ma = new ModelAnggota();
@@ -235,30 +248,29 @@ class Infaq extends BaseController
         $json = $this->request->getJSON();
 
         $infaq = $mi->select('*')->where('kode', $json->kode_infaq)->first();
-        if (!$infaq) return $this->fail('Kode Acara ' . $json->kode_infaq . ' belum dibuat.', 400);
-        if ($infaq['aktif'] == '0') return $this->fail('Acara ' . $infaq['acara'] . ' sudah dinonaktifkan', 400);
-        if ($infaq['tanggal_acara'] < date('Y-m-d')) return $this->fail('Tanggal acara ' . $infaq['acara'] . ' sudah terlewat', 400);
+        if (!$infaq) return $this->fail('Kode Acara ' . $json->kode_infaq . ' belum dibuat.', 402);
+        if ($infaq['aktif'] == '0') return $this->fail('Acara ' . $infaq['acara'] . ' sudah dinonaktifkan', 402);
+        if ($infaq['tanggal_acara'] < date('Y-m-d')) return $this->fail('Tanggal acara ' . $infaq['acara'] . ' sudah terlewat', 402);
         $wilayah = $mw->select('*')->where('kode', $json->wilayah)->first();
-        if (!$wilayah) return $this->fail('Kode wilayah' . $json->wilayah . ' tidak ditemukan', 400);
-        if ($wilayah['aktif'] == '0') return $this->fail('Kode wilayah ' . $json->wilayah . ' sudah dinonaktifkan', 400);
+        if (!$wilayah) return $this->fail('Kode wilayah' . $json->wilayah . ' tidak ditemukan', 402);
+        if ($wilayah['aktif'] == '0') return $this->fail('Kode wilayah ' . $json->wilayah . ' sudah dinonaktifkan', 402);
 
         $anggota = $ma->select('*')->where(['wilayah' => $json->wilayah, 'aktif' => 'aktif'])->findAll();
         $tanggal = date('Y-m-d');
         foreach ($anggota as $key => $val) {
             $cek_tagihan = $mp->select('*')->where(['kode_infaq' => $json->kode_infaq, 'nia' => $val['nia']])->first();
-            if(!$cek_tagihan) {
+            if (!$cek_tagihan) {
                 $dorong = [
                     'tanggal' => $tanggal,
-                    'nomor_pembayaran' => time() . '-' . $val['nia'],
+                    'nomor_pembayaran' => $json->kode_infaq . '-' . $val['nia'],
                     'kode_infaq' => $json->kode_infaq,
                     'nia' => $val['nia'],
                 ];
                 $mp->insert($dorong);
-
             }
             continue;
         }
-        return $this->respond(['pesan' => 'Tagihan infaq '.$infaq['acara'].' berhasil digenerate ke wilayah ' . $wilayah['keterangan']]);
+        return $this->respond(['pesan' => 'Tagihan infaq ' . $infaq['acara'] . ' berhasil digenerate ke wilayah ' . $wilayah['keterangan']]);
     }
 
     public function generateSemua($kode_infaq)
@@ -268,26 +280,25 @@ class Infaq extends BaseController
         $mp = new ModelPembayaran();
 
         $infaq = $mi->select('*')->where('kode', $kode_infaq)->first();
-        if (!$infaq) return $this->fail('Kode Acara ' . $kode_infaq . ' belum dibuat.', 400);
-        if ($infaq['aktif'] == '0') return $this->fail('Acara ' . $infaq['acara'] . ' sudah dinonaktifkan', 400);
-        if ($infaq['tanggal_acara'] < date('Y-m-d')) return $this->fail('Tanggal acara ' . $infaq['acara'] . ' sudah terlewat', 400);
+        if (!$infaq) return $this->fail('Kode Acara ' . $kode_infaq . ' belum dibuat.', 402);
+        if ($infaq['aktif'] == '0') return $this->fail('Acara ' . $infaq['acara'] . ' sudah dinonaktifkan', 402);
+        if ($infaq['tanggal_acara'] < date('Y-m-d')) return $this->fail('Tanggal acara ' . $infaq['acara'] . ' sudah terlewat', 402);
 
         $anggota = $ma->select('*')->where(['aktif' => 'aktif'])->where('nia <> 0537')->findAll();
         $tanggal = date('Y-m-d');
         foreach ($anggota as $key => $val) {
             $cek_tagihan = $mp->select('*')->where(['kode_infaq' => $kode_infaq, 'nia' => $val['nia']])->first();
-            if(!$cek_tagihan) {
+            if (!$cek_tagihan) {
                 $dorong = [
                     'tanggal' => $tanggal,
-                    'nomor_pembayaran' => time() . '-' . $val['nia'],
+                    'nomor_pembayaran' => $kode_infaq . '-' . $val['nia'],
                     'kode_infaq' => $kode_infaq,
                     'nia' => $val['nia'],
                 ];
                 $mp->insert($dorong);
-
             }
             continue;
         }
-        return $this->respond(['pesan' => 'Tagihan infaq '.$infaq['acara'].' berhasil digenerate ke semua anggota.']);
+        return $this->respond(['pesan' => 'Tagihan infaq ' . $infaq['acara'] . ' berhasil digenerate ke semua anggota.']);
     }
 }

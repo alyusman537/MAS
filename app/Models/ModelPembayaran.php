@@ -25,7 +25,7 @@ class ModelPembayaran extends Model
     public function daftarInfaq($nia, $status)
     {
         $db = $this->db->table('pembayaran as p');
-        $db->select('p.*, infaq.acara, infaq.rutin');
+        $db->select('p.*, infaq.acara, infaq.rutin, infaq.nominal');
         $db->where('p.validator IS '.$status.' AND infaq.aktif = "1"');
         $db->where('p.nia', $nia);
         $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
@@ -50,11 +50,11 @@ class ModelPembayaran extends Model
         return $data->getResult();
     }
     
-    public function daftarTunggu($status)
+    public function daftarTungguBaru()
     {
         $db = $this->db->table('pembayaran as p');
-        $db->select('p.*, infaq.acara, infaq.rutin, anggota.nama');
-        $db->where('p.validator IS '.$status.' AND infaq.aktif = 1');
+        $db->select('p.*, infaq.acara, infaq.rutin, infaq.tanggal_acara, anggota.nama');
+        $db->where('p.bayar = 0 AND p.validator IS NULL AND infaq.aktif = 1');
         $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
         $db->join('anggota', 'anggota.nia=p.nia', 'left');
         $db->orderBy('p.tanggal', 'DESC');
@@ -63,4 +63,32 @@ class ModelPembayaran extends Model
         if(!$data) return false;
         return $data->getResult();
     }
+    public function daftarTungguPending()
+    {
+        $db = $this->db->table('pembayaran as p');
+        $db->select('p.*, infaq.acara, infaq.rutin, infaq.tanggal_acara, anggota.nama');
+        $db->where('p.bayar >= infaq.nominal AND p.validator IS NULL AND infaq.aktif = 1');
+        $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
+        $db->join('anggota', 'anggota.nia=p.nia', 'left');
+        $db->orderBy('p.tanggal', 'DESC');
+        $db->limit(50);
+        $data = $db->get();
+        if(!$data) return false;
+        return $data->getResult();
+    }
+
+    public function daftarTungguLunas()
+    {
+        $db = $this->db->table('pembayaran as p');
+        $db->select('p.*, infaq.acara, infaq.rutin, infaq.tanggal_acara, anggota.nama');
+        $db->where('p.bayar >= infaq.nominal AND p.validator IS NOT NULL AND infaq.aktif = 1');
+        $db->join('infaq', 'infaq.kode=p.kode_infaq', 'left');
+        $db->join('anggota', 'anggota.nia=p.nia', 'left');
+        $db->orderBy('p.tanggal', 'DESC');
+        $db->limit(50);
+        $data = $db->get();
+        if(!$data) return false;
+        return $data->getResult();
+    }
+
 }
