@@ -150,10 +150,46 @@ class Mutasi extends BaseController
 
     public function pdfMutasi($tglAwal, $tglAkhir)
     {
-
-        $data = $this->list($tglAwal, $tglAkhir);
-        $dataServis = [
-            'data' => $data
+        $mm = new ModelMutasi();
+        // $date = $tglAwal;
+        // $newDate = date('Y-m-d', strtotime($date . ' - 1 days')); 
+        $plus = $mm->selectSum('nominal')->where('tanggal < "' . $tglAwal . '" ')->where('jenis', 'D')->first();
+        $minus = $mm->selectSum('nominal')->where('tanggal < "' . $tglAwal . '" ')->where('jenis', 'K')->first();
+        $plus = !$plus ? 0 : (int) $plus['nominal'];
+        $minus = !$minus ? 0 : (int) $minus['nominal'];
+        $saldoAwal = $plus - $minus;
+        $saldo = $saldoAwal;
+        // return print_r($saldoAwal);
+        $list = $mm->list($tglAwal, $tglAkhir);
+        $mutasi = [];
+        foreach ($list as $key => $val) {
+            $debet = 0;
+            $kredit = 0;
+            if ($val->jenis == 'D') {
+                $debet = (int) $val->nominal;
+                $saldo = $saldo + $debet;
+            } else {
+                $kredit = (int) $val->nominal;
+                $saldo = $saldo - $kredit;
+            }
+            $dorong = [
+                'tanggal'  => $val->tanggal,
+                'nomor' => $val->nomor_mutasi,
+                'debet' => $debet == '0'? '' : number_format($debet),
+                'kredit' => $kredit == '0'? '' : number_format($kredit),
+                'saldo' => number_format($saldo),
+                'keterangan' => $val->keterangan,
+                'admin' => $val->admin,
+            ];
+            $mutasi[] = $dorong;
+        }
+        $data = [
+            'tanggal_awal' => $tglAwal,
+            'tanggal_akhir' => $tglAkhir,
+            'tanggal_cetak' => date('Y-m-d H:i:s'),
+            'saldo_awal' => number_format($saldoAwal),
+            'mutasi' => $mutasi,
+            'saldo_akhir' => $saldo
         ];
         // title dari pdf
         // $this->data['title_pdf'] = 'Laporan Aktifitas '.$user.' '.$karyawan['Nama'];
@@ -168,7 +204,7 @@ class Mutasi extends BaseController
         //orientasi paper potrait / landscape
         $orientation = "portrait";
 
-        $html = view('pdf/pdfKas', $dataServis);
+        $html = view('pdf/pdfKas', $data);
 
         // run dompdf
         $Pdfgenerator->generate($html, $file_pdf, $paper, $orientation);

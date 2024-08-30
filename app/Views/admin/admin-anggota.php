@@ -28,16 +28,28 @@
                     v-model="cari"></v-text-field>
                 </v-col>
                 <v-col cols="4">
-                  <v-btn class="mt-4" color="info" small depressed @click="loadDialogBaru()">
-                    <v-icon>mdi-plus</v-icon>Anggota
+                  <v-btn class="mt-4" color="info" block small depressed @click="loadDialogBaru()">
+                    <v-icon>mdi-plus-box</v-icon>Anggota
                   </v-btn>
+                </v-col>
+                <v-col cols="6">
+                  <v-btn color="info" block small depressed @click="pdfAnggota()">
+                    <v-icon>mdi-file-pdf-box</v-icon>Anggota
+                  </v-btn>
+                </v-col>
+                <v-col cols="6">
+                  <a style="text-decoration: none;" href="<?= base_url()?>api/excel/anggota">
+                    <v-btn color="info" block small depressed>
+                      <v-icon>mdi-file-excel-box</v-icon>Anggota
+                    </v-btn>
+                  </a>
                 </v-col>
               </v-row>
               <v-data-table
                 :headers="header"
                 :items="listAnggota"
                 :search="cari"
-                class="elevation-0">
+                class="elevation-0 mt-2">
                 <!--status: el.aktif == '1' ? true : false,
                   aktif: el.aktif == '1' ? 'Aktif' : 'Nonaktif',
                   warna: el.aktif == '1' ? 'success' : 'error'-->
@@ -569,6 +581,9 @@
                 })
             }
           });
+        },
+        pdfAnggota(){
+          window.open('<?= base_url()?>api/pdf/anggota', '_blank')
         },
       }
     })

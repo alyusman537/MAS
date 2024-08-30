@@ -323,7 +323,7 @@
                       <div class="font-weight-bold text-right">{{ infaq.tanggal_validasi }}</div>
                     </v-col>
                     <v-col cols="12">
-                      <v-img :src="infaq.bukti_bayar" width="400" height="100%"></v-img>
+                        <v-img :src="infaq.bukti_bayar" width="400" height="100%" @click="lihatBukti"></v-img>
                     </v-col>
                     <v-col cols="12" v-if="isTerima">
                       <v-btn color="success" depressed small block @click="terimaInfaq()">Terima Pembayaran</v-btn>
@@ -584,6 +584,10 @@
                 })
             }
           });
+        },
+        lihatBukti()
+        {
+          window.open(this.infaq.bukti_bayar, '_blank')
         },
 
       }

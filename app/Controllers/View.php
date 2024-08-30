@@ -68,4 +68,12 @@ class View extends BaseController
     {
         return view('/admin/admin-transaksi-kas');
     }
+    public function adminPdfKas()
+    {
+        return view('/pdf/pdfKas');
+    }
+    public function adminPdfAnggota()
+    {
+        return view('/pdf/pdfAnggota');
+    }
 }

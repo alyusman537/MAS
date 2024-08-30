@@ -84,6 +84,10 @@ $routes->get('/api/admin/mutasi-tanggal/(:any)/(:any)', 'Mutasi::list/$1/$2');
 $routes->get('/api/admin/mutasi-detail/(:any)', 'Mutasi::detail/$1');
 $routes->get('/api/admin/saldo-akhir', 'Mutasi::saldoAkhir');
 
+$routes->get('/api/pdf/mutasi/(:any)/(:any)', 'Mutasi::pdfMutasi/$1/$2');
+$routes->get('/api/pdf/anggota', 'Anggota::pdfAnggota');
+$routes->get('/api/excel/anggota', 'Anggota::excelAnggota');
+
 ///////////// VIEW USER ///////////////
 $routes->get('/login', 'View::userLogin');
 $routes->get('/profile', 'View::userProfile');
@@ -101,3 +105,4 @@ $routes->get('/administrator/infaq', 'View::adminInfaq');
 $routes->get('/administrator/penerimaan-infaq', 'View::adminPenerimaanInfaq');
 $routes->get('/administrator/penerimaan-infaq-umum', 'View::adminPenerimaanInfaqUmum');
 $routes->get('/administrator/transaksi-kas', 'View::adminTransaksiKas');
+$routes->get('/administrator/laporan-kas', 'View::adminPdfKas');

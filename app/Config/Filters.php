@@ -65,6 +65,11 @@ class Filters extends BaseConfig
                     '/administrator/penerimaan-infaq',
                     '/administrator/penerimaan-infaq-umum',
                     '/administrator/transaksi-kas',
+                    '/administrator/laporan-kas',
+
+                    ////////////
+                    '/api/pdf/*',
+                    '/api/excel/*',
                 ]
             ],
             'admin' => [
@@ -87,6 +92,11 @@ class Filters extends BaseConfig
                     '/administrator/penerimaan-infaq',
                     '/administrator/penerimaan-infaq-umum',
                     '/administrator/transaksi-kas',
+                    '/administrator/laporan-kas',
+
+                    ///////////
+                    '/api/pdf/*',
+                    '/api/excel/*',
                 ]
             ],
         ],

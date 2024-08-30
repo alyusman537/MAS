@@ -131,6 +131,7 @@
               console.log(res.data);
               localStorage.clear()
               localStorage.setItem('admin-token', res.data.token)
+              localStorage.setItem('nia', res.data.user.nia)
               window.open('<?= base_url(); ?>administrator/dashboard', '_self')
             })
             .catch((err) => {

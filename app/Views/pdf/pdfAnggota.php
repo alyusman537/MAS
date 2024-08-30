@@ -13,7 +13,11 @@
             width: 100%;
         }
 
-        #table td,
+        #table td {
+            font-size: smaller;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
         #table th {
             border: 1px solid #ddd;
             padding: 5px;
@@ -75,15 +79,9 @@
 
 <body>
     </div>
-    <h4>Laporan Mutasi Kas Al-Wafa Bi'ahdillah</h4>
-    <div class="row">
-        <div class="column">
-            <p>Periode <?= $tanggal_awal . ' s/d ' . $tanggal_akhir; ?></p>
-        </div>
-        <div class="column">
-            <p class="nominal" style="margin-right: 35px;">Tanggal Cetak <?= $tanggal_cetak; ?></p>
-        </div>
-    </div>
+    <h4>Data Anggota Al-Wafa Bi'ahdillah</h4>
+    <p id="nia">nia </p>
+        <p class="nominal" style="margin-right: 35px;">Tanggal Cetak <?= $tanggal_cetak; ?></p>
 
 
     <table id="table">
@@ -91,32 +89,28 @@
             <tr>
                 <th>No.</th>
                 <!-- <th>Kode</th> -->
-                <th>Tanggal</th>
-                <th>Keterangan</th>
-                <th>Debet</th>
-                <th>Kredit</th>
-                <th>Saldo</th>
+                <th>NIA</th>
+                <th>Nama</th>
+                <th>WA</th>
+                <th>Wilayah</th>
+                <th>Alamat</th>
+                <th>Level</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td></td>
-                <td></td>
-                <td>Saldo Awal</td>
-                <td></td>
-                <td></td>
-                <td class="nominal"> <?= $saldo_awal; ?></td>
-            </tr>
             <?php $no = 0;
-            foreach ($mutasi as $item): ?>
+            foreach ($anggota as $item): ?>
                 <tr>
-                    <td class="nominal" scope="row" width="5%"><?= $no + 1;
+                    <td style="text-align:right; padding-right: 10;" scope="row" width="5%"><?= $no + 1;
                                                                 $no++; ?></td>
-                    <td width="12%"><?= $item['tanggal'] ?></td>
-                    <td width="27%"><?= $item['keterangan'] ?></td>
-                    <td class="nominal" width="15%"><?= $item['debet'] ?></td>
-                    <td class="nominal" width="15%"><?= $item['kredit'] ?></td>
-                    <td class="nominal" width="15%"><?= $item['saldo'] ?></td>
+                    <td width="10%"><?= $item->nia ?></td>
+                    <td width="20%"><?= $item->nama ?></td>
+                    <td white="15"><?= $item->wa ?></td>
+                    <td width="10%"><?= $item->wilayah ?></td>
+                    <td width="25%"><?= $item->alamat ?></td>
+                    <td width="10%"><?= $item->level ?></td>
+                    <td width="10%"><?= $item->aktif ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -129,6 +123,7 @@
     <div id="footer">
     <p class="page">Halaman </p>
 </div>
+
 </body>
 
 </html>
