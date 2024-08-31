@@ -84,7 +84,9 @@ class Pembayaran extends BaseController
                 $nomoradmin [] = $val['wa'];
             }
             $nomor = implode(",", $nomoradmin);
-            $pesan = 'Mohon segera terima pembayaran infaq *'.$infaq['acara'].'* dari Nomor anggoa *'.$bayar['nia'].'*';
+            $pesan = 'Mohon segera terima pembayaran infaq *'.$infaq['acara'].'* dari Nomor anggoa *'.$bayar['nia'].'*'."
+
+Al-wafa Bi'ahdillah.";
             $kirim = $fonnte::kirimPesan($nomor, $pesan);
             // return print_r($kirim);
 
