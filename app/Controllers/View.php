@@ -15,6 +15,10 @@ class View extends BaseController
     {
         return view('/user/login');
     }
+    public function userResetPassword()
+    {
+        return view('/user/reset-password');
+    }
     public function userProfile()
     {
         return view('/user/profile');
@@ -67,5 +71,13 @@ class View extends BaseController
     public function adminTransaksiKas()
     {
         return view('/admin/admin-transaksi-kas');
+    }
+    public function adminPdfKas()
+    {
+        return view('/pdf/pdfKas');
+    }
+    public function adminPdfAnggota()
+    {
+        return view('/pdf/pdfAnggota');
     }
 }

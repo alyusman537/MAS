@@ -18,7 +18,7 @@ class Pembayaran extends Migration
             ],
             'nomor_pembayaran' => [
                 'type' => 'VARCHAR',
-                'constraint' => '20',
+                'constraint' => '50',
             ],
             'kode_infaq' => [
                 'type'       => 'VARCHAR',

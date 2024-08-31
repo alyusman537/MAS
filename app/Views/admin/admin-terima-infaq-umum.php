@@ -278,7 +278,7 @@
 
                   <v-row class="mt-2">
                     <v-col cols="12">
-                      <v-img :src="infaq.bukti" width="400" height="100%"></v-img>
+                      <v-img :src="infaq.bukti" width="400" height="100%" @click="lihatBukti()"></v-img>
                     </v-col>
                     <v-col cols="12" v-if="isTerima">
                       <v-btn color="success" depressed small block @click="terimaInfaq()">Terima Infaq</v-btn>
@@ -294,8 +294,8 @@
     </v-app>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="<?= base_url(); ?>api/render/js/dash-admin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -485,28 +485,6 @@
           this.infaq.validator = item.validator
 
           this.dialogDetail = true
-
-          // await axios.get('<?= base_url(); ?>api/admin/detail-bayar-umum/' + item.kode, this.config)
-          //   .then((res) => {
-          //     this.refresh()
-          //     console.log('detail ', res.data);
-          // this.infaq.id: null,
-          // this.infaq.bukti: null,
-          // this.infaq.keterangan: null,
-          // this.infaq.kode: null,
-          // this.infaq.nama: null,
-          // this.infaq.nia: null,
-          // this.infaq.nominal: null,
-          // this.infaq.tanggal: null,
-          // this.infaq.tanggal_validasi: null,
-          // this.infaq.validator: null,
-
-          // this.dialogDetail = true
-          // })
-          // .catch((err) => {
-          //   console.log(err.response.data);
-
-          // })
         },
 
         terimaInfaq() {
@@ -536,6 +514,10 @@
                 })
             }
           });
+        },
+
+        lihatBukti(){
+          window.open(this.infaq.bukti, '_blank')
         },
 
       }

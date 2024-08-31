@@ -9,6 +9,10 @@ use App\Models\ModelAnggota;
 use App\Models\ModelWilayah;
 
 use App\Libraries\JwtDecode;
+use App\Libraries\PdfGenerator;
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Anggota extends BaseController
 {
@@ -317,5 +321,81 @@ class Anggota extends BaseController
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage(), $th->getCode());
         }
+    }
+
+    public function pdfAnggota()
+    {
+        $mm = new ModelAnggota();
+        $data = [
+            'tanggal_cetak' => date('Y-m-d H:i:s'),
+            'anggota' => $mm->allAnggota()
+        ];
+        
+        $Pdfgenerator = new PdfGenerator();
+        // filename dari pdf ketika didownload
+        $file_pdf = 'Data-anggota';
+        // setting paper
+        $paper = 'A4';
+        //orientasi paper potrait / landscape
+        $orientation = "landscape";
+
+        $html = view('pdf/pdfAnggota', $data);
+
+        // run dompdf
+        $Pdfgenerator->generate($html, $file_pdf, $paper, $orientation);
+    }
+
+    public function excelAnggota()
+    {
+        $ma = new ModelAnggota();
+        $anggota = $ma->allAnggota();
+
+        $spreadsheet = new Spreadsheet();
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'NIA')
+            ->setCellValue('B1', 'NAMA')
+            ->setCellValue('C1', 'WA')
+            ->setCellValue('D1', 'EMAIL')
+            ->setCellValue('E1', 'WILAYAH')
+            ->setCellValue('F1', 'ALAMAT')
+            ->setCellValue('G1', 'LEVEL')
+            ->setCellValue('H1', 'STATUS')
+            ;
+            
+            $column = 2;
+            
+            foreach ($anggota as $key => $a) {
+                $spreadsheet->setActiveSheetIndex(0)
+                /*'nia' => $anggota['nia'],
+                'nama' => $anggota['nama'],
+                'wa'  => $anggota['wa'],
+                'email' => $anggota['email'],
+                'wilayah' => $anggota['wilayah'],
+                'alamat' => $anggota['alamat'],
+                'level' => $anggota['level'],
+                'aktif' => $anggota['aktif'],
+                'foto' => !$anggota['foto'] ? base_url() . 'no_photo.jpg' : base_url() . 'api/render/foto/' . $anggota['foto'],
+                */
+                ->setCellValue('A' . $column, $a->nia)
+                ->setCellValue('B' . $column, $a->nama)
+                ->setCellValue('C' . $column, $a->wa)
+                ->setCellValue('D' . $column, $a->email)
+                ->setCellValue('E' . $column, $a->wilayah)
+                ->setCellValue('F' . $column, $a->alamat)
+                ->setCellValue('G' . $column, $a->level)
+                ->setCellValue('H' . $column, $a->aktif);
+
+            $column++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = date('Y-m-d-His'). '-Data-Anggota';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
     }
 }

@@ -323,7 +323,7 @@
                       <div class="font-weight-bold text-right">{{ infaq.tanggal_validasi }}</div>
                     </v-col>
                     <v-col cols="12">
-                      <v-img :src="infaq.bukti_bayar" width="400" height="100%"></v-img>
+                        <v-img :src="infaq.bukti_bayar" width="400" height="100%" @click="lihatBukti"></v-img>
                     </v-col>
                     <v-col cols="12" v-if="isTerima">
                       <v-btn color="success" depressed small block @click="terimaInfaq()">Terima Pembayaran</v-btn>
@@ -339,8 +339,8 @@
     </v-app>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="<?= base_url(); ?>api/render/js/dash-admin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -584,6 +584,10 @@
                 })
             }
           });
+        },
+        lihatBukti()
+        {
+          window.open(this.infaq.bukti_bayar, '_blank')
         },
 
       }

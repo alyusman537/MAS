@@ -9,6 +9,7 @@ use App\Models\ModelMutasi;
 
 use App\Libraries\JwtDecode;
 use App\Libraries\LibMutasi;
+use App\Libraries\PdfGenerator;
 
 class Mutasi extends BaseController
 {
@@ -22,7 +23,7 @@ class Mutasi extends BaseController
     {
         $mm = new ModelMutasi();
         $date = date('Y-m-d');
-        $tglAwal = date('Y-m-d', strtotime($date . ' + 1 days')); 
+        $tglAwal = date('Y-m-d', strtotime($date . ' + 1 days'));
         $plus = $mm->selectSum('nominal')->where('tanggal < "' . $tglAwal . '" ')->where('jenis', 'D')->first();
         $minus = $mm->selectSum('nominal')->where('tanggal < "' . $tglAwal . '" ')->where('jenis', 'K')->first();
         $plus = !$plus ? 0 : (int) $plus['nominal'];
@@ -54,7 +55,7 @@ class Mutasi extends BaseController
         foreach ($list as $key => $val) {
             $debet = 0;
             $kredit = 0;
-            if($val->jenis == 'D') {
+            if ($val->jenis == 'D') {
                 $debet = (int) $val->nominal;
                 $saldo = $saldo + $debet;
             } else {
@@ -70,10 +71,13 @@ class Mutasi extends BaseController
                 'keterangan' => $val->keterangan,
                 'admin' => $val->admin,
             ];
-            $mutasi [] = $dorong;
+            $mutasi[] = $dorong;
         }
-        return $this->respond(['saldo_awal' => $saldoAwal, 'mutasi' => $mutasi,
-    'saldo_akhir' => $saldo]);
+        return $this->respond([
+            'saldo_awal' => $saldoAwal,
+            'mutasi' => $mutasi,
+            'saldo_akhir' => $saldo
+        ]);
     }
 
     public function detail($nomor_mutasi)
@@ -144,4 +148,65 @@ class Mutasi extends BaseController
         return $this->respondCreated(['pesan' => 'Mutasi transaksi berhasil disimpan.']);
     }
 
+    public function pdfMutasi($tglAwal, $tglAkhir)
+    {
+        $mm = new ModelMutasi();
+        // $date = $tglAwal;
+        // $newDate = date('Y-m-d', strtotime($date . ' - 1 days')); 
+        $plus = $mm->selectSum('nominal')->where('tanggal < "' . $tglAwal . '" ')->where('jenis', 'D')->first();
+        $minus = $mm->selectSum('nominal')->where('tanggal < "' . $tglAwal . '" ')->where('jenis', 'K')->first();
+        $plus = !$plus ? 0 : (int) $plus['nominal'];
+        $minus = !$minus ? 0 : (int) $minus['nominal'];
+        $saldoAwal = $plus - $minus;
+        $saldo = $saldoAwal;
+        // return print_r($saldoAwal);
+        $list = $mm->list($tglAwal, $tglAkhir);
+        $mutasi = [];
+        foreach ($list as $key => $val) {
+            $debet = 0;
+            $kredit = 0;
+            if ($val->jenis == 'D') {
+                $debet = (int) $val->nominal;
+                $saldo = $saldo + $debet;
+            } else {
+                $kredit = (int) $val->nominal;
+                $saldo = $saldo - $kredit;
+            }
+            $dorong = [
+                'tanggal'  => $val->tanggal,
+                'nomor' => $val->nomor_mutasi,
+                'debet' => $debet == '0'? '' : number_format($debet),
+                'kredit' => $kredit == '0'? '' : number_format($kredit),
+                'saldo' => number_format($saldo),
+                'keterangan' => $val->keterangan,
+                'admin' => $val->admin,
+            ];
+            $mutasi[] = $dorong;
+        }
+        $data = [
+            'tanggal_awal' => $tglAwal,
+            'tanggal_akhir' => $tglAkhir,
+            'tanggal_cetak' => date('Y-m-d H:i:s'),
+            'saldo_awal' => number_format($saldoAwal),
+            'mutasi' => $mutasi,
+            'saldo_akhir' => $saldo
+        ];
+        // title dari pdf
+        // $this->data['title_pdf'] = 'Laporan Aktifitas '.$user.' '.$karyawan['Nama'];
+        // $this->data['title_pdf1'] = 'Mulai dari tgl. '.$tglAwal.' s/d '.$tglAkhir;
+        // $this->data['aktifitas'] = $aktifitas;
+        
+        $Pdfgenerator = new PdfGenerator();
+        // filename dari pdf ketika didownload
+        $file_pdf = 'Servis-';
+        // setting paper
+        $paper = 'A4';
+        //orientasi paper potrait / landscape
+        $orientation = "portrait";
+
+        $html = view('pdf/pdfKas', $data);
+
+        // run dompdf
+        $Pdfgenerator->generate($html, $file_pdf, $paper, $orientation);
+    }
 }

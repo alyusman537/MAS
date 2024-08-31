@@ -51,6 +51,7 @@ class Filters extends BaseConfig
                     '/api/user-login',
                     '/api/admin*',
                     '/login',
+                    '/reset-password',
                     '/profile',
                     '/infaq',
                     '/infaq*',
@@ -65,6 +66,13 @@ class Filters extends BaseConfig
                     '/administrator/penerimaan-infaq',
                     '/administrator/penerimaan-infaq-umum',
                     '/administrator/transaksi-kas',
+                    '/administrator/laporan-kas',
+
+                    ////////////
+                    '/api/pdf/*',
+                    '/api/excel/*',
+                    '/api/user/minta-otp',
+                    '/api/user/kirim-otp',
                 ]
             ],
             'admin' => [
@@ -73,6 +81,7 @@ class Filters extends BaseConfig
                     '/api/admin-login',
                     '/api/user*',
                     '/login',
+                    '/reset-password',
                     '/profile',
                     '/infaq',
                     '/infaq*',
@@ -87,6 +96,13 @@ class Filters extends BaseConfig
                     '/administrator/penerimaan-infaq',
                     '/administrator/penerimaan-infaq-umum',
                     '/administrator/transaksi-kas',
+                    '/administrator/laporan-kas',
+
+                    ///////////
+                    '/api/pdf/*',
+                    '/api/excel/*',
+                    '/api/user/minta-otp',
+                    '/api/user/kirim-otp',
                 ]
             ],
         ],

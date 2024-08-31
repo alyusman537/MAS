@@ -17,13 +17,14 @@
         <v-container>
           <v-card class="mx-auto justify-center mt-5 pb-7" max-width="800" flat>
             <v-toolbar color="teal" flat class="text-center mx-auto" dark>
-              <v-toolbar-title>Mutasi KAS </v-toolbar-title>
+              <!-- <v-toolbar-title>Mutasi KAS </v-toolbar-title> -->
               <v-spacer></v-spacer>
-              <v-btn text outlined @click="loadDialog()"><v-icon>mdi-plus</v-icon>Transaksi</v-btn>
+              <v-btn class="mr-2" text outlined @click="loadDialog()"><v-icon>mdi-plus-box</v-icon>Transaksi</v-btn>
+              <v-btn text outlined @click="lapPdf()"><v-icon>mdi-file-pdf-box</v-icon>PDF</v-btn>
             </v-toolbar>
             <v-card-text class="px-2">
               <v-row>
-                <v-col cols="6">
+                <v-col cols="4">
                   <v-dialog
                     ref="dialogAwal"
                     v-model="dialogTglAwal"
@@ -34,7 +35,6 @@
                       <v-text-field
                         v-model="dateAwal"
                         label="Dari Tanggal"
-                        prepend-icon="mdi-calendar"
                         readonly
                         v-bind="attrs"
                         v-on="on"
@@ -59,7 +59,7 @@
                     </v-date-picker>
                   </v-dialog>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="4">
                   <v-dialog
                     ref="dialogAkhir"
                     v-model="dialogTglAkhir"
@@ -70,7 +70,6 @@
                       <v-text-field
                         v-model="dateAkhir"
                         label="Sampai Tanggal"
-                        prepend-icon="mdi-calendar"
                         readonly
                         v-bind="attrs"
                         v-on="on"
@@ -94,6 +93,9 @@
                       </v-btn>
                     </v-date-picker>
                   </v-dialog>
+                </v-col>
+                <v-col cols="2">
+                  <v-btn class="mt-3" color="info" small  depressed @click="getList()"><v-icon>mdi-gesture-tap-box</v-icon></v-btn>
                 </v-col>
               </v-row>
 
@@ -190,8 +192,8 @@
     </v-app>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="<?= base_url(); ?>api/render/js/dash-admin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -377,6 +379,11 @@
               swal('Gagal!', JSON.stringify(err.response.data), 'error')
             }
           })
+        },
+
+        async lapPdf()
+        {
+          await window.open('<?= base_url();?>api/pdf/mutasi/'+this.dateAwal+'/'+this.dateAkhir, '_blank')
         },
 
       }

@@ -129,7 +129,8 @@ class Penerimaan extends BaseController
         $nomor = $nomorAnggota['wa'];
         $pesan = '*Jazakallah Ahsanal Jaza* 
 
-Pembayaran infaq *' . $infaq['acara'] . '* dari Anda telah diterima oleh Admin *' . $validator . '*';
+Pembayaran infaq *' . $infaq['acara'] . '* dari Anda telah diterima oleh Admin *' . $validator . '*'."
+Al-wafa Bi'ahdillah";
         $kirim = $fonnte::kirimPesan($nomor, $pesan);
 
         return $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
@@ -172,7 +173,8 @@ Pembayaran infaq *' . $infaq['acara'] . '* dari Anda telah diterima oleh Admin *
         $nomor = $nomorAnggota['wa'];
         $pesan = '*Jazakallah Ahsanal Jaza* 
 
-Pembayaran infaq umum untuk *' . $bayar['keterangan'] . '* dari Anda telah diterima oleh Admin *' . $validator . '*';
+Pembayaran infaq umum untuk *' . $bayar['keterangan'] . '* dari Anda telah diterima oleh Admin *' . $validator . '*'."
+Al-wafa Bi'ahdillah.";
         $kirim = $fonnte::kirimPesan($nomor, $pesan);
 
         return $this->respond(['pesan' => 'Pembayaran infaq umum kode ' . $kode . ' berhasil diterima oleh ' . $validator . '.']);

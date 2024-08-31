@@ -16,7 +16,7 @@
         <admin-nav-bar :title="title"></admin-nav-bar>
 
         <v-container>
-          <v-card class="mx-auto justify-center mt-5 pb-7" max-width="800" flat color="teal lighten-5">
+          <v-card class="mx-auto justify-center mt-5 pb-7" max-width="1200" flat color="teal lighten-5">
             <!--v-card color="teal" flat class="text-center mx-auto py-3" dark>
               <h3 class="mx-auto">Daftar Infaq</h3>
             </v-card-->
@@ -28,16 +28,28 @@
                     v-model="cari"></v-text-field>
                 </v-col>
                 <v-col cols="4">
-                  <v-btn class="mt-4" color="info" small depressed @click="loadDialogBaru()">
-                    <v-icon>mdi-plus</v-icon>Anggota
+                  <v-btn class="mt-4" color="info" block small depressed @click="loadDialogBaru()">
+                    <v-icon>mdi-plus-box</v-icon>Anggota
                   </v-btn>
+                </v-col>
+                <v-col cols="6">
+                  <v-btn color="info" block small depressed @click="pdfAnggota()">
+                    <v-icon>mdi-file-pdf-box</v-icon>Anggota
+                  </v-btn>
+                </v-col>
+                <v-col cols="6">
+                  <a style="text-decoration: none;" href="<?= base_url()?>api/excel/anggota">
+                    <v-btn color="info" block small depressed>
+                      <v-icon>mdi-file-excel-box</v-icon>Anggota
+                    </v-btn>
+                  </a>
                 </v-col>
               </v-row>
               <v-data-table
                 :headers="header"
                 :items="listAnggota"
                 :search="cari"
-                class="elevation-0">
+                class="elevation-0 mt-2">
                 <!--status: el.aktif == '1' ? true : false,
                   aktif: el.aktif == '1' ? 'Aktif' : 'Nonaktif',
                   warna: el.aktif == '1' ? 'success' : 'error'-->
@@ -228,8 +240,8 @@
     </v-app>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="<?= base_url(); ?>api/render/js/dash-admin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -569,6 +581,9 @@
                 })
             }
           });
+        },
+        pdfAnggota(){
+          window.open('<?= base_url()?>api/pdf/anggota', '_blank')
         },
       }
     })
