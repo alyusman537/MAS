@@ -13,6 +13,8 @@ $routes->get('/api/render/js/(:any)', 'Render::js/$1');
 
 $routes->post('/api/user-login', 'Login::auth');
 $routes->get('/api/user/refresh-token', 'Login::refreshToken');
+$routes->post('/api/user/minta-otp', 'Login::permintaanOtp');
+$routes->post('/api/user/kirim-otp', 'Login::kirimOtp');
 
 $routes->get('/api/user/profile', 'Profile::index');
 $routes->get('/api/user/profile/edit/(:any)', 'Profile::edit/$1');
@@ -90,6 +92,7 @@ $routes->get('/api/excel/anggota', 'Anggota::excelAnggota');
 
 ///////////// VIEW USER ///////////////
 $routes->get('/login', 'View::userLogin');
+$routes->get('/reset-password', 'View::userResetPassword');
 $routes->get('/profile', 'View::userProfile');
 $routes->get('/infaq', 'View::userInfaq');
 $routes->get('/infaq-umum', 'View::userInfaqUmum');

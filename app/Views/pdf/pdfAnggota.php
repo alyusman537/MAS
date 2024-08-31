@@ -80,10 +80,7 @@
 <body>
     </div>
     <h4>Data Anggota Al-Wafa Bi'ahdillah</h4>
-    <p id="nia">nia </p>
-        <p class="nominal" style="margin-right: 35px;">Tanggal Cetak <?= $tanggal_cetak; ?></p>
-
-
+        
     <table id="table">
         <thead>
             <tr>
@@ -121,7 +118,16 @@
         </div>
     </div-->
     <div id="footer">
-    <p class="page">Halaman </p>
+        <table id="table">
+            <tr>
+                <td width="50%">
+                    <p class="page">Halaman </p>
+                </td>
+                <td width="50%">
+                    <p style="text-align: right;">Tanggal cetak <?= date('Y-m-d H:i:s')?></p>
+                </td>
+            </tr>
+        </table>
 </div>
 
 </body>

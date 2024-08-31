@@ -51,6 +51,7 @@ class Filters extends BaseConfig
                     '/api/user-login',
                     '/api/admin*',
                     '/login',
+                    '/reset-password',
                     '/profile',
                     '/infaq',
                     '/infaq*',
@@ -70,6 +71,8 @@ class Filters extends BaseConfig
                     ////////////
                     '/api/pdf/*',
                     '/api/excel/*',
+                    '/api/user/minta-otp',
+                    '/api/user/kirim-otp',
                 ]
             ],
             'admin' => [
@@ -78,6 +81,7 @@ class Filters extends BaseConfig
                     '/api/admin-login',
                     '/api/user*',
                     '/login',
+                    '/reset-password',
                     '/profile',
                     '/infaq',
                     '/infaq*',
@@ -97,6 +101,8 @@ class Filters extends BaseConfig
                     ///////////
                     '/api/pdf/*',
                     '/api/excel/*',
+                    '/api/user/minta-otp',
+                    '/api/user/kirim-otp',
                 ]
             ],
         ],

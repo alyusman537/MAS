@@ -16,7 +16,7 @@
         <admin-nav-bar :title="title"></admin-nav-bar>
 
         <v-container>
-          <v-card class="mx-auto justify-center mt-5 pb-7" max-width="800" flat color="teal lighten-5">
+          <v-card class="mx-auto justify-center mt-5 pb-7" max-width="1200" flat color="teal lighten-5">
             <!--v-card color="teal" flat class="text-center mx-auto py-3" dark>
               <h3 class="mx-auto">Daftar Infaq</h3>
             </v-card-->
@@ -240,8 +240,8 @@
     </v-app>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="<?= base_url(); ?>api/render/js/dash-admin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

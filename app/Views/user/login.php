@@ -61,7 +61,7 @@
                               <a href="#" class="teal--text" style="text-decoration: none;" @click="goAdmin">Admin Page</a>
                             </v-col>
                             <v-col cols="6">
-                              <a href="#" class="teal--text text-decoration-none">Lupa Password</a>
+                              <a href="#" class="teal--text text-decoration-none" @click="gotReset">Lupa Password</a>
                             </v-col>
                           </v-row>
                         </v-col>
@@ -78,8 +78,8 @@
     </v-img>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
@@ -182,6 +182,9 @@
         goAdmin(){
           window.open('<?= base_url();?>administrator/login', '_self')
         },
+        gotReset(){
+          window.open('<?= base_url();?>reset-password', '_self')
+        }
       }
     })
   </script>

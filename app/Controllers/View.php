@@ -15,6 +15,10 @@ class View extends BaseController
     {
         return view('/user/login');
     }
+    public function userResetPassword()
+    {
+        return view('/user/reset-password');
+    }
     public function userProfile()
     {
         return view('/user/profile');
