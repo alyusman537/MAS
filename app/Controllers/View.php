@@ -80,4 +80,8 @@ class View extends BaseController
     {
         return view('/pdf/pdfAnggota');
     }
+    public function adminLaporanKas()
+    {
+        return view('/admin/admin-laporan-infaq');
+    }
 }

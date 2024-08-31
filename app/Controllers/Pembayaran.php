@@ -157,5 +157,24 @@ Al-wafa Bi'ahdillah.";
         return $this->respond(['image' => $namaFoto]);
     }
 
+    public function listInfaq()
+    {
+        $mp = new ModelPembayaran();
+        $mi = new ModelInfaq();
+        $infaq = $mi->select('kode, tanggal_acara, nominal')->where(['aktif' => 1])->findAll();
+        // return print_r($infaq[0]['kode']);
+        $data = [];
+        foreach ($infaq as $key => $val) {
+            $listPembayaran = $mp->selectCount('nomor_pembayaran')->where(['kode_infaq' => $val['kode']])->first();
+            $bayar = $mp->hitungInfaq($val['kode'], 'lunas');
+            // $data [] = $bayar[0];
+            if($listPembayaran['nomor_pembayaran'] == $bayar['nomor_pembayaran']) {
+                $data [] = 'wes lunas';
+            }
+        }
+        return $this->respond($data);
+        return $this->respond($mp->hitungInfaq('lunas'));
+    }
+
     
 }

@@ -91,4 +91,41 @@ class ModelPembayaran extends Model
         return $data->getResult();
     }
 
+    public function hitungInfaq($kode_infaq, $status)
+    {
+        $kondisi = null;
+        if($status == 'lunas') {
+            $kondisi = 'p.bayar >= infaq.nominal AND p.validator IS NOT NULL AND infaq.aktif = 1';
+        }
+        if($status == 'pending') {
+            $kondisi = 'p.bayar >= infaq.nominal AND p.validator IS NOT NULL AND infaq.aktif = 1';
+        }
+        if($status == 'baru') {
+            $kondisi = 'p.bayar = 0 AND p.validator IS NULL AND infaq.aktif = 1';
+        }
+        $db = $this->db->table('pembayaran as p');
+        $db->selectCount('p.nomor_pembayaran');
+        $db->select('infaq.kode, infaq.acara, infaq.tanggal_acara');
+        $db->where('p.kode_infaq', $kode_infaq);
+        $db->where($kondisi);
+        $db->join('infaq', 'p.kode_infaq = infaq.kode');
+        $db->limit(1);
+        $data = $db->get();
+        if(!$data) return false;
+        return $data->getResult();
+    }
+    public function listBayar($infaq_kode)
+    {
+        $db = $this->db->table('pembayaran as p');
+        $db->select('p.*, infaq.acara, infaq.rutin, infaq.tanggal_acara, anggota.nama');
+        $db->where('p.infaq_kode', $infaq_kode);
+        // $db->where('p.bayar >= infaq.nominal AND p.validator IS NOT NULL AND infaq.aktif = 1');
+        $db->join('infaq', 'infaq.kode=p.kode_infaq');
+        $db->join('anggota', 'anggota.nia=p.nia', 'left');
+        $db->orderBy('anggota.nama', 'ASC');
+        $data = $db->get();
+        if(!$data) return false;
+        return $data->getResult();
+    }
+
 }

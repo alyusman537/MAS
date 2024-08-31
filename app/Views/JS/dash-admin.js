@@ -75,6 +75,13 @@ Vue.component("admin-nav-bar", {
         </v-list-item>
         <v-divider></v-divider>
 
+        <v-list-item @click="gotoLaporanInfaq">
+            <v-list-item-content>
+            <v-list-item-title>Laporan Infaq</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider></v-divider>
+
         <v-list-item @click="keluar">
             <v-list-item-content>
             <v-list-item-title>Keluar</v-list-item-title>
@@ -142,6 +149,9 @@ Vue.component("admin-nav-bar", {
     },
     gotoTransaksiKas() {
       window.open(this.url + "/administrator/transaksi-kas", "_self");
+    },
+    gotoLaporanInfaq() {
+      window.open(this.url + "/administrator/laporan-infaq", "_self");
     },
   },
 });
