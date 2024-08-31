@@ -255,7 +255,9 @@ class Login extends BaseController
         $token_otp = password_hash($anggota['nia'].'ditambah'.$anggota['wa'].'ditambah'.$otp, PASSWORD_DEFAULT);
         try {
             $fonnte = new LibFonnte;
-            $waAnggota = $fonnte->kirimPesan($anggota['wa'], $otp);
+            $pesan = "Al-wafa Bi'ahdillah 
+OTP reset password Anda adalah *". $otp."*. Segera kirim OPT anda dalam waktu maksimal 3 menit.";
+            $waAnggota = $fonnte->kirimPesan($anggota['wa'], $pesan);
             if ($waAnggota) {
                 $mot = new ModelOtp();
                 $data = [
@@ -265,7 +267,8 @@ class Login extends BaseController
                     'token_otp' => $token_otp
                 ];
                 $mot->insert($data);
-                return $this->respond(['pesan' => 'OTP reset password berhasil dikirim', 'token_otp' => $token_otp]);
+                $text = 'OTP reset password berhasil dikirim. Silahkan periksa WA Anda dan segera kirim OPT dalam waktu 3 menit.';
+                return $this->respond(['pesan' => $text, 'token_otp' => $token_otp]);
             }
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage(), 500);
@@ -302,7 +305,7 @@ class Login extends BaseController
         $waktu_sekarang = time();
         $batas_waktu = 60*3; //lima menit
         if(($waktu_sekarang - $waktu_otp) > $batas_waktu) return $this->fail('Masa berlaku OPT anda sudah kadaluarsa.', 402);
-        return print_r(['masih belum']);
+
         $anggota = $ma->select('*')->where(['nia' => $data_otp['nia']])->first();
         if (!$anggota || !password_verify($anggota['nia'].'ditambah'.$anggota['wa'].'ditambah'.$otp, $token_otp )) return $this->fail('Perminataan reset password tidak dapat dilakukan. mohon hubungi admin.', 402);
         $fonnte = new LibFonnte;

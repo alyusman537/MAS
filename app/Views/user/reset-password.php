@@ -41,7 +41,7 @@
                     hint="Masukkan nomor WA Anda"></v-text-field>
                 </v-col>
                 <v-col cols="12">
-                  <v-btn color="info" block depressed height="55" @click="mintaOtp()">Minta OTP</v-btn>
+                  <v-btn color="info" block depressed height="55" @click="mintaOtp()">Minta OTP reset password</v-btn>
                 </v-col>
                 <v-col cols="12">
                   <v-otp-input
@@ -54,12 +54,10 @@
                 </v-col>
                 <v-col cols="12">
                   <v-btn color="error" height="50" rounded depressed block @click="goLoginPage">batal</v-btn>
-                  <v-btn color="error" height="50" rounded depressed block @click="waktuJalan">jalan</v-btn>
                 </v-col>
               </v-row>
             </v-card-text>
           </v-card>
-          <h3>{{ timerCount }}</h3>
         </v-container>
       </v-main>
     </v-app>
@@ -81,6 +79,7 @@
         toast.onmouseleave = Swal.resumeTimer;
       }
     });
+
     new Vue({
       el: '#app',
       vuetify: new Vuetify({
@@ -99,11 +98,6 @@
         wa: null,
         otp: null,
         token_otp: null,
-        /////////
-        timerCount: 180,
-        minutes: 3,
-        seconds: 0,
-        isEnded: false,
         //////////
         password: null,
         showPassword: false,
@@ -112,19 +106,19 @@
         config: null,
       },
       created() {
-        // this.waktuJalan()
+
       },
       watch: {
-        timerCount: {
-          handler(value) {
-            if (value > 0) {
-              setTimeout(() => {
-                this.timerCount--;
-              }, 1000);
-            }
-          },
-          immediate: true // This ensures the watcher is triggered upon creation
-        }
+        // timerCount: {
+        //   handler(value) {
+        //     if (value > 0) {
+        //       setTimeout(() => {
+        //         this.timerCount--;
+        //       }, 1000);
+        //     }
+        //   },
+        //   immediate: true // This ensures the watcher is triggered upon creation
+        // }
       },
       methods: {
         async goLoginPage() {
@@ -171,22 +165,13 @@
             token_otp: this.token_otp,
             otp: this.otp
           }
-          console.log(param);
 
           await axios.post('<?= base_url(); ?>api/user/kirim-otp', param)
             .then((res) => {
-              console.log(res.data);
               Toast.fire({
                 icon: "success",
                 title: res.data.pesan
               });
-              this.minutes = 3
-              this.seconds = 0
-              // this.goLoginPage()
-              // this.wa = null 
-              // this.otp = nul
-              // this.token_otp = null
-              // this.nia = null
             })
             .catch((err) => {
               console.log(err.response.data);
@@ -206,27 +191,6 @@
                 });
               }
             })
-        },
-        updateRemaining(distance) {
-          this.minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-          this.seconds = Math.floor((distance % (1000 * 60)) / 1000)
-          console.log('minutes :' + this.minutes + ' detik: ' + this.seconds);
-
-        },
-
-        tick() {
-          const currentTime = new Date()
-          const distance = Math.max(this.endDate - currentTime, 0)
-          this.updateRemaining(distance)
-
-          if (distance === 0) {
-            clearInterval(this.timer)
-            this.isEnded = true
-          }
-        },
-        waktuJalan() {
-          this.tick()
-          this.timer = setInterval(this.tick.bind(this), 1000)
         },
         goLoginPage() {
           window.open('<?= base_url(); ?>login', '_self')
