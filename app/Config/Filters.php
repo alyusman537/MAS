@@ -68,6 +68,7 @@ class Filters extends BaseConfig
                     '/administrator/transaksi-kas',
                     '/administrator/laporan-kas',
                     '/administrator/laporan-infaq',
+                    '/administrator/laporan-infaq-detail/*',
 
                     ////////////
                     '/api/pdf/*',
@@ -99,6 +100,7 @@ class Filters extends BaseConfig
                     '/administrator/transaksi-kas',
                     '/administrator/laporan-kas',
                     '/administrator/laporan-infaq',
+                    '/administrator/laporan-infaq-detail/*',
 
                     ///////////
                     '/api/pdf/*',

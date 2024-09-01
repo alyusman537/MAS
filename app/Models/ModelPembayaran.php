@@ -114,18 +114,20 @@ class ModelPembayaran extends Model
         if(!$data) return false;
         return $data->getResult();
     }
-    public function listBayar($infaq_kode)
+    public function listBayar($kode_infaq)
     {
         $db = $this->db->table('pembayaran as p');
-        $db->select('p.*, infaq.acara, infaq.rutin, infaq.tanggal_acara, anggota.nama');
-        $db->where('p.infaq_kode', $infaq_kode);
+        $db->select('p.*, infaq.acara, infaq.rutin, infaq.tanggal_acara, anggota.nama, anggota.wilayah');
+        $db->where('p.kode_infaq', $kode_infaq);
         // $db->where('p.bayar >= infaq.nominal AND p.validator IS NOT NULL AND infaq.aktif = 1');
         $db->join('infaq', 'infaq.kode=p.kode_infaq');
         $db->join('anggota', 'anggota.nia=p.nia', 'left');
         $db->orderBy('anggota.nama', 'ASC');
+        $db->orderBy('anggota.wilayah', 'ASC');
         $data = $db->get();
         if(!$data) return false;
         return $data->getResult();
     }
+
 
 }

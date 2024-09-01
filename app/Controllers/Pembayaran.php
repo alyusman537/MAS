@@ -11,6 +11,7 @@ use App\Models\ModelAnggota;
 
 use App\Libraries\JwtDecode;
 use App\Libraries\LibFonnte;
+use CodeIgniter\Database\BaseBuilder;
 
 class Pembayaran extends BaseController
 {
@@ -159,22 +160,45 @@ Al-wafa Bi'ahdillah.";
 
     public function listInfaq()
     {
-        $mp = new ModelPembayaran();
         $mi = new ModelInfaq();
-        $infaq = $mi->select('kode, tanggal_acara, nominal')->where(['aktif' => 1])->findAll();
-        // return print_r($infaq[0]['kode']);
-        $data = [];
-        foreach ($infaq as $key => $val) {
-            $listPembayaran = $mp->selectCount('nomor_pembayaran')->where(['kode_infaq' => $val['kode']])->first();
-            $bayar = $mp->hitungInfaq($val['kode'], 'lunas');
-            // $data [] = $bayar[0];
-            if($listPembayaran['nomor_pembayaran'] == $bayar['nomor_pembayaran']) {
-                $data [] = 'wes lunas';
-            }
+        try {
+            $data = $mi->whereIn('kode', function (BaseBuilder $builder) {
+                $builder->select('kode_infaq')->distinct()->from('pembayaran')->where('validator IS NULL');
+            });
+            $dataInfaq = $data->get()->getResult();
+            return $this->respond($dataInfaq);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage(), 500);
         }
-        return $this->respond($data);
-        return $this->respond($mp->hitungInfaq('lunas'));
     }
+    
+    public function listInfaqBelumLunas($kode_infaq)
+    {
+        $mi = new ModelInfaq();
+        $mp = new ModelPembayaran();
+        $infaq = $mi->select('*')->where(['kode' => $kode_infaq])->first();
+        $bayar = $mp->listBayar($kode_infaq);
+        $data_bayar = [];
+        foreach ($bayar as $key => $val) {
+            $is_lunas = (int) $val->bayar > 0 ? 'Pending' : ((int) $val->bayar > 0 && $val->validator != null ? 'Lunas' : 'Belum Bayar') ;
+            $dorong = [
+                'nia' => $val->nia,
+                'nama' => $val->nama,
+                'wilayah' => $val->wilayah,
+                'bayar' => $val->bayar,
+                'tanggal_bayar' => $val->tanggal_bayar,
+                'validator' => $val->validator,
+                'tanggal_validasi' => $val->tanggal_validasi,
+                'is_lunas' => $is_lunas
+            ];
+            $data_bayar [] = $dorong;
+        }
+        $data = [
+            'infaq' => $infaq,
+            'data_bayar' => $data_bayar
+        ];
+        return $this->respond($data);
 
+    }
     
 }

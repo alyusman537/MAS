@@ -21,13 +21,6 @@ class ModelInfaq extends Model
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-
-    public function listInfaq()
-    {
-        $db = $this->db->table('infaq as i');
-        $db->select('i.kode, i.acara, i.nominal, i.rutin');
-        
-    }
     
 
 }
