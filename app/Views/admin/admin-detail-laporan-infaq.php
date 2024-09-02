@@ -22,13 +22,16 @@
             </v-card-->
             <v-card-text class="px-2">
               <v-row class="px-3">
-                <v-col cols="7">
+                <v-col cols="5">
                   <v-text-field
                     label="Cari Data Infaq"
                     v-model="cari"></v-text-field>
                 </v-col>
-                <v-col cols="5">
-                  <v-btn class="mt-3" color="info" depressed block><v-icon>mdi-file-pdf-box</v-icon>export</v-btn>
+                <v-col cols="4">
+                  <v-btn class="mt-3" color="info" depressed block @click="lihatKartu()"><v-icon>mdi-file-pdf-box</v-icon>export</v-btn>
+                </v-col>
+                <v-col cols="3">
+                  <v-btn class="mt-3" color="info" depressed block @click="balik()"><v-icon>mdi-close</v-icon></v-btn>
                 </v-col>
                 <v-col cols="12">
                   <!-- this.infaq.kode = da.kode
@@ -287,62 +290,11 @@
               console.log('getlist infq ', err.response);
             })
         },
-        async lihatDetaillll(kode_pembayaran) {
-          await axios.get('<?= base_url(); ?>api/admin/detail-bayar-infaq/' + kode_pembayaran, this.config)
-            .then((res) => {
-              this.refresh()
-              console.log('detail ', res.data);
-              this.infaq.id = res.data.pembayaran.id
-              this.infaq.kode_infaq = da.kode
-              this.infaq.acara = da.acara
-              this.infaq.tanggal_acara = da.tanggal_acara
-              this.infaq.nominal = parseInt(da.nominal).toLocaleString('ID-id')
-              this.infaq.rutin = da.rutin == '1' ? 'Rutin' : 'Insidential'
-              this.infaq.nia = res.data.pembayaran.nia
-              this.infaq.nama = res.data.anggota.nama
-              this.infaq.nomor_pembayaran = res.data.pembayaran.nomor_pembayaran
-              this.infaq.bayar = parseInt(res.data.pembayaran.bayar).toLocaleString('ID-id')
-              this.infaq.bukti_bayar = res.data.pembayaran.bukti_bayar == null ? '<?= base_url() ?>No_Image_Available.jpg' : '<?= base_url() ?>api/render/bukti/' + res.data.pembayaran.bukti_bayar
-              this.infaq.tanggal_bayar = res.data.pembayaran.tanggal_bayar
-              this.infaq.validator = res.data.pembayaran.validator
-              this.infaq.tanggal_validasi = res.data.pembayaran.tanggal_validasi
-
-              this.dialogDetail = true
-            })
-            .catch((err) => {
-              console.log(err.response.data);
-
-            })
+        lihatKartu() {
+          window.open('<?= base_url();?>api/pdf/kartu-infaq/'+this.kode_infaq, '_blank')
         },
-
-        terimaInfaq() {
-          Swal.fire({
-            title: "Penerimaan infaq?",
-            text: "Yakin akan melakukan penerimaan infaq nomor pembayaran " + this.infaq.nomor_pembayaran,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Terima"
-          }).then((result) => {
-            if (result.isConfirmed) {
-              axios.get('<?= base_url(); ?>api/admin/terima-infaq/' + this.infaq.nomor_pembayaran, this.config)
-                .then((res) => {
-                  this.refresh()
-                  console.log('detail ', res.data);
-                  swal('Berhasil!', "Nomor pembayaran infaq " + this.infaq.nomor_pembayaran + " berhasil diterima.", 'success')
-
-                  this.dialogDetail = false
-                })
-                .catch((err) => {
-                  console.log(err.response.data);
-
-                })
-            }
-          });
-        },
-        lihatBukti() {
-          window.open(this.infaq.bukti_bayar, '_blank')
+        balik() {
+          window.open('<?= base_url();?>administrator/laporan-infaq', '_self')
         },
 
       }

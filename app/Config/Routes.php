@@ -92,6 +92,7 @@ $routes->get('/api/admin/laporan-infaq-detail/(:any)', 'Pembayaran::listInfaqBel
 $routes->get('/api/pdf/mutasi/(:any)/(:any)', 'Mutasi::pdfMutasi/$1/$2');
 $routes->get('/api/pdf/anggota', 'Anggota::pdfAnggota');
 $routes->get('/api/excel/anggota', 'Anggota::excelAnggota');
+$routes->get('/api/pdf/kartu-infaq/(:any)', 'Pembayaran::pdfKartuInfaq/$1');
 
 ///////////// VIEW USER ///////////////
 $routes->get('/login', 'View::userLogin');

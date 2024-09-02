@@ -88,4 +88,8 @@ class View extends BaseController
     {
         return view('/admin/admin-detail-laporan-infaq');
     }
+    public function adminPdfKartuInfaq()
+    {
+        return view('/pdf/pdfKartuInfaq');
+    }
 }

@@ -11,6 +11,7 @@ use App\Models\ModelAnggota;
 
 use App\Libraries\JwtDecode;
 use App\Libraries\LibFonnte;
+use App\Libraries\PdfGenerator;
 use CodeIgniter\Database\BaseBuilder;
 
 class Pembayaran extends BaseController
@@ -199,6 +200,46 @@ Al-wafa Bi'ahdillah.";
         ];
         return $this->respond($data);
 
+    }
+
+    public function pdfKartuInfaq($kode_infaq)
+    {
+        $mi = new ModelInfaq();
+        $mp = new ModelPembayaran();
+        $infaq = $mi->select('*')->where(['kode' => $kode_infaq])->first();
+        $bayar = $mp->listBayar($kode_infaq);
+        $data_bayar = [];
+        foreach ($bayar as $key => $val) {
+            $is_lunas = (int) $val->bayar > 0 ? 'Pending' : ((int) $val->bayar > 0 && $val->validator != null ? 'Lunas' : 'Belum') ;
+            $dorong = [
+                'nia' => $val->nia,
+                'nama' => $val->nama,
+                'wilayah' => $val->wilayah,
+                'bayar' => $val->bayar,
+                'tanggal_bayar' => $val->tanggal_bayar,
+                'validator' => $val->validator,
+                'tanggal_validasi' => $val->tanggal_validasi,
+                'is_lunas' => $is_lunas
+            ];
+            $data_bayar [] = $dorong;
+        }
+        $data = [
+            'infaq' => $infaq,
+            'data_bayar' => $data_bayar
+        ];
+        
+        $Pdfgenerator = new PdfGenerator();
+        // filename dari pdf ketika didownload
+        $file_pdf = 'Data-anggota';
+        // setting paper
+        $paper = 'A4';
+        //orientasi paper potrait / landscape
+        $orientation = "landscape";
+
+        $html = view('pdf/pdfKartuInfaq', $data);
+
+        // run dompdf
+        $Pdfgenerator->generate($html, $file_pdf, $paper, $orientation);
     }
     
 }
