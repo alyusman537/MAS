@@ -4,6 +4,7 @@ namespace Config;
 
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Filters\CSRF;
+use CodeIgniter\Filters\Cors;
 use CodeIgniter\Filters\DebugToolbar;
 use CodeIgniter\Filters\Honeypot;
 use CodeIgniter\Filters\InvalidChars;
@@ -11,7 +12,7 @@ use CodeIgniter\Filters\SecureHeaders;
 
 use App\Filters\AuthFilter;
 use App\Filters\AdminAuth;
-use App\Filters\Cors;
+// use App\Filters\Cors;
 
 class Filters extends BaseConfig
 {
@@ -44,7 +45,7 @@ class Filters extends BaseConfig
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
-            'cors',
+            'cors' => ['api/*'],
             'auth' => [
                 'except' => [
                     '/api/render/*',
@@ -111,7 +112,8 @@ class Filters extends BaseConfig
             ],
         ],
         'after' => [
-            'toolbar',
+            'cors' => ['api/*'],
+            // 'toolbar',
             // 'honeypot',
             // 'secureheaders',
         ],
@@ -141,5 +143,11 @@ class Filters extends BaseConfig
      *
      * @var array<string, array<string, list<string>>>
      */
-    public array $filters = [];
+
+    public array $filters = [
+        'cors' => [
+            'before' => ['/api/*'],
+            'after'  => ['/api/*'],
+        ],
+    ];
 }

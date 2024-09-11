@@ -5,6 +5,11 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+
+ $routes->group('', ['filter' => 'cors'], static function (RouteCollection $routes): void {
+    $routes->options('api/(:any)', static function () {});
+});
+
 $routes->get('/', 'View::index');
 
 $routes->get('/api/render/bukti/(:any)', 'Render::bukti/$1');
