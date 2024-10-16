@@ -97,7 +97,7 @@
             </v-card>
           </v-dialog>
 
-          
+
           <v-dialog
             v-model="dialogDetail">
             <v-card flat max-width="500" class="mx-auto">
@@ -270,7 +270,7 @@
         async getListInfaq() {
           await axios.get('<?= base_url(); ?>api/user/home/infaq-umum', this.config)
             .then((res) => {
-              // console.log('res ', res.data);
+              console.log('infaq umum ', res.data);
               this.refresh()
               this.listInfaq = res.data.map((val) => {
                 const tgl = String(val.tanggal).split(' ')
@@ -292,7 +292,7 @@
               console.log(this.listInfaq);
             })
             .catch((err) => {
-              if(err.response.status == 401 ){
+              if (err.response.status == 401) {
                 this.keluar()
               }
               console.log('getlist infq ', err);
@@ -306,19 +306,19 @@
               this.refresh()
               this.detail.bukti = res.data.bukti
               this.detail.jam_validasi = res.data.jam_validasi
-          this.detail.keterangan = res.data.keterangan
-          this.detail.kode = res.data.kode
-          this.detail.nominal = parseInt(res.data.nominal).toLocaleString('ID-id')
-          this.detail.tanggal = res.data.tanggal
-          this.detail.tanggal_validasi = res.data.tanggal_validasi
-          this.detail.jam_validasi = res.data.jam_validasi
-          this.detail.validator = res.data.validator
+              this.detail.keterangan = res.data.keterangan
+              this.detail.kode = res.data.kode
+              this.detail.nominal = parseInt(res.data.nominal).toLocaleString('ID-id')
+              this.detail.tanggal = res.data.tanggal
+              this.detail.tanggal_validasi = res.data.tanggal_validasi
+              this.detail.jam_validasi = res.data.jam_validasi
+              this.detail.validator = res.data.validator
 
-          this.dialogDetail = true
+              this.dialogDetail = true
 
             })
             .catch((err) => {
-              if(err.response.status == 401 ){
+              if (err.response.status == 401) {
                 this.keluar()
               }
               console.log('getlist infq ', err);
@@ -336,7 +336,7 @@
               this.dialogInfaq = true
             })
             .catch((err) => {
-              if(err.response.status == 401 ){
+              if (err.response.status == 401) {
                 this.keluar()
               }
               console.log(err.response);
@@ -356,18 +356,30 @@
             this.toast('error', 'Silahkan sertakan bukti infaq Anda.')
             return false
           }
+          let fdata = new FormData();
+          fdata.append("bukti", this.attFile);
+          fdata.append("nominal", this.infaq.nominal)
+          fdata.append("keterangan", this.infaq.keterangan)
           const param = {
             nominal: this.infaq.nominal,
             keterangan: this.infaq.keterangan
           }
-          await axios.post('<?= base_url(); ?>/api/user/infaq-umum/add', param, this.config)
+          await axios.post('<?= base_url(); ?>/api/user/infaq-umum/add', fdata, this.config)
             .then((res) => {
-              // console.log(res.data);
+              console.log(res.data);
+              this.toast('success', 'Silahkan hubungi admin untuk menerima infaq umum Anda.')
+              this.getListInfaq()
+              this.dialogInfaq = false
+              this.attFile = null
+              fdata.delete("bukti")
+              fdata.delete("nominal")
+              fdata.delete("keterangan")
               this.refresh()
-              this.uploadBuktiBayar(res.data.kode)
+              // this.uploadBuktiBayar(res.data.kode)
+
             })
             .catch((err) => {
-              if(err.response.status == 401 ){
+              if (err.response.status == 401) {
                 this.keluar()
               }
               if (err.response.status === 402) {
@@ -395,7 +407,7 @@
           }
           this.attFile = event;
           console.log(this.attFile);
-          
+
           // this.linkFoto = URL.createObjectURL(event);
         },
         async uploadBuktiBayar(kode) {

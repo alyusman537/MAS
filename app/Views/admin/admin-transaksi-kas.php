@@ -23,7 +23,7 @@
               <v-btn text outlined @click="lapPdf()"><v-icon>mdi-file-pdf-box</v-icon>PDF</v-btn>
             </v-toolbar>
             <v-card-text class="px-2">
-              <v-row>
+              <v-row justify-end>
                 <v-col cols="4">
                   <v-dialog
                     ref="dialogAwal"
@@ -95,12 +95,12 @@
                   </v-dialog>
                 </v-col>
                 <v-col cols="2">
-                  <v-btn class="mt-3" color="info" small  depressed @click="getList()"><v-icon>mdi-gesture-tap-box</v-icon></v-btn>
+                  <v-btn class="mt-3" color="info" small depressed @click="getList()"><v-icon>mdi-gesture-tap-box</v-icon></v-btn>
                 </v-col>
               </v-row>
 
               <template>
-                <v-simple-table>
+                <!-- <v-simple-table>
                   <template v-slot:default>
                     <thead>
                       <tr>
@@ -140,7 +140,25 @@
                       </tr>
                     </tbody>
                   </template>
-                </v-simple-table>
+                </v-simple-table> -->
+                <v-data-table
+                  :headers="headerList"
+                  :items="listMutasi"
+                  class="elevation-0"
+                  :hide-default-footer="true">
+                  <template v-slot:item.aksi="{ item }">
+                    <v-btn
+                      color="info"
+                      depressed
+                      rounded
+                      small
+                      dark
+                      @click="lihatDetail(item.nomor)">
+                      Detail
+                    </v-btn>
+                  </template>
+                </v-data-table>
+
               </template>
 
             </v-card-text>
@@ -154,17 +172,16 @@
               </v-toolbar>
               <v-card-text class="py-8">
                 <v-text-field
-                type="number"
-                pattern="[0-9\s]{13,19}"
-                label="nominal"
-                v-model="mutasi.nominal"></v-text-field>
+                  type="number"
+                  pattern="[0-9\s]{13,19}"
+                  label="nominal"
+                  v-model="mutasi.nominal"></v-text-field>
                 <v-textarea
                   label="Keterangan"
                   v-model="mutasi.keterangan"
-                  rows="2"
-                  ></v-textarea>
+                  rows="2"></v-textarea>
 
-                  <v-radio-group
+                <v-radio-group
                   v-model="mutasi.jenis"
                   row>
                   <v-radio
@@ -183,6 +200,44 @@
                     <v-btn color="error" block depressed @click="dialog = false">Batal</v-btn>
                   </v-col>
                 </v-row>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+
+          <v-dialog
+            v-model="dialogDetail"
+          >
+            <v-card class="mx-auto" max-width="600">
+              <v-toolbar color="primary" flat dark>
+                <v-toolbart-tiltle>Detail Mutasi</v-toolbart-tiltle>
+                <v-spacer></v-spacer>
+                <v-btn color="error" text @click="dialogDetail = false"><v-icon>mdi-close</v-icon></v-btn>
+              </v-toolbar>
+              <v-card-text>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td width="35%">Tanggal</td>
+                      <td width="65%"> <div class="font-weight-bold"> : {{ detail.tanggal }}</div></td>
+                    </tr>
+                    <tr>
+                      <td>Jenis</td>
+                      <td> <div class="font-weight-bold"> : {{ detail.jenis }}</div></td>
+                    </tr>
+                    <tr>
+                      <td>Nominal</td>
+                      <td> <div class="font-weight-bold"> : {{ detail.nominal }}</div></td>
+                    </tr>
+                      <tr>
+                      <td>Keterangan</td>
+                      <td> <div class="font-weight-bold"> : {{ detail.keterangan }}</div></td>
+                    </tr>
+                    <tr>
+                      <td>Admin</td>
+                      <td> <div class="font-weight-bold"> : {{ detail.admin }}</div></td>
+                    </tr>
+                  </tbody>
+                </table>
               </v-card-text>
             </v-card>
           </v-dialog>
@@ -241,8 +296,7 @@
         dateAwal: null,
         saldoAwal: 0,
         saldoAkhir: 0,
-        header: [
-          {
+        headerList: [{
             text: 'Tanggal',
             value: 'tanggal'
           },
@@ -269,12 +323,27 @@
           nominal: null,
           jenis: null,
         },
-        listJenis: [
-          {value: 'D', text: 'Masuk'},
-          {value: 'K', text: 'Keluar'},
+        listJenis: [{
+            value: 'D',
+            text: 'Masuk'
+          },
+          {
+            value: 'K',
+            text: 'Keluar'
+          },
         ],
         dialog: false,
         titleDialog: null,
+        dialogDetail: false,
+        detail: {
+          admin: null,
+          jenis: null,
+          keterangan: null,
+          nama: null,
+          nominal: null,
+          nomor_mutasi: null,
+          tanggal: null
+        }
 
       },
       watch: {},
@@ -317,14 +386,14 @@
                 const tgl = String(val.tanggal).split(' ')
                 const spTanggal = String(tgl[0]).split('-')
                 const masuk = val.debet // == '0' ? null : parseInt(val.debet)
-                const keluar = val.kredit// == '0' ? null : parseInt(val.kredit)
+                const keluar = val.kredit // == '0' ? null : parseInt(val.kredit)
                 saldo = saldo + masuk - keluar
                 const dorong = {
                   tanggal: `${spTanggal[2]}-${spTanggal[1]}-${spTanggal[0]}`,
                   masuk: masuk != '0' ? masuk.toLocaleString('ID-id') : null,
                   keluar: keluar > 0 ? keluar.toLocaleString('ID-id') : null,
                   saldo: saldo.toLocaleString('ID-id'),
-                  nomor: urut + 1,
+                  nomor: val.nomor,
                   keterangan: val.keterangan,
                   admin: val.admin
 
@@ -334,7 +403,7 @@
               console.log(this.listMutasi);
             })
             .catch((err) => {
-              if(err.response.status == 401) {
+              if (err.response.status == 401) {
                 this.keluar()
                 return false
               }
@@ -342,48 +411,66 @@
 
             })
         },
-        loadDialog(){
+        async lihatDetail(nomor) {
+          await axios.get('<?= base_url(); ?>api/admin/mutasi-detail/' + nomor, this.config)
+            .then((res) => {
+              console.log(res.data);
+              this.detail.admin = res.data.admin
+              this.detail.jenis = res.data.jenis == 'D' ? 'Kas masuk' : 'Kas keluar'
+              this.detail.keterangan = res.data.keterangan
+              this.detail.nama = res.data.nama
+              this.detail.nominal = parseInt(res.data.nominal).toLocaleString("ID-id")
+              this.detail.nomor_mutasi = res.data.nomor_mutasi
+              this.detail.tanggal = res.data.tanggal
+
+              this.dialogDetail = true
+              this.refresh()
+            })
+            .catch((err) => {
+              console.log(err.response);
+            })
+        },
+        loadDialog() {
           this.mutasi.nominal = null
           this.mutasi.keterangan = null
           this.mutasi.jenis = null
           this.dialog = true
           this.titleDialog = 'Form Transaksi Kas'
         },
-        async simpan(){
+        async simpan() {
           const param = {
             nominal: this.mutasi.nominal,
             keterangan: this.mutasi.keterangan,
             jenis: this.mutasi.jenis
           }
-          await axios.post('<?= base_url()?>api/admin/mutasi', param, this.config)
-          .then((res) => {
-            console.log(res.data);
-            this.toast('success', res.data.pesan)
-            this.dialog = false
-            this.getList()
-            this.refresh()
-          })
-          .catch((err) => {
-            console.log(err.response);
-            if(err.response.status == 401) {
-              this.keluar
-            } else if(err.response.status == 409) {
-              const errNominal = err.response.data.messages.nominal ? err.response.data.messages.nominal +'\n' : ''
-              const errKeterangan = err.response.data.messages.keterangan ? err.response.data.messages.keterangan +'\n' : ''
-              const errJenis = err.response.data.messages.jenis ? err.response.data.messages.jenis : ''
+          await axios.post('<?= base_url() ?>api/admin/mutasi', param, this.config)
+            .then((res) => {
+              console.log(res.data);
+              this.toast('success', res.data.pesan)
+              this.dialog = false
+              this.getList()
+              this.refresh()
+            })
+            .catch((err) => {
+              console.log(err.response);
+              if (err.response.status == 401) {
+                this.keluar
+              } else if (err.response.status == 409) {
+                const errNominal = err.response.data.messages.nominal ? err.response.data.messages.nominal + '\n' : ''
+                const errKeterangan = err.response.data.messages.keterangan ? err.response.data.messages.keterangan + '\n' : ''
+                const errJenis = err.response.data.messages.jenis ? err.response.data.messages.jenis : ''
 
-              swal('Gagal!', errNominal+errKeterangan+errJenis , 'error')
-            } else if( err.response.status == 402) {
-              swal('Gagal!', err.response.data.messages.error, 'error')
-            } else {
-              swal('Gagal!', JSON.stringify(err.response.data), 'error')
-            }
-          })
+                swal('Gagal!', errNominal + errKeterangan + errJenis, 'error')
+              } else if (err.response.status == 402) {
+                swal('Gagal!', err.response.data.messages.error, 'error')
+              } else {
+                swal('Gagal!', JSON.stringify(err.response.data), 'error')
+              }
+            })
         },
 
-        async lapPdf()
-        {
-          await window.open('<?= base_url();?>api/pdf/mutasi/'+this.dateAwal+'/'+this.dateAkhir, '_blank')
+        async lapPdf() {
+          await window.open('<?= base_url(); ?>api/pdf/mutasi/' + this.dateAwal + '/' + this.dateAkhir, '_blank')
         },
 
       }

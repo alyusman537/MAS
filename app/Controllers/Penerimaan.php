@@ -17,6 +17,11 @@ use App\Libraries\LibFonnte;
 class Penerimaan extends BaseController
 {
     use ResponseTrait;
+    private $db;
+    public function __construct()
+    {
+        $this->db = \Config\Database::connect();
+    }
     public function index()
     {
         //

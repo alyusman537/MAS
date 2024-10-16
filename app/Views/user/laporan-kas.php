@@ -16,11 +16,11 @@
 
         <v-container>
           <v-card class="mx-auto justify-center mt-5 pb-7" max-width="800" flat>
-            <v-toolbar color="teal" flat class="text-center mx-auto" dark>
-              <v-toolbar-title>Mutasi KAS </v-toolbar-title>
+            <v-toolbar color="teal" flat  dark>
+              <v-toolbar-title>Mutasi KAS <br> {{ dateAwal }} s/d {{ dateAkhir }}</v-toolbar-title>
             </v-toolbar>
             <v-card-text class="px-2">
-              <v-row>
+              <!-- <v-row>
                 <v-col cols="6">
                   <v-dialog
                     ref="dialogAwal"
@@ -93,10 +93,10 @@
                     </v-date-picker>
                   </v-dialog>
                 </v-col>
-              </v-row>
+              </v-row> -->
 
               <template>
-                <v-simple-table>
+                <!-- v-simple-table>
                   <template v-slot:default>
                     <thead>
                       <tr>
@@ -131,7 +131,24 @@
                       </tr>
                     </tbody>
                   </template>
-                </v-simple-table>
+                </v-simple-table-->
+                <v-data-table
+                :headers="headerList"
+                :items="listMutasi"
+                class="elevation-0"
+                :hide-default-footer="true"
+                >
+                <template v-slot:item.detail="{ item }">
+                  <v-btn
+                    color="info"
+                    depressed
+                    rounded
+                    small
+                    dark>
+                    Detail
+                  </v-btn>
+                </template>
+              </v-data-table>
               </template>
 
             </v-card-text>
@@ -185,6 +202,36 @@
         dateAwal: null,
         saldoAwal: 0,
         saldoAkhir: 0,
+        headerList: [
+          {
+            text: 'Tanggal',
+            align: 'start', // sortable: false,
+            value: 'tanggal',
+          },
+          {
+            text: 'Masuk',
+            align: 'end', // 
+            sortable: false,
+            value: 'masuk',
+          },
+          {
+            text: 'Keluar',
+            align: 'end', // 
+            sortable: false,
+            value: 'keluar',
+          },
+          {
+            text: 'Saldo',
+            align: 'end', // 
+            sortable: false,
+            value: 'saldo',
+          },
+          {
+            text: 'Detail',
+            sortable: false,
+            value: 'detail',
+          },
+        ],
         listMutasi: [],
 
       },
