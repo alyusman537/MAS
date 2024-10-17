@@ -102,6 +102,7 @@ Vue.component("admin-nav-bar", {
     return {
       // title: "titlenya navbar",
       url: "http://localhost:8080",
+      // url: "https://alwafa.alyusman.my.id",
       drawer: null,
       group: null,
     };
