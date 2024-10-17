@@ -110,16 +110,16 @@ class Anggota extends BaseController
                     'is_unique' => '{field} sudah terdaftar.'
                 ],
             ],
-            'email'         => [
-                'rules' => 'required|min_length[4]|max_length[100]|valid_email|is_unique[anggota.email]',
-                'errors' => [
-                    'required' => '{field} tidak boleh kosong',
-                    'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
-                    'max_length' => '{field} tidak boleh lebih dari 100 karakter.',
-                    'is_unique' => '{field} sudah terdaftar.',
-                    'valid_email' => '{field} yang anda masukkan tidak valid.'
-                ]
-            ],
+            // 'email'         => [
+            //     'rules' => 'required|min_length[4]|max_length[100]|valid_email|is_unique[anggota.email]',
+            //     'errors' => [
+            //         'required' => '{field} tidak boleh kosong',
+            //         'min_length' => '{field} tidak boleh kurang dari 4 karakter.',
+            //         'max_length' => '{field} tidak boleh lebih dari 100 karakter.',
+            //         'is_unique' => '{field} sudah terdaftar.',
+            //         'valid_email' => '{field} yang anda masukkan tidak valid.'
+            //     ]
+            // ],
             'alamat'      => [
                 'rules' => 'required|min_length[4]|max_length[300]',
                 'errors' => [
@@ -141,7 +141,7 @@ class Anggota extends BaseController
         $mw = new ModelWilayah();
         $json = $this->request->getJSON();
         $nia = strtoupper($json->nia);
-        $email = $json->email;
+        $email = !$json->email ? $nia.'@email.com' : $json->email;
 
         $cek = $ma->select('*')->where('nia', $nia)->first();
         if ($cek) return $this->fail('Nomor induk anggota ' . $nia . ' sudah ada.', 402);
@@ -310,7 +310,7 @@ class Anggota extends BaseController
         if (!$cek) return $this->fail('Data anggota NIA ' . $nia . ' tidak ada.', 402);
         if ($cek['aktif'] != 'aktif') return $this->fail('Data anggota NIA ' . $nia . ' masuk dalam daftar anggota nonaktif.', 402);
         $data = [
-            'password' => password_hash($nia, PASSWORD_DEFAULT),
+            'password' => password_hash(strtoupper($nia), PASSWORD_DEFAULT),
         ];
 
         try {

@@ -146,8 +146,8 @@ class Login extends BaseController
         $ma = new ModelAnggota();
 
         $json = $this->request->getJSON();
-        $nia = $json->nia;
-        $password = $json->password;
+        $nia = strtoupper($json->nia);
+        $password = strtoupper($json->password);
 
         $user = $ma->where('nia', $nia)->first();
 

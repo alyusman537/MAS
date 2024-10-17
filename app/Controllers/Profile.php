@@ -183,8 +183,8 @@ class Profile extends BaseController
 
         $json = $this->request->getJSON();
 
-        $password_lama = $json->password_lama;
-        $password_baru = $json->password_baru;
+        $password_lama =strtoupper($json->password_lama);
+        $password_baru = strtoupper($json->password_baru);
         // $konfirmasi_password = $json->konfirmasi_password;
 
         $cek = $ma->select('*')->where(['nia' => $nia])->first();

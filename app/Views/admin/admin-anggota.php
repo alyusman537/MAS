@@ -462,7 +462,7 @@
               this.getAnggota()
             })
             .catch((err) => {
-              if(err.response.status) {
+              if(err.response.status === 401) {
                 this.keluar()
               }
               if (err.response.status === 409) {
