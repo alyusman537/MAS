@@ -34,7 +34,7 @@ class Cors extends BaseConfig
          *   - ['http://localhost:8080']
          *   - ['https://www.example.com']
          */
-        'allowedOrigins' => ['http://localhost:3500', 'http://localhost:8050', 'http://192.168.1.63:8050'],
+        'allowedOrigins' => ['*'],
 
         /**
          * Origin regex patterns for the `Access-Control-Allow-Origin` header.
@@ -103,13 +103,4 @@ class Cors extends BaseConfig
         'maxAge' => 7200,
     ];
 
-    public array $api = [
-        'allowedOrigins'         => ['http://localhost:3500', 'http://localhost:8050' ],
-        'allowedOriginsPatterns' => [],
-        'supportsCredentials'    => true,
-        'allowedHeaders'         => ['Authorization', 'Content-Type'],
-        'exposedHeaders'         => [],
-        'allowedMethods'         => ['GET', 'POST', 'PUT', 'DELETE'],
-        'maxAge'                 => 7200,
-    ];
 }

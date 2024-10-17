@@ -312,6 +312,34 @@
               console.log('status error : ',err.response.status);
             })
         },
+        hapusWilayah(kode) {
+          Swal.fire({
+            title: "Lakukan penghapusan data wilayah ini?",
+            showDenyButton: true,
+            confirmButtonText: "Ya",
+            denyButtonText: "Tidak",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.delete('<?= base_url()?>api/admin/wilayah/'+kode, this.config)
+                .then((res) => {
+                  this.refresh()
+                  this.getWilayah()
+                  Swal.fire({
+                    title: "Berhasil!",
+                    text: "Data wilayah berhasil dihapus.",
+                    icon: "success"
+                  });
+                })
+                .catch((err) => {
+                  if(err.response.status == 401) {
+                this.keluar()
+              }
+                  console.log(err.response.data);
+                  
+                })
+            }
+          });
+        },
       }
     })
   </script>
