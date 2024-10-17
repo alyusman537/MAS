@@ -9,6 +9,7 @@ use App\Models\ModelInfaq;
 use App\Models\ModelPembayaran;
 use App\Models\ModelUmum;
 use App\Models\ModelAnggota;
+use App\Models\ModelMutasi;
 
 use App\Libraries\JwtDecode;
 use App\Libraries\LibMutasi;
@@ -17,6 +18,11 @@ use App\Libraries\LibFonnte;
 class Penerimaan extends BaseController
 {
     use ResponseTrait;
+    private $db;
+    public function __construct()
+    {
+        $this->db = \Config\Database::connect();
+    }
     public function index()
     {
         //
@@ -112,28 +118,42 @@ class Penerimaan extends BaseController
             'validator' => $validator,
             'tanggal_validasi' => $tgl_sekarang,
         ];
+        $data_mutasi = [
+            'tanggal' => date('Y-m-d'),
+            'nomor_mutasi' => 'PI-' . time(),
+            'jenis' => 'D',
+            'nominal' => $bayar['bayar'],
+            'admin' => $validator,
+            'keterangan' => 'Penerimaan infaq nomor ' . $nomor_pembayaran
+        ];
 
-        $mp->set($data);
-        $mp->where('nomor_pembayaran', $nomor_pembayaran);
-        $update = $mp->update();
-        if (!$update) return $this->fail('Gagal terima pembayaran infaq kode ' . $nomor_pembayaran . ' .', 402);
+        $mMutasi = new ModelMutasi();
 
-        $libMutasi = new LibMutasi();
-        $mutasi = $libMutasi->transaksi('PI-' . time(), date('Y-m-d'), 'D', $bayar['bayar'], 'Penerimaan infaq nomor ' . $nomor_pembayaran, $validator);
-        if (!$mutasi) return $this->fail('Infaq berhasil diterima namun gagal simpan pada mutasi.');
+        $this->db->transBegin();
+        try {
+            $mp->set($data);
+            $mp->where('nomor_pembayaran', $nomor_pembayaran);
+            $mp->update();
 
-        $fonnte = new LibFonnte();
-        $ma = new ModelAnggota();
-        $nomorAnggota = $ma->select('wa')->where(['nia' => $bayar['nia']])->first();
+            $mMutasi->insert($data_mutasi);
+            $this->db->transCommit();
 
-        $nomor = $nomorAnggota['wa'];
-        $pesan = '*Jazakallah Ahsanal Jaza* 
+            $fonnte = new LibFonnte();
+            $ma = new ModelAnggota();
+            $nomorAnggota = $ma->select('wa')->where(['nia' => $bayar['nia']])->first();
 
-Pembayaran infaq *' . $infaq['acara'] . '* dari Anda telah diterima oleh Admin *' . $validator . '*'."
+            $nomor = $nomorAnggota['wa'];
+            $pesan = '*Jazakallah...* 
+
+Pembayaran infaq *' . $infaq['acara'] . '* dari Anda telah diterima oleh Admin *' . $validator . '*' . "
 Al-wafa Bi'ahdillah";
-        $kirim = $fonnte::kirimPesan($nomor, $pesan);
+            $kirim = $fonnte::kirimPesan($nomor, $pesan);
 
-        return $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
+            return $this->respond(['pesan' => 'Pembayaran infaq Anda berhasil diterima oleh ' . $validator . '.']);
+        } catch (\Throwable $th) {
+            $this->db->transRollback();
+            return $this->fail('Gagal terima pembayaran infaq kode ' . $nomor_pembayaran . ' .', 402);
+        }
     }
 
     public function terimaUmum($kode)
@@ -143,6 +163,8 @@ Al-wafa Bi'ahdillah";
         $user = $decoder->admin($header);
 
         $mp = new ModelUmum();
+        $mMutasi = new ModelMutasi();
+
         $tgl_sekarang = date('Y-m-d H:i:s');
         $validator = $user->sub; //dari token
 
@@ -157,26 +179,42 @@ Al-wafa Bi'ahdillah";
             'tanggal_validasi' => $tgl_sekarang,
         ];
 
-        $mp->set($data);
-        $mp->where('kode', $kode);
-        $update = $mp->update();
-        if (!$update) return $this->fail('Gagal terima infaq umum nomor ' . $kode, 402);
+        $data_mutasi = [
+            'tanggal' => date('Y-m-d'),
+            'nomor_mutasi' => 'PI-' . time(),
+            'jenis' => 'D',
+            'nominal' => $bayar['nominal'],
+            'admin' => $validator,
+            'keterangan' => 'Penerimaan infaq nomor ' . $kode
+        ];
+        $this->db->transBegin();
+        try {
+            $mp->set($data);
+            $mp->where('kode', $kode);
+            $mp->update();
 
-        $libMutasi = new LibMutasi();
-        $mutasi = $libMutasi->transaksi('PI-' . time(), date('Y-m-d'), 'D', $bayar['nominal'], 'Penerimaan infaq umum nomor ' . $kode, $validator);
-        if (!$mutasi) return $this->fail('Infaq berhasil diterima namun gagal simpan pada mutasi.');
+            $mMutasi->insert($data_mutasi);
+            $this->db->transCommit();
 
-        $fonnte = new LibFonnte();
-        $ma = new ModelAnggota();
-        $nomorAnggota = $ma->select('wa')->where(['nia' => $bayar['nia']])->first();
+            // $libMutasi = new LibMutasi();
+            // $mutasi = $libMutasi->transaksi('PI-' . time(), date('Y-m-d'), 'D', $bayar['nominal'], 'Penerimaan infaq umum nomor ' . $kode, $validator);
+            // if (!$mutasi) return $this->fail('Infaq berhasil diterima namun gagal simpan pada mutasi.');
 
-        $nomor = $nomorAnggota['wa'];
-        $pesan = '*Jazakallah Ahsanal Jaza* 
+            $fonnte = new LibFonnte();
+            $ma = new ModelAnggota();
+            $nomorAnggota = $ma->select('wa')->where(['nia' => $bayar['nia']])->first();
 
-Pembayaran infaq umum untuk *' . $bayar['keterangan'] . '* dari Anda telah diterima oleh Admin *' . $validator . '*'."
+            $nomor = $nomorAnggota['wa'];
+            $pesan = '*Jazakallah Ahsanal Jaza* 
+
+Pembayaran infaq umum untuk *' . $bayar['keterangan'] . '* dari Anda telah diterima oleh Admin *' . $validator . '*' . "
 Al-wafa Bi'ahdillah.";
-        $kirim = $fonnte::kirimPesan($nomor, $pesan);
+            $kirim = $fonnte::kirimPesan($nomor, $pesan);
 
-        return $this->respond(['pesan' => 'Pembayaran infaq umum kode ' . $kode . ' berhasil diterima oleh ' . $validator . '.']);
+            return $this->respond(['pesan' => 'Pembayaran infaq umum kode ' . $kode . ' berhasil diterima oleh ' . $validator . '.']);
+        } catch (\Throwable $th) {
+            $this->db->transRollback();
+            return $this->fail('Gagal terima infaq umum nomor ' . $kode, 402);
+        }
     }
 }

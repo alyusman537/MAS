@@ -14,6 +14,11 @@ use App\Libraries\LibFonnte;
 class Umum extends BaseController
 {
     use ResponseTrait;
+    private $db;
+    public function __construct()
+    {
+        $this->db = \Config\Database::connect();
+    }
     public function periode($tgl_awal, $tgl_akhir)
     {
         $mu = new ModelUmum();
@@ -36,7 +41,7 @@ class Umum extends BaseController
             $jam_validasi = explode(' ', $data['tanggal_validasi'])[1];
         }
         $tanggal = explode('-', $data['tanggal']);
-        $bukti = $data['bukti'] == null ? base_url().'No_Image_Available.jpg' : base_url() . 'api/render/bukti/' . $data['bukti'];
+        $bukti = $data['bukti'] == null ? base_url() . 'No_Image_Available.jpg' : base_url() . 'api/render/bukti/' . $data['bukti'];
         $resp = [
             'bukti' => $bukti,
             'tanggal' => $tanggal[2] . '-' . $tanggal[1] . '-' . $tanggal[0],
@@ -79,31 +84,82 @@ class Umum extends BaseController
         $user = $decoder->decoder($header);
         $nia = $user->sub; //dari token
 
-        $mu = new ModelUmum();
-        $json = $this->request->getJSON();
-        $data = [
-            'tanggal' => date('Y-m-d'),
-            'kode' => time() . '-' . $nia,
-            'nominal' => $json->nominal,
-            'nia' => $nia,
-            'keterangan' => $json->keterangan
+        helper(['form', 'url']);
+        $rules = [
+            'nominal'         => [
+                'rules' =>  'required',
+                'errors' => [
+                    'required' => '{field} tidak boleh kosong.',
+                ]
+            ],
+            'keterangan'         => [
+                'rules' =>  'required|min_length[4]|max_length[300]',
+                'errors' => [
+                    'required' => '{field} tidak boleh kosong.',
+                    'min_length' => '{field} tidak boleh kurang dari 4 karakter',
+                    'max_length' => '{field} tidak boleh lebih dari 300 karakter'
+                ]
+            ],
+            'bukti' => [
+                'rules' => [
+                    'uploaded[bukti]',
+                    'is_image[bukti]',
+                    'mime_in[bukti,image/jpg,image/jpeg,image/png]',
+                    'max_size[bukti,2048]',
+                    // 'max_dims[userfile,1024,768]',
+                ],
+                'errors' => [
+                    'uploaded' => 'tidak ada gambar yagn diupload',
+                    'is_image' => 'file harus berupa gambar',
+                    'mime_in' => 'gambar harus berupa jpg atau jpeg',
+                    'max_size' => 'ukurang gambar harus kurang dari 2mb'
+                ]
+            ]
         ];
+
+        if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
+
+        $mu = new ModelUmum();
+        // $json = $this->request->getJSON();
+        // $this->db->transBegin();
         try {
-            $insert = $mu->insert($data);
-            if (!$insert) return $this->fail($mu->errors(), 409);
+            $x_file = $this->request->getFile('bukti');
+            $ukuran = filesize($x_file);
+            $namaFoto = $x_file->getRandomName();
+            
+            $image = service('image');
+            $image->withFile($x_file)
+            ->resize(500, 500, true, 'height')
+            ->save(WRITEPATH . '/uploads/bukti/' . $namaFoto);
+            
+            unlink($x_file);
+            try {
+                $data = [
+                    'tanggal' => date('Y-m-d'),
+                    'kode' => time() . '-' . $nia,
+                    'nominal' => $this->request->getVar('nominal'), // $json->nominal,
+                    'nia' => $nia,
+                    'keterangan' => $this->request->getVar('keterangan'), //$json->keterangan
+                    'bukti' => $namaFoto
+                ];
+                $insert = $mu->insert($data);
+                if (!$insert) unlink(WRITEPATH . '/uploads/bukti/' . $namaFoto);
 
-            $fonnte = new LibFonnte();
-            $ma = new ModelAnggota();
-            $admin = $ma->select('wa')->where(['level' => 'admin'])->findAll();
-            $nomoradmin = [];
-            foreach ($admin as $key => $val) {
-                $nomoradmin [] = $val['wa'];
+                $fonnte = new LibFonnte();
+                $ma = new ModelAnggota();
+                $admin = $ma->select('wa')->where(['level' => 'admin'])->findAll();
+                $nomoradmin = [];
+                foreach ($admin as $key => $val) {
+                    $nomoradmin[] = $val['wa'];
+                }
+                $nomor = implode(",", $nomoradmin);
+                $pesan = 'Mohon segera terima pembayaran infaq Umum untuk *' . $this->request->getVar('keterangan') . '* dari Nomor anggoa *' . $nia . '*';
+                $fonnte::kirimPesan($nomor, $pesan);
+
+                return $this->respondCreated($data);
+            } catch (\Throwable $th) {
+                return $this->fail($th->getMessage(), 500);
             }
-            $nomor = implode(",", $nomoradmin);
-            $pesan = 'Mohon segera terima pembayaran infaq Umum untuk *'.$json->keterangan.'* dari Nomor anggoa *'.$nia.'*';
-            $kirim = $fonnte::kirimPesan($nomor, $pesan);
-
-            return $this->respondCreated($data);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage(), 500);
         }

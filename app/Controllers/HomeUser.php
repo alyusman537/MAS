@@ -49,9 +49,7 @@ use ResponseTrait;
 
         $nia = $user->sub; //dari token
         $mu = new ModelUmum();
-        
         $data = $mu->select('*')->where('nia', $nia)->orderBy('tanggal', 'DESC')->limit(50)->findAll();
-
         return $this->respond($data);
     }
 }
