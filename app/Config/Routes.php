@@ -25,7 +25,7 @@ $routes->get('/api/user/profile', 'Profile::index');
 $routes->get('/api/user/profile/edit/(:any)', 'Profile::edit/$1');
 $routes->put('/api/user/profile/update/(:any)', 'Profile::update/$1');
 $routes->get('/api/user/profile/edit-password', 'Profile::editPassword');
-$routes->put('/api/user/profile/update-password/(:any)', 'profile::updatePassword/$1');
+$routes->put('/api/user/profile/update-password/(:any)', 'Profile::updatePassword/$1');
 $routes->post('/api/user/profile/foto', 'Profile::foto');
 
 $routes->get('/api/user/infaq-umum/new', 'Umum::new');

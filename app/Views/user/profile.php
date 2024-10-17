@@ -397,9 +397,9 @@
         },
         async updatePassword() {
           const param = {
-            password_lama: this.password_lama,
-            password_baru: this.password_baru,
-            konfirmasi_password: this.konfirmasi_password,
+            password_lama: String(this.password_lama).toUpperCase(),
+            password_baru: String(this.password_baru).toUpperCase(),
+            konfirmasi_password: String(this.konfirmasi_password).toUpperCase(),
           }
           await axios.put('<?= base_url(); ?>api/user/profile/update-password/' + this.id_user, param, this.config)
             .then((res) => {
