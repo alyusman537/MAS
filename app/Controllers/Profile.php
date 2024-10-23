@@ -228,7 +228,7 @@ class Profile extends BaseController
             ],
         ];
         if (! $this->validateData([], $validationRule)) {
-            return $this->fail($this->validator->getErrors());
+            return $this->fail($this->validator->getErrors(), 400);
         }
         $mm = new ModelAnggota();
 

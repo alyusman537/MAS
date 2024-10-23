@@ -17,6 +17,11 @@ use CodeIgniter\Database\BaseBuilder;
 class Pembayaran extends BaseController
 {
     use ResponseTrait;
+    private $db;
+    public function __construct()
+    {
+        $this->db = \Config\Database::connect();
+    }
     public function index()
     {
         //
@@ -29,7 +34,7 @@ class Pembayaran extends BaseController
         $user = $decoder->decoder($header);
         $nia = $user->sub; //dari token
 
-        helper(['form']);
+        helper(['form', 'url']);
         $rules = [
             'bayar'          => [
                 'rules' => 'required',
@@ -42,6 +47,22 @@ class Pembayaran extends BaseController
                 'errors' => [
                     'required' => '{field} tidak boleh kosong.',
                 ],
+            ],
+            'bukti' => [
+                // 'label' => 'Image File',
+                'rules' => [
+                    'uploaded[bukti]',
+                    'is_image[bukti]',
+                    'mime_in[bukti,image/jpg,image/jpeg,image/png]',
+                    'max_size[bukti,2048]',
+                    // 'max_dims[userfile,1024,768]',
+                ],
+                'errors' => [
+                    'uploaded' => 'tidak ada gambar yagn diupload',
+                    'is_image' => 'file harus berupa gambar',
+                    'mime_in' => 'gambar harus berupa jpg atau jpeg',
+                    'max_size' => 'ukurang gambar harus kurang dari 2mb'
+                ]
             ],
         ];
         if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
@@ -67,14 +88,42 @@ class Pembayaran extends BaseController
         if ($nominal_pembayaran < $nominal_infaq) return $this->fail('Nominal pembayaran anda kurang dari tagihan iuran', 402);
         if ((int) $bayar['bayar'] >= $nominal_infaq && $bayar['validator'] == null) return $this->fail('Kode infaq Anda sudah terbayar namun belum diterima oleh admin. silahkan hubungi admin untuk konfirmasi.', 402);
 
-        $data = [
-            'bayar' => $nominal_pembayaran,
-            'tanggal_bayar' => $tanggal_bayar,
-            // 'bukti_bayar' => $json->bukti_bayar
-        ];
+        
 
         try {
-            $mp->set($data);
+            $fotoLama = $mp->select('*')->where('nomor_pembayaran', $nomor_pembayaran)->first();
+            if ($fotoLama['nia'] != $nia) return $this->fail('Anda tidak berhak upload bukti bayar orang lain.', 402);
+
+            $foto = isset($fotoLama['bukti_bayar']) ? $fotoLama['bukti_bayar'] : false;
+            $path_ori = WRITEPATH . 'uploads/bukti/' . $foto;
+
+            $x_file = $this->request->getFile('bukti');
+            $namaFoto = $x_file->getRandomName();
+
+            // $x_file->move(WRITEPATH . 'uploads/bukti', $namaFoto);
+            $image = service('image');
+            $image->withFile($x_file)
+                ->resize(500, 500, true, 'height')
+                ->save(WRITEPATH . '/uploads/bukti/' . $namaFoto);
+
+            unlink($x_file);
+
+            $data_bayar = [
+                'bayar' => $nominal_pembayaran,
+                'tanggal_bayar' => $tanggal_bayar,
+                'bukti_bayar' => $namaFoto
+            ];
+
+            // $mp->set(['bukti_bayar' => $namaFoto]);
+            // $mp->where('nomor_pembayaran', $nomor_pembayaran);
+            // $mp->update();
+
+            if ($foto) {
+                if (file_exists($path_ori)) {
+                    unlink($path_ori);
+                }
+            }
+            $mp->set($data_bayar);
             $mp->where(['nomor_pembayaran' => $nomor_pembayaran]);
             $mp->update();
 
@@ -83,10 +132,10 @@ class Pembayaran extends BaseController
             $admin = $ma->select('wa')->where(['level' => 'admin'])->findAll();
             $nomoradmin = [];
             foreach ($admin as $key => $val) {
-                $nomoradmin [] = $val['wa'];
+                $nomoradmin[] = $val['wa'];
             }
             $nomor = implode(",", $nomoradmin);
-            $pesan = 'Mohon segera terima pembayaran infaq *'.$infaq['acara'].'* dari Nomor anggoa *'.$bayar['nia'].'*'."
+            $pesan = 'Mohon segera terima pembayaran infaq *' . $infaq['acara'] . '* dari Nomor anggoa *' . $bayar['nia'] . '*' . "
 
 Al-wafa Bi'ahdillah.";
             $kirim = $fonnte::kirimPesan($nomor, $pesan);
@@ -130,7 +179,7 @@ Al-wafa Bi'ahdillah.";
         $mm = new ModelPembayaran();
 
         $fotoLama = $mm->select('*')->where('nomor_pembayaran', $nomor_pembayaran)->first();
-        if($fotoLama['nia'] != $nia) return $this->fail('Anda tidak berhak upload bukti bayar orang lain.', 402);
+        if ($fotoLama['nia'] != $nia) return $this->fail('Anda tidak berhak upload bukti bayar orang lain.', 402);
 
         $foto = isset($fotoLama['bukti_bayar']) ? $fotoLama['bukti_bayar'] : false;
         $path_ori = WRITEPATH . 'uploads/bukti/' . $foto;
@@ -172,7 +221,7 @@ Al-wafa Bi'ahdillah.";
             return $this->fail($th->getMessage(), 500);
         }
     }
-    
+
     public function listInfaqBelumLunas($kode_infaq)
     {
         $mi = new ModelInfaq();
@@ -181,7 +230,7 @@ Al-wafa Bi'ahdillah.";
         $bayar = $mp->listBayar($kode_infaq);
         $data_bayar = [];
         foreach ($bayar as $key => $val) {
-            $is_lunas = (int) $val->bayar > 0 ? 'Pending' : ((int) $val->bayar > 0 && $val->validator != null ? 'Lunas' : 'Belum Bayar') ;
+            $is_lunas = (int) $val->bayar > 0 ? 'Pending' : ((int) $val->bayar > 0 && $val->validator != null ? 'Lunas' : 'Belum Bayar');
             $dorong = [
                 'nia' => $val->nia,
                 'nama' => $val->nama,
@@ -192,14 +241,13 @@ Al-wafa Bi'ahdillah.";
                 'tanggal_validasi' => $val->tanggal_validasi,
                 'is_lunas' => $is_lunas
             ];
-            $data_bayar [] = $dorong;
+            $data_bayar[] = $dorong;
         }
         $data = [
             'infaq' => $infaq,
             'data_bayar' => $data_bayar
         ];
         return $this->respond($data);
-
     }
 
     public function pdfKartuInfaq($kode_infaq)
@@ -210,7 +258,7 @@ Al-wafa Bi'ahdillah.";
         $bayar = $mp->listBayar($kode_infaq);
         $data_bayar = [];
         foreach ($bayar as $key => $val) {
-            $is_lunas = (int) $val->bayar > 0 ? 'Pending' : ((int) $val->bayar > 0 && $val->validator != null ? 'Lunas' : 'Belum') ;
+            $is_lunas = (int) $val->bayar > 0 ? 'Pending' : ((int) $val->bayar > 0 && $val->validator != null ? 'Lunas' : 'Belum');
             $dorong = [
                 'nia' => $val->nia,
                 'nama' => $val->nama,
@@ -221,13 +269,13 @@ Al-wafa Bi'ahdillah.";
                 'tanggal_validasi' => $val->tanggal_validasi,
                 'is_lunas' => $is_lunas
             ];
-            $data_bayar [] = $dorong;
+            $data_bayar[] = $dorong;
         }
         $data = [
             'infaq' => $infaq,
             'data_bayar' => $data_bayar
         ];
-        
+
         $Pdfgenerator = new PdfGenerator();
         // filename dari pdf ketika didownload
         $file_pdf = 'Data-anggota';
@@ -241,5 +289,4 @@ Al-wafa Bi'ahdillah.";
         // run dompdf
         $Pdfgenerator->generate($html, $file_pdf, $paper, $orientation);
     }
-    
 }

@@ -454,6 +454,8 @@
             this.attFile = null;
             return false;
           }
+          console.log(event);
+          
           this.attFile = event;
           this.linkFoto = URL.createObjectURL(event);
         },

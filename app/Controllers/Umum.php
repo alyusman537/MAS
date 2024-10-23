@@ -89,7 +89,7 @@ class Umum extends BaseController
             'nominal'         => [
                 'rules' =>  'required',
                 'errors' => [
-                    'required' => '{field} tidak boleh kosong.',
+                    'required' => 'Nominal tidak boleh kosong.',
                 ]
             ],
             'keterangan'         => [

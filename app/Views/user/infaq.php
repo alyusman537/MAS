@@ -114,7 +114,7 @@
                     </v-file-input>
                   </v-col>
                   <v-col cols="12">
-                    <v-btn color="success" block depressed @click="uploadBuktiBayar()">Bayar sekarang</v-btn>
+                    <v-btn color="success" block depressed @click="bayarInfaq()">Bayar sekarang</v-btn>
                   </v-col>
                   <v-col cols="12">
                     <v-btn color="error" block depressed @click="dialogBayar = false">Batal</v-btn>
@@ -242,6 +242,7 @@
         async getListInfaq() {
           await axios.get('<?= base_url(); ?>/api/user/home/daftar-infaq/' + this.nia, this.config)
             .then((res) => {
+              console.log(res.data);
               this.listInfaq = res.data.map((val) => {
                 const spTanggal = String(val.tanggal).split('-')
                 const nominal = parseInt(val.nominal)
@@ -254,7 +255,7 @@
                   'nominal': nominal.toLocaleString('ID-id'),
                   'bayar': bayar.toLocaleString('ID-id'),
                   'lunas': val.validator != null && status_lunas === true? 'Lunas' : ( val.validator == null && status_lunas === false ? 'Bayar' : 'Pending'),
-                  'warna_lunas': val.validator != null && status_lunas === true? 'success' : ( val.validator == null && status_lunas === false ? 'eroor' : 'warning'),
+                  'warna_lunas': val.validator != null && status_lunas === true? 'success' : ( val.validator == null && status_lunas === false ? 'error' : 'warning'),
                   'validator': val.validator,
                   'intBayar': bayar,
                   'intNominal': nominal
@@ -290,11 +291,16 @@
             this.toast('error', 'Anda belum memasukkan nominal pembayaran')
             return false
           }
+          let fdata = new FormData();
+          fdata.append("bukti", this.attFile);
+          fdata.append("bayar", this.bayar.nominal_bayar)
+          fdata.append("tanggal_bayar", this.bayar.tanggal_bayar)
+
           const param = {
             bayar: this.infaq.nominal_bayar,
             tanggal_bayar: this.infaq.tanggal_bayar
           }
-          await axios.put('<?= base_url(); ?>/api/user/pembayaran/' + this.infaq.nomor_pembayaran, param, this.config)
+          await axios.put('<?= base_url(); ?>/api/user/pembayaran/' + this.infaq.nomor_pembayaran, fdata, this.config)
             .then((res) => {
               // console.log(res.data);
               this.refresh()
