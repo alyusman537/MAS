@@ -114,7 +114,9 @@
                     </v-file-input>
                   </v-col>
                   <v-col cols="12">
-                    <v-btn color="success" block depressed @click="bayarInfaq()">Bayar sekarang</v-btn>
+                    <!-- <v-btn color="success" block depressed @click="bayarInfaq()">Bayar sekarang</v-btn> -->
+                    <v-btn color="success" block depressed @click="uploadBuktiBayar()">Bayar sekarang</v-btn>
+                    <!-- bayarInfaq -->
                   </v-col>
                   <v-col cols="12">
                     <v-btn color="error" block depressed @click="dialogBayar = false">Batal</v-btn>
@@ -267,6 +269,10 @@
               console.log(this.listInfaq);
             })
             .catch((err) => {
+              if(err.response.status === 401) {
+                localStorage.clear()
+                window.open("<?= base_url()?>login", '_self')
+              }
               console.log('getlist infq ', err);
 
             })
@@ -291,16 +297,24 @@
             this.toast('error', 'Anda belum memasukkan nominal pembayaran')
             return false
           }
-          let fdata = new FormData();
-          fdata.append("bukti", this.attFile);
-          fdata.append("bayar", this.bayar.nominal_bayar)
-          fdata.append("tanggal_bayar", this.bayar.tanggal_bayar)
+          let fdata = new FormData()
+            fdata.append('bayar', this.infaq.nominal_bayar)
+            fdata.append("tanggal_bayar", this.infaq.tanggal_bayar)
+            fdata.append("bukti", this.attFile)
+          // try {
+          // } catch (error) {
+          //   console.log(error);
+          // }
 
+          // return console.log(option);
           const param = {
             bayar: this.infaq.nominal_bayar,
-            tanggal_bayar: this.infaq.tanggal_bayar
+            tanggal_bayar: this.infaq.tanggal_bayar,
+            form: fdata
           }
-          await axios.put('<?= base_url(); ?>/api/user/pembayaran/' + this.infaq.nomor_pembayaran, fdata, this.config)
+          console.log(param);
+          
+          await axios.post('<?= base_url(); ?>/api/user/pembayaran/' + this.infaq.nomor_pembayaran, fdata, this.config)
             .then((res) => {
               // console.log(res.data);
               this.refresh()
@@ -315,7 +329,10 @@
               if (err.response.status === 402) {
                 this.toast('error', err.response.data.messages.error)
               }
-              console.log(err);
+              if (err.response.status === 409) {
+                alert(JSON.stringify(err.response.data.messages))
+              }
+              console.log(err.response.data);
 
             })
         },
@@ -340,6 +357,8 @@
           }
           let fdata = new FormData();
           fdata.append("bukti", this.attFile);
+          return console.log(fdata);
+          
           await axios
             .post('<?= base_url(); ?>api/user/pembayaran-bukti/' + this.infaq.nomor_pembayaran, fdata, this.config)
             .then((res) => {

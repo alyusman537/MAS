@@ -32,7 +32,7 @@ class Pembayaran extends BaseController
         $header = $this->request->getServer('HTTP_AUTHORIZATION');
         $decoder = new JwtDecode();
         $user = $decoder->decoder($header);
-        $nia = $user->sub; //dari token
+        $nia = strtoupper($user->sub); //dari token
 
         helper(['form', 'url']);
         $rules = [
@@ -66,16 +66,20 @@ class Pembayaran extends BaseController
             ],
         ];
         if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
+        // if (!$this->validate($rules)) return $this->fail($this->validator->getErrors(), 409);
 
         $mi = new ModelInfaq();
         $mp = new ModelPembayaran();
-        $json = $this->request->getJSON();
-        $tanggal_bayar = $json->tanggal_bayar;
-        $nominal_pembayaran = (int) $json->bayar;
+        // $json = $this->request->getJSON();
+        $tanggal_bayar = $this->request->getVar("tanggal_bayar");
+        // return print_r($tanggal_bayar);
+        $nominal_pembayaran = (int) $this->request->getVar("bayar");
+        $x_file = $this->request->getFile('bukti');
 
         if ($tanggal_bayar > date('Y-m-d')) return $this->fail('Tanggal pembayaran yagn anda pilih tidak boleh melebihi tanggal sekarang.', 402);
 
         $bayar = $mp->select('*')->where(['nomor_pembayaran' => $nomor_pembayaran])->first();
+        // return print_r($bayar);
         if (!$bayar) return $this->fail('Kode pembayaran infaq ' . $nomor_pembayaran . ' anda tidak ditemukan.', 402);
         if ($bayar['nia'] != $nia) return $this->fail('Anda tidak berhak membayar nomor pembayaran infaq ' . $nomor_pembayaran . ' ini.', 402);
         if ($bayar['bukti_bayar'] == null) return $this->fail('Silahkan masukkan bukti pembayaran Anda', 402);
@@ -97,7 +101,7 @@ class Pembayaran extends BaseController
             $foto = isset($fotoLama['bukti_bayar']) ? $fotoLama['bukti_bayar'] : false;
             $path_ori = WRITEPATH . 'uploads/bukti/' . $foto;
 
-            $x_file = $this->request->getFile('bukti');
+            
             $namaFoto = $x_file->getRandomName();
 
             // $x_file->move(WRITEPATH . 'uploads/bukti', $namaFoto);
