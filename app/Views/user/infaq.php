@@ -114,8 +114,8 @@
                     </v-file-input>
                   </v-col>
                   <v-col cols="12">
-                    <!-- <v-btn color="success" block depressed @click="bayarInfaq()">Bayar sekarang</v-btn> -->
-                    <v-btn color="success" block depressed @click="uploadBuktiBayar()">Bayar sekarang</v-btn>
+                    <v-btn color="success" block depressed @click="bayarInfaq()">Bayar sekarang</v-btn>
+                    <!-- <v-btn color="success" block depressed @click="uploadBuktiBayar()">Bayar sekarang</v-btn> -->
                     <!-- bayarInfaq -->
                   </v-col>
                   <v-col cols="12">
